@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Японский сад — Красная нить</title>
+
+	<!-- Стили (путь на уровень выше) -->
+	<link rel="stylesheet" href="../css/section.css">
+
+	<!-- Шрифты -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
+		rel="stylesheet">
+</head>
+
+<body class="section-garden">
+
+	<!-- Индикатор загрузки -->
+	<div class="loader" id="loader">
+		<div class="loader-seal">
+			<svg width="50" height="50" viewBox="0 0 50 50" fill="none">
+				<circle cx="25" cy="25" r="22" stroke="#E84040" stroke-width="1.5" stroke-dasharray="8 4"
+					class="loader-circle" />
+				<text x="25" y="31" text-anchor="middle" fill="#E84040" font-family="'Noto Serif JP', serif"
+					font-size="18">静</text>
+			</svg>
+		</div>
+		<p class="loader-text">Загрузка...</p>
+	</div>
+
+	<!-- Контейнер книги -->
+	<div class="book-container" id="bookContainer">
+
+		<!-- Заголовок раздела -->
+		<div class="section-header">
+			<a href="../index.html" class="back-btn">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+					<polyline points="15 18 9 12 15 6"></polyline>
+				</svg>
+				<span>Обложка</span>
+			</a>
+			<div class="section-title-group">
+				<span class="section-subtitle-jp">日本庭園</span>
+				<h1 class="section-title">Японский сад</h1>
+				<span class="section-location">Парк Краснодар</span>
+			</div>
+			<div class="page-indicator">
+				<span id="currentPage">1</span>
+				<span class="indicator-divider">/</span>
+				<span id="totalPages">6</span>
+			</div>
+		</div>
+
+		<!-- Книга -->
+		<div class="book-wrapper">
+			<div id="flipbook">
+				<!-- Страница 1-2 (разворот) -->
+				<div class="page spread-page">
+					<div class="page-content full-photo">
+						<img src="../photos/garden/garden-01.jpg" alt="Вход в сад" class="page-photo">
+						<div class="page-caption">
+							<span class="caption-jp">入り口</span>
+							<span class="caption-ru">Вход в сад</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Страница 3 -->
+				<div class="page">
+					<div class="page-content vertical-photo">
+						<img src="../photos/garden/garden-02.jpg" alt="Мостик" class="page-photo">
+						<div class="page-caption">
+							<span class="caption-jp">橋</span>
+							<span class="caption-ru">Мост над прудом</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Страница 4 -->
+				<div class="page">
+					<div class="page-content">
+						<img src="../photos/garden/garden-03.jpg" alt="Камни" class="page-photo">
+						<div class="page-caption">
+							<span class="caption-jp">石</span>
+							<span class="caption-ru">Сад камней</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Страница 5-6 (разворот) -->
+				<div class="page spread-page">
+					<div class="page-content full-photo">
+						<img src="../photos/garden/garden-04.jpg" alt="Пара в саду" class="page-photo">
+						<div class="page-caption">
+							<span class="caption-jp">二人</span>
+							<span class="caption-ru">Только вдвоём</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Страница 7 -->
+				<div class="page">
+					<div class="page-content vertical-photo">
+						<img src="../photos/garden/garden-05.jpg" alt="Детали" class="page-photo">
+						<div class="page-caption">
+							<span class="caption-jp">細部</span>
+							<span class="caption-ru">Детали сада</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Страница 8 -->
+				<div class="page">
+					<div class="page-content">
+						<img src="../photos/garden/garden-06.jpg" alt="Финал" class="page-photo">
+						<div class="page-caption">
+							<span class="caption-jp">静けさ</span>
+							<span class="caption-ru">Тишина</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Нижняя навигация по разделам -->
+		<nav class="section-nav">
+			<span class="section-nav-item disabled">← Сад</span>
+			<a href="zags.html" class="section-nav-item next">
+				ЗАГС
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+					<polyline points="9 18 15 12 9 6"></polyline>
+				</svg>
+			</a>
+		</nav>
+	</div>
+
+	<!-- Светлячки -->
+	<div class="fireflies-container" id="firefliesContainer"></div>
+
+	<!-- Скрипты (пути на уровень выше) -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script src="../lib/turn.min.js"></script>
+	<script src="../js/section.js"></script>
+</body>
+
+</html>

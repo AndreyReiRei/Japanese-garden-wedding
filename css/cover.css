@@ -1,0 +1,822 @@
+/* ============================================================
+   ТАБЛИЦА СОДЕРЖАНИЯ
+   ────────────────────────────────────────────────────────────
+   1.  Сброс стилей и CSS-переменные
+   2.  Базовые стили (html, body)
+   3.  Фоновый шум
+   4.  Основной контейнер
+   5.  Фото на весь экран (фон)
+   6.  Верхняя навигация
+   7.  Нижний информационный блок
+   8.  Оверлей с историей
+   9.  Лепестки сакуры
+   10. Светлячки
+   11. Адаптивность (планшеты, большие экраны)
+   ============================================================ */
+
+/* ============================================================
+   1. СБРОС СТИЛЕЙ И CSS-ПЕРЕМЕННЫЕ
+   ============================================================ */
+
+/* Убираем все отступы и включаем border-box для удобства вёрстки.
+   Отключаем подсветку нажатий на мобильных устройствах. */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: transparent;
+	/* Убирает синюю подсветку при тапе */
+}
+
+/* CSS-переменные (кастомные свойства) для всей цветовой схемы.
+   Меняя значения здесь, можно перекрасить весь сайт. */
+:root {
+	/* Основные цвета фона */
+	--bg-primary: #060606;
+	/* Глубокий чёрный */
+
+	/* Акцентные цвета */
+	--red-accent: #E84040;
+	/* Киноварь (ярко-красный) */
+	--red-glow: rgba(232, 64, 64, 0.5);
+	/* Свечение для красных элементов */
+	--gold: #C9A96E;
+	/* Золотой / охра */
+	--gold-light: #D4BC80;
+	/* Светлое золото */
+
+	/* Цвета текста */
+	--white: #F5F1EC;
+	/* Молочно-белый (не чисто белый) */
+	--text-muted: rgba(255, 255, 255, 0.55);
+	/* Приглушённый белый */
+	--text-dim: rgba(255, 255, 255, 0.6);
+	/* Ещё более тусклый */
+
+	/* Тени для текста (три уровня глубины) */
+	--text-shadow-strong:
+		0 2px 12px rgba(0, 0, 0, 0.7),
+		/* Ближняя тень */
+		0 0 40px rgba(0, 0, 0, 0.4);
+	/* Дальнее размытие */
+	--text-shadow-medium:
+		0 1px 8px rgba(0, 0, 0, 0.6),
+		0 0 20px rgba(0, 0, 0, 0.3);
+	--text-shadow-light:
+		0 1px 4px rgba(0, 0, 0, 0.5);
+
+	/* Скругления */
+	--radius-sm: 8px;
+	/* Маленькое скругление */
+	--radius-md: 10px;
+	/* Среднее */
+	--radius-lg: 14px;
+	/* Крупное (навигация) */
+	--radius-pill: 24px;
+	/* Капсула (кнопки) */
+
+	/* Анимация */
+	--ease-out-expo: cubic-bezier(0.22, 0.61, 0.36, 1);
+	/* Плавное торможение */
+	--transition-fast: 0.15s ease;
+	/* Быстрый переход (нажатия) */
+	--transition-normal: 0.3s ease;
+	/* Обычный переход */
+	--transition-slow: 0.35s var(--ease-out-expo);
+	/* Медленный */
+	--transition-very-slow: 0.55s var(--ease-out-expo);
+	/* Самый медленный */
+}
+
+/* ============================================================
+   2. БАЗОВЫЕ СТИЛИ
+   ============================================================ */
+
+/* html и body занимают 100% высоты экрана.
+   overflow: hidden — полностью запрещаем скролл (страница фиксирована). */
+html,
+body {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+
+	/* Основной шрифт: Cormorant Garamond (латиница), Noto Serif JP (иероглифы).
+       Если оба недоступны — системный шрифт с засечками. */
+	font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+
+	background: var(--bg-primary);
+	color: var(--white);
+
+	/* Сглаживание шрифтов для чёткости */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	/* Запрет выделения текста (чтобы страница ощущалась как приложение) */
+	user-select: none;
+	-webkit-user-select: none;
+
+	/* Оптимизация touch-событий */
+	touch-action: manipulation;
+}
+
+/* ============================================================
+   3. ФОНОВЫЙ ШУМ
+   ============================================================ */
+
+/* Создаёт едва заметную текстуру "бумаги ручного отлива" 
+   с помощью SVG-фильтра. Не влияет на производительность. */
+.bg-noise {
+	position: fixed;
+	/* Фиксирован относительно окна */
+	inset: 0;
+	/* Растянут на весь экран (аналог top/right/bottom/left: 0) */
+	z-index: 0;
+	/* Самый нижний слой */
+	pointer-events: none;
+	/* Не перехватывает клики */
+
+	/* SVG в base64 генерирует шум через feTurbulence */
+	background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+	opacity: 0.5;
+	/* Приглушаем шум */
+}
+
+/* ============================================================
+   4. ОСНОВНОЙ КОНТЕЙНЕР
+   ============================================================ */
+
+/* Flex-контейнер, распределяющий контент по вертикали:
+   - навигация вверху
+   - фото по центру (фоном)
+   - текст внизу */
+.cover-container {
+	width: 100%;
+	height: 100vh;
+	/* 100% высоты viewport */
+	height: 100dvh;
+	/* Динамический viewport (для iPhone с чёлкой) */
+
+	display: flex;
+	flex-direction: column;
+	/* Элементы идут сверху вниз */
+	justify-content: space-between;
+	/* Крайние элементы прижаты к краям */
+	align-items: center;
+	/* Центрирование по горизонтали */
+
+	padding: 20px 16px 28px;
+	/* Отступы: сверху, по бокам, снизу */
+	position: relative;
+	z-index: 1;
+	/* Над шумом, под оверлеем */
+}
+
+/* ============================================================
+   5. ФОТО НА ВЕСЬ ЭКРАН (ФОН)
+   ============================================================ */
+
+/* Контейнер фото — растянут на весь экран позади контента */
+.photo-fullscreen {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	/* Позади всех элементов */
+	overflow: hidden;
+	/* Обрезает края фото */
+}
+
+/* Обёртка для 3D-движения фона.
+   inset: -10px — фото чуть больше экрана, 
+   чтобы при смещении не было чёрных полей. */
+.photo-bg-wrapper {
+	position: absolute;
+	inset: -10px;
+	transform-style: preserve-3d;
+	/* Для будущих 3D-эффектов */
+	transition: transform 0.3s ease-out;
+	/* Плавное возвращение */
+	will-change: transform;
+	/* Оптимизация: браузер готовит GPU */
+}
+
+/* Само изображение */
+.photo-bg {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	/* Заполняет контейнер, сохраняя пропорции */
+	object-position: center 30%;
+	/* Фокус чуть выше центра (лица обычно сверху) */
+	display: block;
+
+	/* Фильтры для атмосферности */
+	filter: brightness(0.8)
+		/* Затемнение */
+		contrast(1.05)
+		/* Лёгкий контраст */
+		saturate(0.85);
+	/* Приглушение цвета (под японскую эстетику) */
+}
+
+/* Затемняющий градиент поверх фото.
+   Верх и низ темнее — для читаемости текста. */
+.photo-overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to bottom,
+			rgba(6, 6, 6, 0.55) 0%,
+			/* Сильное затемнение сверху (для навигации) */
+			rgba(6, 6, 6, 0.2) 25%,
+			/* Плавное осветление */
+			rgba(6, 6, 6, 0.1) 50%,
+			/* Почти прозрачный центр */
+			rgba(6, 6, 6, 0.25) 75%,
+			/* Начало затемнения снизу */
+			rgba(6, 6, 6, 0.65) 100%
+			/* Сильное затемнение снизу (для имён) */
+		);
+	z-index: 1;
+	pointer-events: none;
+	/* Пропускает клики к фото */
+}
+
+/* Виньетка — затемнение по краям, как в объективе */
+.photo-vignette {
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(ellipse at center,
+			transparent 50%,
+			/* Центр полностью прозрачный */
+			rgba(0, 0, 0, 0.3) 80%,
+			/* Лёгкое затемнение */
+			rgba(0, 0, 0, 0.6) 100%
+			/* Края заметно темнее */
+		);
+	z-index: 1;
+	pointer-events: none;
+}
+
+/* Тонкая рамка по периметру экрана */
+.photo-frame-border {
+	position: absolute;
+	inset: 10px;
+	/* Отступ от краёв экрана */
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 2px;
+	z-index: 2;
+	pointer-events: none;
+}
+
+/* Угловые акценты — декоративные уголки в стиле японских рамок */
+.corner {
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	z-index: 3;
+	pointer-events: none;
+}
+
+/* Псевдоэлементы рисуют линии уголка */
+.corner::before,
+.corner::after {
+	content: '';
+	position: absolute;
+	background: rgba(255, 255, 255, 0.5);
+}
+
+.corner::before {
+	width: 100%;
+	height: 1px;
+	/* Горизонтальная линия */
+}
+
+.corner::after {
+	width: 1px;
+	height: 100%;
+	/* Вертикальная линия */
+}
+
+/* Позиционирование уголков */
+.corner-tl {
+	top: 16px;
+	left: 16px;
+}
+
+/* Top-Left */
+.corner-tl::before {
+	top: 0;
+	left: 0;
+}
+
+.corner-tl::after {
+	top: 0;
+	left: 0;
+}
+
+.corner-tr {
+	top: 16px;
+	right: 16px;
+}
+
+/* Top-Right */
+.corner-tr::before {
+	top: 0;
+	right: 0;
+}
+
+.corner-tr::after {
+	top: 0;
+	right: 0;
+}
+
+.corner-bl {
+	bottom: 16px;
+	left: 16px;
+}
+
+/* Bottom-Left */
+.corner-bl::before {
+	bottom: 0;
+	left: 0;
+}
+
+.corner-bl::after {
+	bottom: 0;
+	left: 0;
+}
+
+.corner-br {
+	bottom: 16px;
+	right: 16px;
+}
+
+/* Bottom-Right */
+.corner-br::before {
+	bottom: 0;
+	right: 0;
+}
+
+.corner-br::after {
+	bottom: 0;
+	right: 0;
+}
+
+/* ============================================================
+   6. ВЕРХНЯЯ НАВИГАЦИЯ
+   ============================================================ */
+
+/* Полупрозрачная плашка с размытием (glass-эффект) */
+.top-nav {
+	display: flex;
+	gap: 6px;
+	/* Расстояние между кнопками */
+	width: 100%;
+	max-width: 400px;
+	/* Ограничение ширины */
+	position: relative;
+	z-index: 10;
+	/* Поверх фото */
+
+	padding: 5px;
+	background: rgba(0, 0, 0, 0.35);
+	/* Полупрозрачный чёрный */
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: var(--radius-lg);
+
+	/* Размытие фона (glassmorphism) */
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	/* Префикс для Safari */
+}
+
+/* Кнопка навигации */
+.nav-item {
+	flex: 1;
+	/* Равномерное распределение */
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+
+	padding: 11px 8px;
+	background: transparent;
+	border: none;
+	border-radius: var(--radius-md);
+
+	color: rgba(255, 255, 255, 0.6);
+	cursor: pointer;
+
+	font-family: 'Inter', sans-serif;
+	text-shadow: var(--text-shadow-light);
+
+	transition: all var(--transition-slow);
+}
+
+/* Иконка (эмодзи) */
+.nav-item .nav-icon {
+	font-size: 16px;
+	filter: grayscale(0.3);
+	/* Слегка обесцвечена в неактивном состоянии */
+	transition: all var(--transition-normal);
+}
+
+/* Текстовая метка */
+.nav-item .nav-label {
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+}
+
+/* Активная кнопка */
+.nav-item.active {
+	background: rgba(232, 64, 64, 0.2);
+	/* Красный полупрозрачный фон */
+	color: #fff;
+}
+
+.nav-item.active .nav-icon {
+	filter: grayscale(0);
+	/* Полноцветная иконка */
+	transform: scale(1.08);
+	/* Лёгкое увеличение */
+}
+
+/* Эффект нажатия (тап) */
+.nav-item:active {
+	transform: scale(0.95);
+	/* Кнопка "вдавливается" */
+	transition: transform var(--transition-fast);
+}
+
+/* ============================================================
+   7. НИЖНИЙ ИНФОРМАЦИОННЫЙ БЛОК
+   ============================================================ */
+
+.info-block {
+	text-align: center;
+	position: relative;
+	z-index: 10;
+	/* Поверх фото */
+	width: 100%;
+}
+
+/* Дата вверху блока */
+.date-top {
+	font-family: 'Inter', sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	letter-spacing: 0.25em;
+	/* Широкий межбуквенный интервал */
+	color: var(--gold-light);
+	text-transform: uppercase;
+	margin-bottom: 10px;
+	text-shadow: var(--text-shadow-medium);
+}
+
+/* Строка с именами */
+.names-line {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	margin-bottom: 6px;
+}
+
+/* Имя */
+.name {
+	font-size: 32px;
+	font-weight: 300;
+	/* Тонкое начертание */
+	letter-spacing: 0.06em;
+	color: #fff;
+	text-shadow: var(--text-shadow-strong);
+	/* Сильная тень для читаемости */
+}
+
+/* Амперсанд (&) между именами */
+.ampersand {
+	font-size: 24px;
+	font-style: italic;
+	color: var(--red-accent);
+	font-weight: 400;
+	text-shadow:
+		0 0 20px var(--red-glow),
+		/* Красное свечение */
+		var(--text-shadow-medium);
+}
+
+/* Локация */
+.location {
+	font-family: 'Inter', sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0.15em;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	margin-bottom: 18px;
+	text-shadow: var(--text-shadow-light);
+}
+
+/* Кнопка "История одного дня..." */
+.story-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+
+	background: rgba(0, 0, 0, 0.35);
+	/* Полупрозрачный фон */
+	border: 1px solid rgba(201, 169, 110, 0.3);
+	/* Золотая окантовка */
+	border-radius: var(--radius-pill);
+	padding: 11px 22px;
+
+	color: var(--gold-light);
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 15px;
+	font-weight: 400;
+	letter-spacing: 0.05em;
+	cursor: pointer;
+
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+
+	text-shadow: var(--text-shadow-light);
+	transition: all var(--transition-slow);
+}
+
+/* Иконка стрелки */
+.story-toggle .story-icon {
+	display: flex;
+	align-items: center;
+	transition: transform var(--transition-very-slow);
+}
+
+/* Нажатие на кнопку */
+.story-toggle:active {
+	background: rgba(201, 169, 110, 0.1);
+	border-color: rgba(201, 169, 110, 0.5);
+}
+
+/* ============================================================
+   8. ОВЕРЛЕЙ С ИСТОРИЕЙ
+   ============================================================ */
+
+/* Затемнённый фон поверх всего, выезжает снизу */
+.story-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	/* Самый верхний слой */
+
+	background: rgba(3, 3, 3, 0.97);
+	/* Почти непрозрачный чёрный */
+	backdrop-filter: blur(40px);
+	-webkit-backdrop-filter: blur(40px);
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+	/* Контент прижат к низу */
+
+	transform: translateY(100%);
+	/* По умолчанию скрыт за экраном */
+	transition: transform var(--transition-very-slow);
+	pointer-events: none;
+	/* Не перехватывает клики когда скрыт */
+}
+
+/* Открытое состояние */
+.story-overlay.open {
+	transform: translateY(0);
+	pointer-events: all;
+	/* Можно взаимодействовать */
+}
+
+/* Панель с контентом */
+.story-panel {
+	width: 100%;
+	flex: 1;
+	/* Занимает всё доступное пространство */
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	/* Вертикальное центрирование */
+	align-items: center;
+	padding: 40px 28px;
+	text-align: center;
+	overflow-y: auto;
+	/* Скролл если контент не влезает */
+	-webkit-overflow-scrolling: touch;
+	/* Плавный скролл на iOS */
+}
+
+/* Печать ханко (круглая) */
+.story-seal {
+	margin-bottom: 24px;
+	opacity: 0.9;
+}
+
+/* Заголовок */
+.story-title {
+	font-size: 26px;
+	font-weight: 300;
+	letter-spacing: 0.05em;
+	color: #fff;
+	margin-bottom: 18px;
+	line-height: 1.4;
+	text-shadow:
+		0 2px 8px rgba(255, 1, 1, 0.6),
+		0 1px 20px rgba(255, 0, 0, 0.3);
+}
+
+/* Разделитель с точкой */
+.story-divider {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 32px;
+}
+
+.divider-line {
+	width: 40px;
+	height: 1px;
+	background: rgba(201, 169, 110, 0.3);
+}
+
+.divider-dot {
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background: var(--red-accent);
+	box-shadow: 0 0 8px var(--red-glow);
+}
+
+/* Контейнер для трёх актов */
+.story-content {
+	max-width: 380px;
+	display: flex;
+	flex-direction: column;
+	gap: 28px;
+}
+
+/* Один акт истории */
+.story-act {
+	display: flex;
+	gap: 16px;
+	text-align: left;
+	align-items: flex-start;
+}
+
+/* Номер акта (I, II, III) */
+.act-number {
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 46px;
+	font-weight: 500;
+	color: var(--red-accent);
+	opacity: 0.8;
+	line-height: 1.5;
+	min-width: 50px;
+	text-shadow: 0 0 15px var(--red-glow);
+	margin: 0 10px;
+	border: 1px solid #9502023b;
+	text-align: center;
+	overflow: hidden;
+}
+
+/* Информация акта */
+.act-info {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+/* Название акта */
+.act-title {
+	font-size: 24px;
+	font-weight: 400;
+	letter-spacing: 0.06em;
+	color: #fff;
+	text-shadow: var(--text-shadow-light);
+}
+
+/* Описание */
+.act-desc {
+	font-size: 20px;
+	font-weight: 300;
+	line-height: 1.6;
+	color: var(--text-dim);
+}
+
+/* Кнопка "Свернуть" */
+.story-close {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+
+	background: rgba(232, 64, 64, 0.08);
+	border: 1px solid rgba(232, 64, 64, 0.3);
+	border-radius: var(--radius-pill);
+	padding: 12px 28px;
+
+	color: var(--red-accent);
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 15px;
+	font-weight: 400;
+	letter-spacing: 0.05em;
+	cursor: pointer;
+	margin-top: 36px;
+
+	text-shadow: var(--text-shadow-light);
+	transition: all var(--transition-normal);
+}
+
+.story-close:active {
+	background: rgba(232, 64, 64, 0.15);
+	border-color: rgba(232, 64, 64, 0.5);
+}
+
+/* Индикатор свайпа (полоска внизу) */
+.swipe-indicator {
+	padding: 12px 0 24px;
+	display: flex;
+	justify-content: center;
+}
+
+.swipe-line {
+	width: 44px;
+	height: 4px;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 2px;
+}
+
+/* ============================================================
+   9. ЛЕПЕСТКИ САКУРЫ
+   ============================================================ */
+
+/* Контейнер для всех летящих частиц */
+.petals-container {
+	position: fixed;
+	inset: 0;
+	z-index: 5;
+	/* Над фото, под текстом и навигацией */
+	pointer-events: none;
+	/* Клики проходят сквозь */
+	overflow: hidden;
+	/* Всё что вылетело за экран — обрезается */
+}
+
+/* ============================================================
+   10. СВЕТЛЯЧКИ
+   ============================================================ */
+
+/* Стили для светящихся точек (создаются в JS) */
+/* .petal-glow — динамически добавляется к некоторым лепесткам */
+
+/* ============================================================
+   11. АДАПТИВНОСТЬ
+   ============================================================ */
+
+/* Экраны шире 420px (большие телефоны) */
+@media (min-width: 420px) {
+	.name {
+		font-size: 36px;
+	}
+
+	.date-top {
+		font-size: 14px;
+	}
+
+	.location {
+		font-size: 13px;
+	}
+}
+
+/* Планшеты и десктоп (шире 768px) */
+@media (min-width: 768px) {
+	.cover-container {
+		padding: 28px 40px 36px;
+	}
+
+	.name {
+		font-size: 42px;
+	}
+
+	.top-nav {
+		max-width: 520px;
+		gap: 10px;
+	}
+
+	.nav-item {
+		padding: 14px 20px;
+	}
+
+	.nav-item .nav-label {
+		font-size: 15px;
+	}
+
+	.story-toggle {
+		font-size: 16px;
+		padding: 12px 28px;
+	}
+}

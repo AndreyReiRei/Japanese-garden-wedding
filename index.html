@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Андрей & Татьяна — Красная нить</title>
+	<link rel="stylesheet" href="css/cover.css">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
+		rel="stylesheet">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<body>
+
+	<!-- Фоновый шум -->
+	<div class="bg-noise"></div>
+
+	<!-- Основной контейнер -->
+	<div class="cover-container">
+
+		<!-- Фото на весь экран (фоном) -->
+		<div class="photo-fullscreen" id="photoFullscreen">
+			<div class="photo-bg-wrapper" id="photoBgWrapper">
+				<img src="photos/cover/Logo.jpg" alt="Андрей и Татьяна" class="photo-bg" id="photoBg">
+				<!-- Затемнение для читаемости текста -->
+				<div class="photo-overlay"></div>
+				<!-- Виньетка -->
+				<div class="photo-vignette"></div>
+			</div>
+			<!-- Тонкая рамка -->
+			<div class="photo-frame-border"></div>
+			<!-- Угловые акценты -->
+			<div class="corner corner-tl"></div>
+			<div class="corner corner-tr"></div>
+			<div class="corner corner-bl"></div>
+			<div class="corner corner-br"></div>
+		</div>
+
+		<!-- Верхняя навигация (поверх фото) -->
+		<nav class="top-nav">
+			<button class="nav-item active" data-section="garden">
+				<span class="nav-icon">⛩️</span>
+				<span class="nav-label">Сад</span>
+			</button>
+			<button class="nav-item" data-section="zags">
+				<span class="nav-icon">💍</span>
+				<span class="nav-label">ЗАГС</span>
+			</button>
+			<button class="nav-item" data-section="home">
+				<span class="nav-icon">🏮</span>
+				<span class="nav-label">Дом</span>
+			</button>
+		</nav>
+
+		<!-- Нижний блок: имена + дата + кнопка (поверх фото) -->
+		<div class="info-block">
+			<p class="date-top">15 · 06 · 2024</p>
+
+			<div class="names-line">
+				<span class="name">Андрей</span>
+				<span class="ampersand">&</span>
+				<span class="name">Татьяна</span>
+			</div>
+
+			<p class="location">Краснодар · Японский Сад</p>
+
+			<button class="story-toggle" id="storyToggle">
+				<span class="story-text">История одного дня в трёх актах</span>
+				<span class="story-icon">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+						stroke-width="1.5">
+						<polyline points="6 9 12 15 18 9"></polyline>
+					</svg>
+				</span>
+			</button>
+		</div>
+
+	</div>
+
+	<!-- Оверлей с историей -->
+	<div class="story-overlay" id="storyOverlay">
+		<div class="story-panel">
+
+			<h2 class="story-title">История одного дня<br>в трёх актах</h2>
+
+			<div class="story-divider">
+				<span class="divider-line"></span>
+				<span class="divider-dot"></span>
+				<span class="divider-line"></span>
+			</div>
+
+			<div class="story-content">
+				<div class="story-act">
+					<span class="act-number">I</span>
+					<div class="act-info">
+						<span class="act-title">Японский сад</span>
+						<span class="act-desc">Утро. Тишина. Только мы вдвоём (Не считая Дружка, Дружки и фотографа)
+							среди сада камней, воды и японских
+							деревьев.</span>
+					</div>
+				</div>
+
+				<div class="story-act">
+					<span class="act-number">II</span>
+					<div class="act-info">
+						<span class="act-title">Бракосочетание</span>
+						<span class="act-desc">Кольца, подписи, клятвы. Торжественный момент, когда две жизни становятся
+							одной.</span>
+					</div>
+				</div>
+
+				<div class="story-act">
+					<span class="act-number">III</span>
+					<div class="act-info">
+						<span class="act-title">Купеческий дом</span>
+						<span class="act-desc">Вечер. Родные лица. Тёплый свет старинного дома, пиршество, поздравления,
+							танцы и смех до утра.</span>
+					</div>
+				</div>
+			</div>
+
+			<button class="story-close" id="storyClose">
+				<span>Свернуть</span>
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+					<polyline points="18 15 12 9 6 15"></polyline>
+				</svg>
+			</button>
+		</div>
+
+		<div class="swipe-indicator">
+			<span class="swipe-line"></span>
+		</div>
+	</div>
+
+	<!-- Лепестки сакуры -->
+	<div class="petals-container" id="petalsContainer"></div>
+
+	<script src="js/main.js"></script>
+</body>
+
+</html>
