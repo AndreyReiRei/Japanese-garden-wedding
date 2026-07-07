@@ -672,14 +672,13 @@ body {
 .act-number {
 	font-family: 'Cormorant Garamond', serif;
 	font-size: 46px;
-	font-weight: 500;
+	font-weight: 300;
 	color: var(--red-accent);
 	opacity: 0.8;
 	line-height: 1.5;
 	min-width: 50px;
 	text-shadow: 0 0 15px var(--red-glow);
 	margin: 0 10px;
-	border: 1px solid #9502023b;
 	text-align: center;
 	overflow: hidden;
 }
