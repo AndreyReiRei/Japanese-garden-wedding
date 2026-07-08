@@ -1,7 +1,11 @@
 /* ============================================================
-   SECTION.CSS — Книга с чёткими границами и перелистыванием
+   SECTION.CSS — Стили для страниц разделов с книгой
+   Адаптивность: мобильный / планшет / десктоп
    ============================================================ */
 
+/* ============================================
+   1. СБРОС И ПЕРЕМЕННЫЕ
+   ============================================ */
 * {
 	margin: 0;
 	padding: 0;
@@ -11,16 +15,16 @@
 
 :root {
 	--bg-primary: #080808;
-	--bg-page: #0f0f0f;
-	--bg-page-edge: #0a0a0a;
 	--red-accent: #E84040;
 	--red-deep: #B02020;
 	--gold: #C9A96E;
 	--gold-light: #D4BC80;
 	--white: #F0EDE8;
 	--text-secondary: #8A8278;
-	--border-page: rgba(255, 255, 255, 0.08);
-	--border-strong: rgba(255, 255, 255, 0.12);
+
+	/* Адаптивные отступы */
+	--header-padding: 8px 4px 12px;
+	--nav-padding: 10px 8px 4px;
 }
 
 html,
@@ -28,6 +32,7 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+	/* Фиксированный экран */
 	font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
 	background: var(--bg-primary);
 	color: var(--white);
@@ -37,7 +42,7 @@ body {
 }
 
 /* ============================================
-   ИНДИКАТОР ЗАГРУЗКИ
+   2. ИНДИКАТОР ЗАГРУЗКИ
    ============================================ */
 .loader {
 	position: fixed;
@@ -81,7 +86,7 @@ body {
 }
 
 /* ============================================
-   КОНТЕЙНЕР КНИГИ
+   3. КОНТЕЙНЕР КНИГИ
    ============================================ */
 .book-container {
 	width: 100%;
@@ -89,7 +94,7 @@ body {
 	height: 100dvh;
 	display: flex;
 	flex-direction: column;
-	padding: 12px 12px 8px;
+	padding: 8px 8px 6px;
 	opacity: 0;
 	transition: opacity 0.6s ease;
 }
@@ -99,16 +104,15 @@ body {
 }
 
 /* ============================================
-   ЗАГОЛОВОК РАЗДЕЛА
+   4. ЗАГОЛОВОК РАЗДЕЛА
    ============================================ */
 .section-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 8px 8px 12px;
+	padding: var(--header-padding);
 	flex-shrink: 0;
-	position: relative;
-	z-index: 20;
+	min-height: 40px;
 }
 
 .back-btn {
@@ -118,30 +122,30 @@ body {
 	color: var(--text-secondary);
 	text-decoration: none;
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
+	font-size: 11px;
 	letter-spacing: 0.05em;
-	transition: color 0.3s ease;
 	padding: 6px 10px;
 	border-radius: 16px;
-	background: rgba(0, 0, 0, 0.3);
 	border: 1px solid rgba(255, 255, 255, 0.06);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
+	transition: all 0.3s ease;
+	white-space: nowrap;
 }
 
 .back-btn:active {
 	color: var(--white);
-	background: rgba(255, 255, 255, 0.05);
+	background: rgba(255, 255, 255, 0.04);
 }
 
 .section-title-group {
 	text-align: center;
+	flex: 1;
+	padding: 0 8px;
 }
 
 .section-subtitle-jp {
 	display: block;
 	font-family: 'Noto Serif JP', serif;
-	font-size: 11px;
+	font-size: 10px;
 	color: var(--red-accent);
 	opacity: 0.7;
 	letter-spacing: 0.3em;
@@ -149,16 +153,16 @@ body {
 }
 
 .section-title {
-	font-size: 20px;
+	font-size: 16px;
 	font-weight: 300;
 	letter-spacing: 0.06em;
-	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+	line-height: 1.2;
 }
 
 .section-location {
 	display: block;
 	font-family: 'Inter', sans-serif;
-	font-size: 9px;
+	font-size: 8px;
 	letter-spacing: 0.15em;
 	color: var(--text-secondary);
 	text-transform: uppercase;
@@ -167,15 +171,10 @@ body {
 
 .page-indicator {
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
+	font-size: 11px;
 	color: var(--text-secondary);
 	letter-spacing: 0.05em;
-	padding: 6px 12px;
-	background: rgba(0, 0, 0, 0.3);
-	border: 1px solid rgba(255, 255, 255, 0.06);
-	border-radius: 16px;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
+	white-space: nowrap;
 }
 
 .indicator-divider {
@@ -184,7 +183,7 @@ body {
 }
 
 /* ============================================
-   ОБЁРТКА КНИГИ
+   5. ОБЁРТКА КНИГИ
    ============================================ */
 .book-wrapper {
 	flex: 1;
@@ -192,84 +191,24 @@ body {
 	align-items: center;
 	justify-content: center;
 	min-height: 0;
-	position: relative;
-	padding: 10px 50px;
-	/* Перспектива для 3D-эффекта */
-	perspective: 2000px;
+	padding: 4px 0;
+	perspective: 1500px;
 }
 
-/* ============================================
-   КОНТЕЙНЕР КНИГИ (Turn.js)
-   ============================================ */
+/* Контейнер Turn.js */
 #flipbook {
-	position: relative;
-	/* Чёткая внешняя граница книги */
-	box-shadow:
-		0 0 0 2px #1a1a1a,
-		/* Внешний край обложки */
-		0 0 0 3px rgba(255, 255, 255, 0.06),
-		/* Тонкая светлая линия */
-		0 4px 30px rgba(0, 0, 0, 0.8),
-		/* Глубокая тень */
-		0 1px 0 rgba(255, 255, 255, 0.03);
-	/* Блик сверху */
-	border-radius: 2px;
+	/* Размеры задаются динамически в JS */
+	margin: 0 auto;
 }
 
-/* ============================================
-   СТРАНИЦЫ — чёткие границы как у книги
-   ============================================ */
-
-/* Базовая страница */
+/* Страница */
 #flipbook .page {
-	background: var(--bg-page);
+	background: #0d0d0d;
+	border: 1px solid rgba(255, 255, 255, 0.04);
 	overflow: hidden;
-	/* Граница каждой страницы */
-	border: 1px solid var(--border-page);
 }
 
-/* Левая страница (even) */
-#flipbook .even {
-	border-right: 1px solid rgba(255, 255, 255, 0.05);
-	background: linear-gradient(to right,
-			#0a0a0a 0%,
-			#0e0e0e 15%,
-			#0f0f0f 50%,
-			#0f0f0f 100%);
-}
-
-/* Правая страница (odd) */
-#flipbook .odd {
-	border-left: 1px solid rgba(255, 255, 255, 0.05);
-	background: linear-gradient(to left,
-			#0a0a0a 0%,
-			#0e0e0e 15%,
-			#0f0f0f 50%,
-			#0f0f0f 100%);
-}
-
-/* Корешок — вертикальная линия между страницами */
-#flipbook::before {
-	content: '';
-	position: absolute;
-	left: 50%;
-	top: 0;
-	bottom: 0;
-	width: 2px;
-	background: linear-gradient(to bottom,
-			transparent 5%,
-			rgba(255, 255, 255, 0.04) 20%,
-			rgba(0, 0, 0, 0.3) 50%,
-			rgba(255, 255, 255, 0.04) 80%,
-			transparent 95%);
-	z-index: 10;
-	pointer-events: none;
-	transform: translateX(-1px);
-}
-
-/* ============================================
-   КОНТЕНТ СТРАНИЦЫ — фото на весь экран с рамкой
-   ============================================ */
+/* Контент страницы */
 .page-content {
 	width: 100%;
 	height: 100%;
@@ -277,153 +216,68 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #060606;
-	/* Внутренняя рамка для фото */
-	padding: 0;
+	background: #0a0a0a;
 }
 
-/* Фото — всегда заполняет всю страницу */
+/* Фото */
 .page-photo {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	/* Всегда заполняет страницу */
 	display: block;
-	/* Лёгкая обработка */
-	filter: brightness(0.93) contrast(1.04) saturate(0.9);
+	filter: brightness(0.9) contrast(1.03) saturate(0.85);
 }
 
-/* Если фото не соответствует пропорциям — видна рамка */
-.page-content::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border: 1px solid rgba(255, 255, 255, 0.04);
-	pointer-events: none;
-	z-index: 1;
+/* Вертикальное фото — НЕ сжимаем, тоже cover */
+.vertical-photo .page-photo {
+	object-fit: cover;
+	/* Было contain — теперь cover */
 }
 
-/* ============================================
-   ПОДПИСЬ К ФОТО
-   ============================================ */
+/* Полноэкранное фото на развороте */
+.full-photo .page-photo {
+	object-fit: cover;
+}
+
+/* Подпись к фото */
 .page-caption {
 	position: absolute;
-	bottom: 16px;
-	left: 16px;
-	right: 16px;
+	bottom: 12px;
+	left: 12px;
+	right: 12px;
 	display: flex;
 	flex-direction: column;
-	gap: 3px;
-	z-index: 3;
+	gap: 2px;
+	z-index: 2;
 	pointer-events: none;
 }
 
 .caption-jp {
 	font-family: 'Noto Serif JP', serif;
-	font-size: 12px;
-	color: rgba(255, 255, 255, 0.9);
-	letter-spacing: 0.12em;
-	text-shadow:
-		0 1px 3px rgba(0, 0, 0, 0.9),
-		0 0 15px rgba(0, 0, 0, 0.5);
+	font-size: 11px;
+	color: rgba(255, 255, 255, 0.85);
+	letter-spacing: 0.1em;
+	text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7), 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .caption-ru {
-	font-size: 13px;
-	color: rgba(255, 255, 255, 0.7);
-	letter-spacing: 0.05em;
-	text-shadow:
-		0 1px 3px rgba(0, 0, 0, 0.8),
-		0 0 10px rgba(0, 0, 0, 0.4);
+	font-size: 12px;
+	color: rgba(255, 255, 255, 0.65);
+	letter-spacing: 0.04em;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
 }
 
 /* ============================================
-   КНОПКИ-СТРЕЛКИ
-   ============================================ */
-.turn-nav-btn {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	background: rgba(0, 0, 0, 0.5);
-	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 50%;
-	width: 36px;
-	height: 36px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	color: rgba(255, 255, 255, 0.6);
-	z-index: 30;
-	transition: all 0.3s ease;
-	-webkit-tap-highlight-color: transparent;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-}
-
-.turn-nav-prev {
-	left: 8px;
-}
-
-.turn-nav-next {
-	right: 8px;
-}
-
-.turn-nav-btn:hover {
-	background: rgba(232, 64, 64, 0.2);
-	border-color: rgba(232, 64, 64, 0.4);
-	color: #fff;
-}
-
-.turn-nav-btn:active {
-	background: rgba(232, 64, 64, 0.4);
-	transform: translateY(-50%) scale(0.9);
-}
-
-/* ============================================
-   ЗОНЫ КЛИКА
-   ============================================ */
-.click-zone {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 50%;
-	z-index: 5;
-}
-
-.click-zone-left {
-	left: 0;
-	cursor: w-resize;
-}
-
-.click-zone-right {
-	right: 0;
-	cursor: e-resize;
-}
-
-/* ============================================
-   ПОДСКАЗКИ НА УГЛАХ
-   ============================================ */
-.turn-hint {
-	position: absolute;
-	bottom: 12px;
-	width: 22px;
-	height: 22px;
-	z-index: 4;
-	pointer-events: none;
-	opacity: 0.4;
-}
-
-/* ============================================
-   НАВИГАЦИЯ ПО РАЗДЕЛАМ
+   6. НАВИГАЦИЯ ПО РАЗДЕЛАМ
    ============================================ */
 .section-nav {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 10px 8px 4px;
+	padding: var(--nav-padding);
 	flex-shrink: 0;
-	position: relative;
-	z-index: 20;
+	min-height: 36px;
 }
 
 .section-nav-item {
@@ -433,15 +287,13 @@ body {
 	color: var(--text-secondary);
 	text-decoration: none;
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
+	font-size: 11px;
 	letter-spacing: 0.06em;
-	padding: 8px 14px;
+	padding: 6px 12px;
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: 20px;
+	border-radius: 18px;
 	transition: all 0.3s ease;
-	background: rgba(0, 0, 0, 0.3);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
+	white-space: nowrap;
 }
 
 .section-nav-item:active {
@@ -451,7 +303,7 @@ body {
 }
 
 .section-nav-item.disabled {
-	opacity: 0.3;
+	opacity: 0.25;
 	pointer-events: none;
 }
 
@@ -460,7 +312,7 @@ body {
 }
 
 /* ============================================
-   СВЕТЛЯЧКИ
+   7. СВЕТЛЯЧКИ
    ============================================ */
 .fireflies-container {
 	position: fixed;
@@ -471,7 +323,7 @@ body {
 }
 
 /* ============================================
-   ЦВЕТОВЫЕ ТЕМЫ РАЗДЕЛОВ
+   8. ЦВЕТОВЫЕ АКЦЕНТЫ ПО РАЗДЕЛАМ
    ============================================ */
 .section-garden {
 	--section-accent: #E84040;
@@ -489,109 +341,157 @@ body {
 }
 
 /* ============================================
-   ТЕНИ TURN.JS ПРИ ПЕРЕЛИСТЫВАНИИ
+   9. ТЁМНАЯ ТЕМА ДЛЯ TURN.JS
    ============================================ */
+#flipbook .even {
+	background: linear-gradient(to right, #0a0a0a 0%, #0d0d0d 100%);
+}
 
-/* Тень на изгибе */
+#flipbook .odd {
+	background: linear-gradient(to left, #0a0a0a 0%, #0d0d0d 100%);
+}
+
 #flipbook .shadow {
-	background: linear-gradient(to right,
-			rgba(0, 0, 0, 0.35) 0%,
-			rgba(0, 0, 0, 0.1) 30%,
-			transparent 100%) !important;
+	background: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, transparent 100%);
 }
 
 /* ============================================
-   МОБИЛЬНАЯ ВЕРСИЯ
+   10. АДАПТИВНОСТЬ
    ============================================ */
-@media (max-width: 767px) {
-	.book-wrapper {
-		padding: 8px 36px;
+
+/* Планшет (≥ 768px) */
+@media (min-width: 768px) {
+	:root {
+		--header-padding: 12px 16px 16px;
+		--nav-padding: 12px 16px 8px;
 	}
 
-	/* На мобильном книга занимает доступное пространство */
-	#flipbook {
-		width: 100% !important;
-		max-width: 100% !important;
-	}
-
-	/* Страница на весь контейнер */
-	#flipbook .page {
-		border-radius: 2px !important;
-	}
-
-	/* Убираем корешок */
-	#flipbook::before {
-		display: none;
-	}
-
-	/* Кнопки компактнее */
-	.turn-nav-btn {
-		width: 30px;
-		height: 30px;
-	}
-
-	.turn-nav-prev {
-		left: 2px;
-	}
-
-	.turn-nav-next {
-		right: 2px;
-	}
-
-	.section-title {
-		font-size: 16px;
-	}
-
-	.page-caption {
-		bottom: 12px;
-		left: 10px;
-		right: 10px;
-	}
-
-	.caption-jp {
-		font-size: 10px;
-	}
-
-	.caption-ru {
-		font-size: 11px;
-	}
-}
-
-/* ============================================
-   ПЛАНШЕТЫ
-   ============================================ */
-@media (min-width: 768px) and (max-width: 1023px) {
-	.book-wrapper {
-		padding: 12px 50px;
-	}
-
-	#flipbook {
-		max-width: 90vw !important;
+	.book-container {
+		padding: 12px 16px 8px;
 	}
 
 	.section-title {
 		font-size: 22px;
 	}
+
+	.section-subtitle-jp {
+		font-size: 12px;
+	}
+
+	.section-location {
+		font-size: 10px;
+	}
+
+	.back-btn {
+		font-size: 12px;
+		padding: 8px 14px;
+	}
+
+	.page-indicator {
+		font-size: 13px;
+	}
+
+	.section-nav-item {
+		font-size: 12px;
+		padding: 8px 16px;
+	}
+
+	.caption-jp {
+		font-size: 13px;
+	}
+
+	.caption-ru {
+		font-size: 14px;
+	}
+
+	.book-wrapper {
+		padding: 8px 0;
+	}
 }
 
-/* ============================================
-   ДЕСКТОП
-   ============================================ */
+/* Десктоп (≥ 1024px) */
 @media (min-width: 1024px) {
-	.book-wrapper {
-		padding: 16px 64px;
+	:root {
+		--header-padding: 16px 24px 20px;
+		--nav-padding: 14px 24px 10px;
 	}
 
-	#flipbook {
-		max-width: 80vw !important;
-	}
-
-	.turn-nav-btn {
-		width: 44px;
-		height: 44px;
+	.book-container {
+		padding: 16px 24px 12px;
+		max-width: 1400px;
+		margin: 0 auto;
 	}
 
 	.section-title {
-		font-size: 24px;
+		font-size: 26px;
+	}
+
+	.section-subtitle-jp {
+		font-size: 14px;
+	}
+
+	.section-location {
+		font-size: 11px;
+	}
+
+	.back-btn {
+		font-size: 13px;
+	}
+
+	.page-indicator {
+		font-size: 14px;
+	}
+
+	.section-nav-item {
+		font-size: 13px;
+		padding: 10px 20px;
+	}
+
+	.caption-jp {
+		font-size: 15px;
+	}
+
+	.caption-ru {
+		font-size: 16px;
+	}
+
+	.book-wrapper {
+		padding: 12px 0;
+	}
+
+	/* Ховер-эффекты только на десктопе */
+	@media (hover: hover) {
+		.back-btn:hover {
+			color: var(--white);
+			background: rgba(255, 255, 255, 0.04);
+		}
+
+		.section-nav-item:hover {
+			background: rgba(255, 255, 255, 0.03);
+			border-color: rgba(255, 255, 255, 0.15);
+			color: var(--white);
+		}
+	}
+}
+
+/* Большие десктопы (≥ 1440px) */
+@media (min-width: 1440px) {
+	.book-container {
+		padding: 20px 40px 16px;
+	}
+
+	.section-title {
+		font-size: 30px;
+	}
+
+	.book-wrapper {
+		padding: 16px 0;
+	}
+}
+
+/* Очень большие экраны (≥ 1920px) */
+@media (min-width: 1920px) {
+	.book-container {
+		max-width: 1600px;
 	}
 }
