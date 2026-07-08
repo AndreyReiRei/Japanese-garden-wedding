@@ -31,12 +31,12 @@
 	 * Кешируем ссылки на все DOM-элементы, с которыми будем работать.
 	 * Используем const, потому что ссылки не меняются после получения.
 	 * 
-	 * loader              — индикатор загрузки (показывается пока грузятся фото)
-	 * bookContainer       — основной контейнер всей страницы
-	 * flipbook            — контейнер для Turn.js (внутри него страницы)
-	 * firefliesContainer  — контейнер для светлячков (фон)
-	 * currentPageEl       — элемент, показывающий номер текущей страницы
-	 * totalPagesEl        — элемент, показывающий общее количество страниц
+	 * loader             — индикатор загрузки (показывается пока грузятся фото)
+	 * bookContainer      — основной контейнер всей страницы
+	 * flipbook           — контейнер для Turn.js (внутри него страницы)
+	 * firefliesContainer — контейнер для светлячков (фон)
+	 * currentPageEl      — элемент, показывающий номер текущей страницы
+	 * totalPagesEl       — элемент, показывающий общее количество страниц
 	 */
 	const loader = document.getElementById( 'loader' );
 	const bookContainer = document.getElementById( 'bookContainer' );
@@ -74,8 +74,13 @@
 	 * 
 	 * { once: true } — обработчик сработает один раз и удалится.
 	 */
-	document.addEventListener( 'click', () => { userInteracted = true; }, { once: true } );
-	document.addEventListener( 'touchstart', () => { userInteracted = true; }, { once: true } );
+	document.addEventListener( 'click', function () {
+		userInteracted = true;
+	}, { once: true } );
+
+	document.addEventListener( 'touchstart', function () {
+		userInteracted = true;
+	}, { once: true } );
 
 	/**
 	 * Безопасный вызов вибрации.
@@ -87,7 +92,7 @@
 	 * @param {number} duration — длительность вибрации в миллисекундах
 	 */
 	function safeVibrate( duration ) {
-		if ( userInteracted && window.navigator?.vibrate ) {
+		if ( userInteracted && window.navigator && window.navigator.vibrate ) {
 			try {
 				window.navigator.vibrate( duration );
 			} catch ( error ) {
@@ -107,7 +112,7 @@
 	 * - Определяем тип устройства по ширине экрана
 	 * - На мобильном (< 768px): одна страница почти во весь экран
 	 * - На планшете (768-1023px): разворот, страницы до 380px
-	 * - На десктопе (≥ 1024px): большой разворот, страницы до 480px
+	 * - На десктопе (>= 1024px): большой разворот, страницы до 480px
 	 * - Соотношение сторон страницы ~ 3:4 (портретная ориентация)
 	 * 
 	 * @returns {Object} Объект с размерами:
@@ -120,19 +125,21 @@
 	 */
 	function calculateBookSize() {
 		// Получаем размеры контейнера-обёртки и экрана
-		const wrapper = flipbook.parentElement;
-		const containerWidth = wrapper.clientWidth;
-		const containerHeight = wrapper.clientHeight;
-		const screenWidth = window.innerWidth;
-		const screenHeight = window.innerHeight;
+		var wrapper = flipbook.parentElement;
+		var containerWidth = wrapper.clientWidth;
+		var containerHeight = wrapper.clientHeight;
+		var screenWidth = window.innerWidth;
+		var screenHeight = window.innerHeight;
 
 		// ── Определяем тип устройства ──────────────────────────
-		const isMobile = screenWidth < 768;
-		const isTablet = screenWidth >= 768 && screenWidth < 1024;
-		const isDesktop = screenWidth >= 1024;
-		const displayMode = isMobile ? 'single' : 'double';
+		var isMobile = screenWidth < 768;
+		var isTablet = screenWidth >= 768 && screenWidth < 1024;
+		var isDesktop = screenWidth >= 1024;
+		var displayMode = isMobile ? 'single' : 'double';
 
-		let pageWidth, pageHeight, bookWidth;
+		var pageWidth;
+		var pageHeight;
+		var bookWidth;
 
 		// ── Мобильный: одна страница почти на весь экран ───────
 		if ( isMobile ) {
@@ -141,14 +148,14 @@
 			pageHeight = containerHeight * 0.88;
 
 			// Корректируем по соотношению 3:4
-			// Идеальная высота = ширина × 1.4 (с небольшим запасом)
-			const idealHeight = pageWidth * 1.4;
+			// Идеальная высота = ширина x 1.4 (с небольшим запасом)
+			var idealHeight = pageWidth * 1.4;
 
 			if ( idealHeight > pageHeight ) {
-				// Фото не влезает по высоте → уменьшаем ширину
+				// Фото не влезает по высоте -> уменьшаем ширину
 				pageWidth = pageHeight / 1.4;
 			} else if ( idealHeight < pageHeight * 0.7 ) {
-				// Экран слишком широкий → ограничиваем высотой
+				// Экран слишком широкий -> ограничиваем высотой
 				pageHeight = idealHeight;
 			}
 
@@ -157,8 +164,8 @@
 
 		// ── Планшет: разворот, страницы поменьше ───────────────
 		else if ( isTablet ) {
-			const maxPageWidth = containerWidth * 0.46;   // Две страницы по 46%
-			const maxPageHeight = containerHeight * 0.85;
+			var maxPageWidth = containerWidth * 0.46;   // Две страницы по 46%
+			var maxPageHeight = containerHeight * 0.85;
 
 			pageWidth = Math.min( maxPageWidth, 380 );
 			pageHeight = Math.min( maxPageHeight, pageWidth * 1.45 );
@@ -167,11 +174,11 @@
 
 		// ── Десктоп: большой разворот ──────────────────────────
 		else {
-			const maxPageWidth = Math.min( containerWidth * 0.44, 480 );
-			const maxPageHeight = Math.min( containerHeight * 0.88, maxPageWidth * 1.5 );
+			var maxPageWidthDesk = Math.min( containerWidth * 0.44, 480 );
+			var maxPageHeightDesk = Math.min( containerHeight * 0.88, maxPageWidthDesk * 1.5 );
 
-			pageWidth = maxPageWidth;
-			pageHeight = maxPageHeight;
+			pageWidth = maxPageWidthDesk;
+			pageHeight = maxPageHeightDesk;
 			bookWidth = pageWidth * 2;
 		}
 
@@ -190,6 +197,7 @@
 		console.log( '  Страница:', pageWidth + '×' + pageHeight );
 		console.log( '  Книга:', bookWidth + '×' + pageHeight );
 
+		// Возвращаем объект с размерами
 		return {
 			width: bookWidth,
 			height: pageHeight,
@@ -220,24 +228,22 @@
 		console.log( '🔍 Проверка зависимостей...' );
 
 		// Проверяем jQuery
-		const hasJQuery = typeof jQuery !== 'undefined';
+		var hasJQuery = ( typeof jQuery !== 'undefined' );
 		console.log( '  jQuery:', hasJQuery ? '✅ v' + jQuery.fn.jquery : '❌ НЕТ' );
 
 		// Проверяем Turn.js (это плагин jQuery, доступен через jQuery.fn.turn)
-		const hasTurn = hasJQuery && typeof jQuery.fn.turn !== 'undefined';
+		var hasTurn = hasJQuery && ( typeof jQuery.fn.turn !== 'undefined' );
 		console.log( '  Turn.js:', hasTurn ? '✅' : '❌ НЕТ' );
 
 		if ( !hasJQuery ) {
 			console.error( '❌ jQuery не загружен!' );
 			console.error( '   Проверь интернет-соединение или путь к CDN' );
-			console.error( '   Строка в HTML: <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>' );
 			return false;
 		}
 
 		if ( !hasTurn ) {
 			console.error( '❌ Turn.js не загружен!' );
 			console.error( '   Проверь наличие файла lib/turn.min.js' );
-			console.error( '   Строка в HTML: <script src="../lib/turn.min.js"></script>' );
 			console.error( '   Важно: Turn.js должен подключаться ПОСЛЕ jQuery' );
 			return false;
 		}
@@ -264,20 +270,22 @@
 	 */
 	function initBook() {
 		// Защита от повторной инициализации
-		if ( bookInitialized ) return;
+		if ( bookInitialized ) {
+			return;
+		}
 
 		console.log( '📖 Инициализация книги...' );
 
 		// ── Проверка зависимостей ──────────────────────────────
 		if ( !checkDependencies() ) {
-			fallbackMode();    // Нет библиотек → упрощённый режим
+			fallbackMode();    // Нет библиотек -> упрощённый режим
 			return;
 		}
 
 		// ── jQuery-объект книги ────────────────────────────────
-		const $book = jQuery( flipbook );
-		const $pages = $book.children( '.page' );
-		const totalPages = $pages.length;
+		var $book = jQuery( flipbook );
+		var $pages = $book.children( '.page' );
+		var totalPages = $pages.length;
 
 		console.log( '  Страниц:', totalPages );
 
@@ -289,13 +297,17 @@
 		}
 
 		// ── Обновляем счётчики ─────────────────────────────────
-		if ( totalPagesEl ) totalPagesEl.textContent = totalPages;
-		if ( currentPageEl ) currentPageEl.textContent = '1';
+		if ( totalPagesEl ) {
+			totalPagesEl.textContent = totalPages;
+		}
+		if ( currentPageEl ) {
+			currentPageEl.textContent = '1';
+		}
 
 		// ── Вычисляем размеры ──────────────────────────────────
-		const size = calculateBookSize();
+		var size = calculateBookSize();
 
-		// Устанавливаем размеры контейнера
+		// Устанавливаем размеры контейнера через CSS
 		$book.css( {
 			width: size.width + 'px',
 			height: size.height + 'px',
@@ -391,19 +403,21 @@
 		// ── Обработчик изменения размера окна ──────────────────
 		// Используем debounce (задержку) чтобы не дёргать Turn.js 
 		// на каждое движение мыши при ресайзе
-		let resizeTimeout;
+		var resizeTimeout;
 
-		window.addEventListener( 'resize', () => {
+		window.addEventListener( 'resize', function () {
 			// Сбрасываем предыдущий таймер
 			clearTimeout( resizeTimeout );
 
 			// Запускаем новый таймер на 250мс
-			resizeTimeout = setTimeout( () => {
+			resizeTimeout = setTimeout( function () {
 				// Книга могла быть уничтожена к этому моменту
-				if ( !bookInitialized ) return;
+				if ( !bookInitialized ) {
+					return;
+				}
 
 				// Пересчитываем размеры
-				const newSize = calculateBookSize();
+				var newSize = calculateBookSize();
 
 				// Обновляем CSS контейнера
 				$book.css( {
@@ -435,38 +449,38 @@
 		console.warn( '⚠️ Включён упрощённый режим (без эффекта перелистывания)' );
 
 		// Меняем layout контейнера на вертикальный список
-		flipbook.style.cssText = `
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 8px;
-            max-height: 75vh;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-        `;
+		flipbook.style.display = 'flex';
+		flipbook.style.flexDirection = 'column';
+		flipbook.style.gap = '12px';
+		flipbook.style.overflowY = 'auto';
+		flipbook.style.overflowX = 'hidden';
+		flipbook.style.padding = '8px';
+		flipbook.style.maxHeight = '75vh';
+		flipbook.style.width = '100%';
+		flipbook.style.maxWidth = '600px';
+		flipbook.style.margin = '0 auto';
 
 		// Стилизуем каждую страницу как отдельную карточку
-		const pages = flipbook.querySelectorAll( '.page' );
-		pages.forEach( ( page, index ) => {
-			const isLast = index === pages.length - 1;
+		var pages = flipbook.querySelectorAll( '.page' );
+		pages.forEach( function ( page, index ) {
+			var isLast = ( index === pages.length - 1 );
 
-			page.style.cssText = `
-                width: 100%;
-                height: auto;
-                aspect-ratio: 3 / 4;
-                border-radius: 8px;
-                overflow: hidden;
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                margin-bottom: ${isLast ? '0' : '8px'};
-            `;
+			page.style.width = '100%';
+			page.style.height = 'auto';
+			page.style.aspectRatio = '3 / 4';
+			page.style.borderRadius = '8px';
+			page.style.overflow = 'hidden';
+			page.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+			page.style.marginBottom = isLast ? '0' : '8px';
 		} );
 
 		// Обновляем счётчики
-		if ( totalPagesEl ) totalPagesEl.textContent = pages.length;
-		if ( currentPageEl ) currentPageEl.textContent = '—';
+		if ( totalPagesEl ) {
+			totalPagesEl.textContent = pages.length;
+		}
+		if ( currentPageEl ) {
+			currentPageEl.textContent = '—';
+		}
 
 		// Скрываем загрузчик
 		hideLoader();
@@ -485,27 +499,26 @@
 	 */
 
 	// Добавляем ключевые кадры анимации мерцания
-	const fireflyStyle = document.createElement( 'style' );
-	fireflyStyle.textContent = `
-        @keyframes fireflyFloat {
-            0%, 100% { 
-                opacity: 0.1; 
-                transform: translate(0, 0) scale(0.7); 
-            }
-            25% { 
-                opacity: 0.8; 
-                transform: translate(10px, -15px) scale(1.5); 
-            }
-            50% { 
-                opacity: 0.2; 
-                transform: translate(-6px, -6px) scale(0.5); 
-            }
-            75% { 
-                opacity: 0.9; 
-                transform: translate(-12px, -20px) scale(1.7); 
-            }
-        }
-    `;
+	var fireflyStyle = document.createElement( 'style' );
+	fireflyStyle.textContent = '' +
+		'@keyframes fireflyFloat {' +
+		'0%, 100% {' +
+		'opacity: 0.1;' +
+		'transform: translate(0, 0) scale(0.7);' +
+		'}' +
+		'25% {' +
+		'opacity: 0.8;' +
+		'transform: translate(10px, -15px) scale(1.5);' +
+		'}' +
+		'50% {' +
+		'opacity: 0.2;' +
+		'transform: translate(-6px, -6px) scale(0.5);' +
+		'}' +
+		'75% {' +
+		'opacity: 0.9;' +
+		'transform: translate(-12px, -20px) scale(1.7);' +
+		'}' +
+		'}';
 	document.head.appendChild( fireflyStyle );
 
 	/**
@@ -515,65 +528,52 @@
 	 * @returns {HTMLElement} Готовый светлячок
 	 */
 	function createFirefly() {
-		const firefly = document.createElement( 'div' );
+		var firefly = document.createElement( 'div' );
 
 		// Случайные параметры для разнообразия
-		const size = Math.random() * 3 + 1.5;     // Размер: 1.5–4.5px
-		const startX = Math.random() * 90;          // Позиция X: 0–90%
-		const startY = Math.random() * 85;          // Позиция Y: 0–85%
-		const duration = Math.random() * 5 + 3;        // Длительность цикла: 3–8с
-		const delay = Math.random() * 4;            // Задержка старта: 0–4с
+		var size = Math.random() * 3 + 1.5;     // Размер: 1.5–4.5px
+		var startX = Math.random() * 90;          // Позиция X: 0–90%
+		var startY = Math.random() * 85;          // Позиция Y: 0–85%
+		var duration = Math.random() * 5 + 3;        // Длительность цикла: 3–8с
+		var delay = Math.random() * 4;            // Задержка старта: 0–4с
 
 		// Тёплый янтарный цвет (как настоящие светлячки)
-		const glowColor = 'rgba(255, 220, 160, 0.9)';
-		const outerGlow = 'rgba(255, 180, 100, 0.5)';
+		var glowColor = 'rgba(255, 220, 160, 0.9)';
+		var outerGlow = 'rgba(255, 180, 100, 0.5)';
 
-		firefly.style.cssText = `
-            position: absolute;
-            top: ${startY}%;
-            left: ${startX}%;
-            width: ${size}px;
-            height: ${size}px;
-            
-            /* Радиальный градиент: яркий центр → прозрачный край */
-            background: radial-gradient(
-                circle at center,
-                ${glowColor} 0%,
-                ${outerGlow} 35%,
-                transparent 70%
-            );
-            border-radius: 50%;
-            
-            /* Многослойное свечение для мягкого эффекта */
-            box-shadow: 
-                0 0 ${size * 3}px rgba(255, 180, 100, 0.5),
-                0 0 ${size * 7}px rgba(255, 150, 60, 0.2);
-            
-            /* Анимация с уникальными параметрами */
-            animation: fireflyFloat ${duration}s ${delay}s ease-in-out infinite;
-            
-            pointer-events: none;    /* Не перехватывает клики */
-            z-index: 0;              /* Самый нижний слой */
-            will-change: transform, opacity;  /* Оптимизация для GPU */
-        `;
+		firefly.style.cssText = '' +
+			'position: absolute;' +
+			'top: ' + startY + '%;' +
+			'left: ' + startX + '%;' +
+			'width: ' + size + 'px;' +
+			'height: ' + size + 'px;' +
+			'background: radial-gradient(circle at center, ' + glowColor + ' 0%, ' + outerGlow + ' 35%, transparent 70%);' +
+			'border-radius: 50%;' +
+			'box-shadow: 0 0 ' + ( size * 3 ) + 'px rgba(255, 180, 100, 0.5), 0 0 ' + ( size * 7 ) + 'px rgba(255, 150, 60, 0.2);' +
+			'animation: fireflyFloat ' + duration + 's ' + delay + 's ease-in-out infinite;' +
+			'pointer-events: none;' +
+			'z-index: 0;' +
+			'will-change: transform, opacity;';
 
 		return firefly;
 	}
 
 	// Создаём первых светлячков
-	const FIREFLY_COUNT = 6;
-	for ( let i = 0; i < FIREFLY_COUNT; i++ ) {
+	var FIREFLY_COUNT = 6;
+	for ( var i = 0; i < FIREFLY_COUNT; i++ ) {
 		firefliesContainer.appendChild( createFirefly() );
 	}
 
 	// Обновляем светлячков каждые 9 секунд
-	setInterval( () => {
+	setInterval( function () {
 		// Удаляем старых
-		const oldFireflies = firefliesContainer.querySelectorAll( 'div' );
-		oldFireflies.forEach( f => f.remove() );
+		var oldFireflies = firefliesContainer.querySelectorAll( 'div' );
+		oldFireflies.forEach( function ( f ) {
+			f.remove();
+		} );
 
 		// Создаём новых на новых позициях
-		for ( let i = 0; i < FIREFLY_COUNT; i++ ) {
+		for ( var j = 0; j < FIREFLY_COUNT; j++ ) {
 			firefliesContainer.appendChild( createFirefly() );
 		}
 	}, 9000 );
@@ -592,7 +592,7 @@
 			loader.classList.add( 'hidden' );
 
 			// Удаляем из DOM через 500мс (после завершения анимации)
-			setTimeout( () => {
+			setTimeout( function () {
 				if ( loader && loader.parentNode ) {
 					loader.remove();
 				}
@@ -617,7 +617,7 @@
 	 * - Запускаем инициализацию книги
 	 */
 	function waitForImages() {
-		const images = flipbook.querySelectorAll( 'img' );
+		var images = flipbook.querySelectorAll( 'img' );
 		console.log( '🖼️ Фото для загрузки:', images.length );
 
 		// Если фото нет — запускаем книгу сразу
@@ -628,22 +628,22 @@
 			return;
 		}
 
-		let loaded = 0;
-		const total = images.length;
+		var loaded = 0;
+		var total = images.length;
 
 		/**
 		 * Вызывается при загрузке каждого фото.
 		 * Когда все загружены — запускает книгу.
 		 */
 		function onImageLoad() {
-			loaded++;
+			loaded = loaded + 1;
 			console.log( '  Загружено: ' + loaded + '/' + total );
 
 			if ( loaded >= total ) {
 				console.log( '✅ Все фото загружены' );
 
 				// Небольшая задержка чтобы браузер отрисовал фото
-				setTimeout( () => {
+				setTimeout( function () {
 					hideLoader();
 					initBook();
 				}, 200 );
@@ -651,7 +651,7 @@
 		}
 
 		// Проверяем каждое изображение
-		images.forEach( img => {
+		images.forEach( function ( img ) {
 			if ( img.complete && img.naturalWidth > 0 ) {
 				// Уже загружено (из кеша браузера)
 				onImageLoad();
@@ -660,7 +660,7 @@
 				img.addEventListener( 'load', onImageLoad );
 
 				// На случай ошибки загрузки — всё равно продолжаем
-				img.addEventListener( 'error', () => {
+				img.addEventListener( 'error', function () {
 					console.warn( '⚠️ Ошибка загрузки:', img.src );
 					onImageLoad();
 				} );
@@ -674,13 +674,13 @@
 
 	/**
 	 * Главная функция инициализации.
-	 * Запускает весь процесс: загрузка фото → книга → светлячки.
+	 * Запускает весь процесс: загрузка фото -> книга -> светлячки.
 	 */
 	function init() {
 		console.log( '📖 Инициализация раздела...' );
 		console.log( '  Заголовок:', document.title );
 		console.log( '  Размер экрана:', window.innerWidth + '×' + window.innerHeight );
-		console.log( '  Мобильный:', window.innerWidth < 768 );
+		console.log( '  Мобильный:', ( window.innerWidth < 768 ) );
 
 		// Начинаем с загрузки изображений
 		waitForImages();
