@@ -53,20 +53,33 @@
 	<div class="flipbook-viewport">
 		<div class="container">
 			<div class="flipbook" id="flipbook">
-				<!-- Страница 1 — одиночная (открывает книгу) -->
-				<div class="page" style="background-image:url(../photos/garden/garden-01.jpg)"></div>
+				<!-- Страница 1 — справа (открывает книгу) -->
+				<div class="page first-page" style="background-image:url(../photos/garden/garden-01.jpg)">
+					<div class="page-corner page-corner-tr" title="Перелистнуть"></div>
+				</div>
 
-				<!-- Разворот 2-3 — двойная страница -->
-				<div class="double" style="background-image:url(../photos/garden/garden-02.jpg)"></div>
+				<!-- Разворот 2-3 -->
+				<div class="double" style="background-image:url(../photos/garden/garden-02.jpg)">
+					<div class="page-corner page-corner-tl" title="Назад"></div>
+					<div class="page-corner page-corner-tr" title="Вперёд"></div>
+				</div>
 
-				<!-- Разворот 4-5 — двойная страница -->
-				<div class="double" style="background-image:url(../photos/garden/garden-03.jpg)"></div>
+				<!-- Разворот 4-5 -->
+				<div class="double" style="background-image:url(../photos/garden/garden-03.jpg)">
+					<div class="page-corner page-corner-tl" title="Назад"></div>
+					<div class="page-corner page-corner-tr" title="Вперёд"></div>
+				</div>
 
-				<!-- Разворот 6-7 — двойная страница -->
-				<div class="double" style="background-image:url(../photos/garden/garden-04.jpg)"></div>
+				<!-- Разворот 6-7 -->
+				<div class="double" style="background-image:url(../photos/garden/garden-04.jpg)">
+					<div class="page-corner page-corner-tl" title="Назад"></div>
+					<div class="page-corner page-corner-tr" title="Вперёд"></div>
+				</div>
 
-				<!-- Страница 8 — одиночная (закрывает книгу) -->
-				<div class="page" style="background-image:url(../photos/garden/garden-05.jpg)"></div>
+				<!-- Страница 8 — слева (закрывает книгу) -->
+				<div class="page last-page" style="background-image:url(../photos/garden/garden-05.jpg)">
+					<div class="page-corner page-corner-tl" title="Назад"></div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -82,11 +95,8 @@
 		</a>
 	</nav>
 
-	<!-- jQuery 1.7 (родная для Turn.js) -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-	<!-- Modernizr (для проверки CSS transforms) -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-	<!-- Скрипты -->
 	<script src="../js/section.js"></script>
 </body>
 
