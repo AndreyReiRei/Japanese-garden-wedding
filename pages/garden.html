@@ -3,98 +3,84 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<title>Японский сад — Красная нить</title>
-	<link rel="stylesheet" href="../css/section.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Японский сад — Александр & Екатерина</title>
+	<link rel="stylesheet" href="../css/gallery.css">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
 		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
 		rel="stylesheet">
 </head>
 
-<body class="section-garden">
+<body data-theme="garden">
 
-	<!-- Индикатор загрузки -->
-	<div class="loader-overlay" id="loader">
-		<div class="loader-seal">
-			<svg width="50" height="50" viewBox="0 0 50 50" fill="none">
-				<circle cx="25" cy="25" r="22" stroke="#E84040" stroke-width="1.5" stroke-dasharray="8 4"
-					class="loader-circle" />
-				<text x="25" y="31" text-anchor="middle" fill="#E84040" font-family="'Noto Serif JP', serif"
-					font-size="18">静</text>
-			</svg>
-		</div>
-		<p class="loader-text">Загрузка...</p>
-	</div>
+	<!-- Фоновый шум -->
+	<div class="bg-noise"></div>
 
 	<!-- Шапка -->
-	<div class="section-header">
-		<a href="../index.html" class="back-btn">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-				<polyline points="15 18 9 12 15 6"></polyline>
-			</svg>
-			<span>Обложка</span>
-		</a>
-		<div class="section-title-group">
-			<span class="section-subtitle-jp">日本庭園</span>
-			<h1 class="section-title">Японский сад</h1>
-		</div>
-		<div class="page-indicator">
-			<span id="currentPage">1</span>
-			<span class="indicator-divider">/</span>
-			<span id="totalPages">0</span>
-		</div>
-	</div>
+	<header class="gallery-header">
+		<div class="header-inner">
+			<button class="back-btn" onclick="history.back()">
+				<span class="back-arrow">←</span>
+				<span>Назад</span>
+			</button>
 
-	<!-- Viewport книги -->
-	<div class="flipbook-viewport">
-		<div class="flipbook" id="flipbook">
-
-			<!-- ПРИМЕРЫ ТРЁХ ТИПОВ СТРАНИЦ -->
-			<!-- Копируй эти блоки сколько нужно, меняй только путь к фото -->
-
-			<!-- Тип 1: Одна вертикальная фотография на всю страницу -->
-			<div class="page" style="background-image:url(../photos/garden/garden-01.jpg)"></div>
-
-			<!-- Тип 2: Одна горизонтальная фотография на весь разворот -->
-			<div class="double" style="background-image:url(../photos/garden/garden-02.jpeg)"></div>
-
-			<!-- Тип 3: Две горизонтальные фотографии (по пол-страницы каждая) -->
-			<div class="double-split">
-				<div class="split-top" style="background-image:url(../photos/garden/garden-03.jpg)"></div>
-				<div class="split-bottom" style="background-image:url(../photos/garden/garden-04.jpg)"></div>
+			<div class="title-block">
+				<div class="section-title-jp">日本庭園</div>
+				<h1 class="section-title">Японский сад</h1>
 			</div>
 
-			<div class="page" style="background-image:url(../photos/garden/garden-05.jpeg)"></div>
-			<div class="double" style="background-image:url(../photos/garden/garden-06.jpg)"></div>
-			<div class="double-split">
-				<div class="split-top" style="background-image:url(../photos/garden/garden-02.jpeg)"></div>
-				<div class="split-bottom" style="background-image:url(../photos/garden/garden-03.jpg)"></div>
-			</div>
-			<div class="page" style="background-image:url(../photos/garden/garden-09.jpg)"></div>
-			<div class="double" style="background-image:url(../photos/garden/garden-10.jpg)"></div>
-
+			<span class="photo-counter" id="photoCounter"></span>
 		</div>
+	</header>
+
+	<!-- Галерея -->
+	<main class="gallery-container">
+		<div class="gallery-grid" id="galleryGrid">
+			<!-- Фото добавятся через JS -->
+		</div>
+	</main>
+
+	<!-- Подвал -->
+	<footer class="section-footer">
+		<div class="footer-seal"><span>静</span></div>
+		<p class="footer-text">Тишина, которую слышно только вдвоём</p>
+	</footer>
+
+	<!-- Лайтбокс -->
+	<div class="lightbox" id="lightbox">
+		<button class="lightbox-close" id="lightboxClose">✕</button>
+		<button class="lightbox-nav prev" id="lightboxPrev">←</button>
+		<img src="" alt="" id="lightboxImg">
+		<button class="lightbox-nav next" id="lightboxNext">→</button>
+		<span class="lightbox-counter" id="lightboxCounter"></span>
+		<span class="lightbox-swipe-hint">← свайп →</span>
 	</div>
 
-	<!-- Нижняя навигация -->
-	<nav class="section-nav">
-		<span class="section-nav-item disabled">← Сад</span>
-		<a href="zags.html" class="section-nav-item next">
-			ЗАГС
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-				<polyline points="9 18 15 12 9 6"></polyline>
-			</svg>
-		</a>
-	</nav>
-
-	<!-- jQuery 1.7 (требуется для Turn.js) -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-	<!-- Turn.js -->
-	<script src="../lib/turn.min.js"></script>
-	<!-- Scissor (для разрезания double страниц) -->
-	<script src="../lib/scissor.min.js"></script>
-	<!-- Наш скрипт -->
-	<script src="../js/section.js"></script>
+	<script src="../js/gallery.js"></script>
+	<script>
+		// Инициализация галереи для раздела Сад
+		initGallery( {
+			section: 'garden',
+			photos: [
+				// Замени на свои фото
+				{ src: '../photos/garden/01.jpeg', alt: 'Вход в сад', span: '2-rows' },
+				{ src: '../photos/garden/02.jpeg', alt: 'Каменная дорожка', span: '' },
+				{ src: '../photos/garden/03.jpg', alt: 'Мостик', span: '2-cols' },
+				{ src: '../photos/garden/04.jpeg', alt: 'Пара у пруда', span: '2-rows' },
+				{ src: '../photos/garden/05.jpeg', alt: 'Детали', span: '' },
+				{ src: '../photos/garden/06.jpg', alt: 'Ветка сакуры', span: '' },
+				{ src: '../photos/garden/07.jpeg', alt: 'Камни', span: '2-rows' },
+				{ src: '../photos/garden/08.jpg', alt: 'Фонарь', span: '' },
+				{ src: '../photos/garden/09.jpg', alt: 'Общий план', span: '2-both' },
+				{ src: '../photos/garden/10.jpeg', alt: 'Портрет', span: '2-rows' },
+				{ src: '../photos/garden/11.jpeg', alt: 'Руки', span: '' },
+				{ src: '../photos/garden/12.jpeg', alt: 'Уход', span: '2-cols' },
+			]
+		} );
+	</script>
 </body>
 
 </html>
