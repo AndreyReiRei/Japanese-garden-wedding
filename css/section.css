@@ -1,7 +1,6 @@
 /* ============================================================
-   SECTION.CSS — Turn.js книга на весь экран
-   Исправлено: крупный масштаб на мобильных,
-   уголки всегда в зоне видимости, свайпы работают
+   SECTION.CSS — Свадебный фотоальбом с эффектом книги
+   Основано на официальной документации Turn.js
    ============================================================ */
 
 /* ============================================
@@ -14,17 +13,11 @@
 }
 
 :root {
-	--bg-primary: #080808;
+	--bg-primary: #000000;
 	--red-accent: #E84040;
 	--gold: #C9A96E;
-	--gold-light: #D4BC80;
 	--white: #F0EDE8;
 	--text-secondary: #8A8278;
-	--corner-size: 44px;
-	--corner-size-mobile: 48px;
-	--corner-line: rgba(232, 64, 64, 0.7);
-	--corner-line-home: rgba(201, 169, 110, 0.7);
-	--corner-bg: rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================
@@ -35,9 +28,7 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-	background-color: var(--bg-primary);
-	margin: 0;
-	padding: 0;
+	background-color: #000;
 	font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
 	color: var(--white);
 	-webkit-font-smoothing: antialiased;
@@ -45,7 +36,6 @@ body {
 	-webkit-tap-highlight-color: transparent;
 	user-select: none;
 	-webkit-user-select: none;
-	touch-action: manipulation;
 }
 
 /* ============================================
@@ -55,12 +45,12 @@ body {
 	position: fixed;
 	inset: 0;
 	z-index: 1000;
-	background: var(--bg-primary);
+	background: #000;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 16px;
+	gap: 20px;
 	transition: opacity 0.5s ease;
 }
 
@@ -70,26 +60,22 @@ body {
 }
 
 .loader-circle {
-	animation: rotateLoader 2s linear infinite;
-	transform-origin: center;
+	animation: spin 2s linear infinite;
+	transform-origin: center center;
 }
 
-@keyframes rotateLoader {
-	from {
-		transform: rotate(0deg);
-	}
-
-	to {
+@keyframes spin {
+	100% {
 		transform: rotate(360deg);
 	}
 }
 
 .loader-text {
+	font-family: 'Inter', sans-serif;
 	font-size: 12px;
 	letter-spacing: 0.2em;
 	color: var(--text-secondary);
 	text-transform: uppercase;
-	font-family: 'Inter', sans-serif;
 }
 
 /* ============================================
@@ -104,47 +90,38 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 12px 16px;
-	background: linear-gradient(to bottom,
-			rgba(8, 8, 8, 0.9) 0%,
-			rgba(8, 8, 8, 0.4) 60%,
-			transparent 100%);
+	padding: 16px 20px;
+	background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
 	pointer-events: none;
 }
 
 .section-header>* {
-	pointer-events: all;
+	pointer-events: auto;
 }
 
 .back-btn {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	color: rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.5);
 	text-decoration: none;
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 400;
-	letter-spacing: 0.06em;
-	padding: 8px 14px;
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	letter-spacing: 0.05em;
+	padding: 8px 16px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 20px;
-	background: rgba(0, 0, 0, 0.2);
+	background: rgba(0, 0, 0, 0.3);
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
-	transition: all 0.35s ease;
-	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .back-btn:hover {
-	color: rgba(255, 255, 255, 0.85);
-	background: rgba(0, 0, 0, 0.45);
-	border-color: rgba(255, 255, 255, 0.2);
-}
-
-.back-btn:active {
-	transform: scale(0.95);
-	transition: transform 0.1s ease;
+	color: #fff;
+	background: rgba(0, 0, 0, 0.5);
+	border-color: rgba(255, 255, 255, 0.25);
 }
 
 .section-title-group {
@@ -154,34 +131,35 @@ body {
 .section-subtitle-jp {
 	display: block;
 	font-family: 'Noto Serif JP', serif;
-	font-size: 10px;
+	font-size: 11px;
 	color: var(--red-accent);
-	opacity: 0.7;
+	opacity: 0.8;
 	letter-spacing: 0.3em;
-	margin-bottom: 2px;
+	margin-bottom: 4px;
+	text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .section-title {
-	font-size: 18px;
+	font-size: 20px;
 	font-weight: 300;
 	letter-spacing: 0.06em;
-	text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
 .page-indicator {
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
-	color: rgba(255, 255, 255, 0.45);
+	font-size: 13px;
+	color: rgba(255, 255, 255, 0.5);
 	letter-spacing: 0.05em;
-	padding: 6px 12px;
-	background: rgba(0, 0, 0, 0.2);
+	padding: 6px 14px;
+	background: rgba(0, 0, 0, 0.3);
 	border-radius: 12px;
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
 }
 
 .indicator-divider {
-	margin: 0 2px;
+	margin: 0 3px;
 	opacity: 0.4;
 }
 
@@ -189,202 +167,132 @@ body {
    5. VIEWPORT КНИГИ
    ============================================ */
 .flipbook-viewport {
+	position: fixed;
+	inset: 0;
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
 }
 
-.flipbook-viewport .container {
+/* ============================================
+   6. FLIPBOOK И СТРАНИЦЫ
+   Используем viewport units для полного покрытия экрана
+   ============================================ */
+.flipbook {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	margin: auto;
-	transform-origin: center center;
+	width: 100vw;
+	height: 100vh;
+	margin-left: -50vw;
+	margin-top: -50vh;
+}
+
+/* Одиночная страница: половина ширины экрана, вся высота */
+.page {
+	width: 50vw !important;
+	height: 100vh !important;
+	background-color: #000;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+/* Двойная страница (разворот): весь экран */
+.double {
+	width: 100vw !important;
+	height: 100vh !important;
+	background-color: #000;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+/* Split-контейнер */
+.double-split {
+	width: 100vw !important;
+	height: 100vh !important;
+	background-color: #000;
+}
+
+/* Верхняя половина */
+.split-top {
+	width: 100%;
+	height: 50%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+/* Нижняя половина */
+.split-bottom {
+	width: 100%;
+	height: 50%;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
 }
 
 /* ============================================
-   6. СТРАНИЦЫ
+   7. ТЕНИ И ВИЗУАЛЬНЫЕ ЭФФЕКТЫ
    ============================================ */
-.flipbook-viewport .page {
-	background-color: #0a0a0a;
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-position: center;
-	position: relative;
-}
-
-.flipbook-viewport .double {
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	position: relative;
-}
-
-/* Тени */
 .flipbook .page,
-.flipbook .double {
-	-webkit-box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
-	-moz-box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
-	box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+.flipbook .double,
+.flipbook .double-split {
+	box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
 }
 
 .flipbook-viewport .shadow {
-	-webkit-transition: -webkit-box-shadow 0.5s;
-	-moz-transition: -moz-box-shadow 0.5s;
 	transition: box-shadow 0.5s;
-	-webkit-box-shadow: 0 0 30px #000;
-	-moz-box-shadow: 0 0 30px #000;
-	box-shadow: 0 0 30px #000;
+	box-shadow: 0 0 60px #000;
 }
 
 /* ============================================
-   7. ДЕКОРАТИВНЫЕ УГОЛКИ
-      Всегда видны на мобильных
-      Правильное позиционирование внутри страницы
+   8. КУРСОР И ИНТЕРАКТИВНОСТЬ
    ============================================ */
+.flipbook {
+	cursor: pointer;
+}
 
-.page-corner {
-	position: absolute;
-	width: var(--corner-size);
-	height: var(--corner-size);
-	z-index: 20;
-	pointer-events: all;
+.flipbook .page,
+.flipbook .double,
+.flipbook .double-split {
 	cursor: grab;
-	opacity: 0.7;
-	/* Всегда видны */
-	transition: opacity 0.3s ease, transform 0.2s ease;
-	-webkit-tap-highlight-color: transparent;
 }
 
-/* При наведении — ярче */
-.page-corner:hover {
-	opacity: 1;
-	transform: scale(1.1);
-}
-
-.page-corner:active {
+.flipbook .page:active,
+.flipbook .double:active,
+.flipbook .double-split:active {
 	cursor: grabbing;
-	opacity: 1;
-	transform: scale(0.95);
 }
 
-/* Линии уголка */
-.page-corner::before,
-.page-corner::after {
+/* Расширенная зона захвата */
+.flipbook .page::before,
+.flipbook .double::before,
+.flipbook .double-split::before {
 	content: '';
 	position: absolute;
-	transition: all 0.3s ease;
-}
-
-.page-corner::before {
-	width: 65%;
-	height: 2px;
-}
-
-.page-corner::after {
-	width: 2px;
-	height: 65%;
-}
-
-/* При наведении линии ярче */
-.page-corner:hover::before,
-.page-corner:hover::after {
-	width: 80%;
-	height: 2px;
-}
-
-.page-corner:hover::after {
-	width: 2px;
-	height: 80%;
-}
-
-/* Правый верхний угол */
-.page-corner-tr {
-	top: 10px;
-	right: 10px;
-}
-
-.page-corner-tr::before {
 	top: 0;
+	bottom: 0;
 	right: 0;
-	border-radius: 0 0 0 2px;
+	width: 80px;
+	z-index: 10;
 }
 
-.page-corner-tr::after {
+.flipbook .page::after,
+.flipbook .double::after,
+.flipbook .double-split::after {
+	content: '';
+	position: absolute;
 	top: 0;
-	right: 0;
-	border-radius: 0 0 0 2px;
-}
-
-/* Левый верхний угол */
-.page-corner-tl {
-	top: 10px;
-	left: 10px;
-}
-
-.page-corner-tl::before {
-	top: 0;
+	bottom: 0;
 	left: 0;
-	border-radius: 0 0 2px 0;
-}
-
-.page-corner-tl::after {
-	top: 0;
-	left: 0;
-	border-radius: 0 0 2px 0;
-}
-
-/* Цвета по разделам */
-.section-garden .page-corner::before,
-.section-garden .page-corner::after {
-	background: #E84040;
-	box-shadow: 0 0 10px rgba(232, 64, 64, 0.5);
-}
-
-.section-garden .page-corner:hover::before,
-.section-garden .page-corner:hover::after {
-	background: #ff6b6b;
-	box-shadow: 0 0 18px rgba(255, 100, 100, 0.8);
-}
-
-.section-zags .page-corner::before,
-.section-zags .page-corner::after {
-	background: #D9382E;
-	box-shadow: 0 0 10px rgba(217, 56, 46, 0.5);
-}
-
-.section-zags .page-corner:hover::before,
-.section-zags .page-corner:hover::after {
-	background: #ff5c5c;
-	box-shadow: 0 0 18px rgba(255, 90, 90, 0.8);
-}
-
-.section-home .page-corner::before,
-.section-home .page-corner::after {
-	background: #C9A96E;
-	box-shadow: 0 0 10px rgba(201, 169, 110, 0.5);
-}
-
-.section-home .page-corner:hover::before,
-.section-home .page-corner:hover::after {
-	background: #e8cc8a;
-	box-shadow: 0 0 18px rgba(230, 200, 130, 0.8);
+	width: 80px;
+	z-index: 10;
 }
 
 /* ============================================
-   8. ЗАПРЕТ ВЫДЕЛЕНИЯ
-   ============================================ */
-.flipbook-viewport .page img,
-.flipbook-viewport .double img {
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	user-select: none;
-	margin: 0;
-}
-
-/* ============================================
-   9. НАВИГАЦИЯ
+   9. НИЖНЯЯ НАВИГАЦИЯ
    ============================================ */
 .section-nav {
 	position: fixed;
@@ -395,445 +303,67 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 8px 16px 20px;
-	background: linear-gradient(to top,
-			rgba(8, 8, 8, 0.9) 0%,
-			rgba(8, 8, 8, 0.4) 60%,
-			transparent 100%);
+	padding: 8px 20px 20px;
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
 	pointer-events: none;
 }
 
 .section-nav>* {
-	pointer-events: all;
+	pointer-events: auto;
 }
 
 .section-nav-item {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	color: rgba(255, 255, 255, 0.4);
+	color: rgba(255, 255, 255, 0.5);
 	text-decoration: none;
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 400;
-	letter-spacing: 0.06em;
-	padding: 9px 16px;
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	letter-spacing: 0.05em;
+	padding: 10px 18px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 20px;
-	background: rgba(0, 0, 0, 0.2);
+	background: rgba(0, 0, 0, 0.3);
 	backdrop-filter: blur(10px);
 	-webkit-backdrop-filter: blur(10px);
-	transition: all 0.35s ease;
-	cursor: pointer;
+	transition: all 0.3s ease;
 }
 
 .section-nav-item:hover {
-	color: rgba(255, 255, 255, 0.85);
-	background: rgba(0, 0, 0, 0.45);
-	border-color: rgba(255, 255, 255, 0.2);
+	color: #fff;
+	background: rgba(0, 0, 0, 0.5);
+	border-color: rgba(255, 255, 255, 0.25);
 }
 
 .section-nav-item:active {
 	transform: scale(0.95);
-	transition: transform 0.1s ease;
 }
 
 .section-nav-item.disabled {
-	opacity: 0.12;
+	opacity: 0.15;
 	pointer-events: none;
-	cursor: default;
 }
 
 /* ============================================
-   10. ЦВЕТОВЫЕ АКЦЕНТЫ
+   10. ЦВЕТОВЫЕ АКЦЕНТЫ ПО РАЗДЕЛАМ
    ============================================ */
 .section-garden {
-	--accent: #E84040;
+	--section-accent: #E84040;
 }
 
 .section-zags {
-	--accent: #D9382E;
+	--section-accent: #D9382E;
 }
 
 .section-home {
-	--accent: #C9A96E;
-}
-
-/* ============================================================
-   11. АДАПТИВНОСТЬ
-       Ключевое: scale подобран так, чтобы книга занимала
-       максимум места, а уголки были в зоне видимости
-   ============================================================ */
-
-/* -----------------------------------------------------------------
-   МОБИЛЬНЫЕ (< 481px)
-   Книга почти на весь экран, уголки крупные (48px)
-   ----------------------------------------------------------------- */
-@media (width < 481px) {
-	.flipbook-viewport .flipbook {
-		width: 640px;
-		height: 400px;
-		left: -320px;
-		top: -200px;
-	}
-
-	.flipbook-viewport .page {
-		width: 320px;
-		height: 400px;
-	}
-
-	.flipbook-viewport .double {
-		width: 640px;
-		height: 400px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.62);
-	}
-
-	.section-title {
-		font-size: 15px;
-	}
-
-	.section-subtitle-jp {
-		font-size: 8px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 10px;
-		padding: 7px 12px;
-	}
-
-	.page-indicator {
-		font-size: 10px;
-		padding: 5px 10px;
-	}
-
-	/* Крупные уголки */
-	.page-corner {
-		--corner-size: 48px;
-		opacity: 0.75;
-	}
-
-	.page-corner-tr {
-		top: 8px;
-		right: 8px;
-	}
-
-	.page-corner-tl {
-		top: 8px;
-		left: 8px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   МОБИЛЬНЫЕ L (481px – 577px)
-   ----------------------------------------------------------------- */
-@media (481px <=width < 577px) {
-	.flipbook-viewport .flipbook {
-		width: 700px;
-		height: 420px;
-		left: -350px;
-		top: -210px;
-	}
-
-	.flipbook-viewport .page {
-		width: 350px;
-		height: 420px;
-	}
-
-	.flipbook-viewport .double {
-		width: 700px;
-		height: 420px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.68);
-	}
-
-	.section-title {
-		font-size: 16px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 11px;
-		padding: 7px 13px;
-	}
-
-	.page-corner {
-		--corner-size: 46px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   БОЛЬШИЕ МОБИЛЬНЫЕ (577px – 769px)
-   ----------------------------------------------------------------- */
-@media (577px <=width < 769px) {
-	.flipbook-viewport .flipbook {
-		width: 780px;
-		height: 460px;
-		left: -390px;
-		top: -230px;
-	}
-
-	.flipbook-viewport .page {
-		width: 390px;
-		height: 460px;
-	}
-
-	.flipbook-viewport .double {
-		width: 780px;
-		height: 460px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.72);
-	}
-
-	.section-title {
-		font-size: 18px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 11px;
-		padding: 8px 14px;
-	}
-
-	.page-corner {
-		--corner-size: 44px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   ПЛАНШЕТЫ (769px – 993px)
-   ----------------------------------------------------------------- */
-@media (769px <=width < 993px) {
-	.flipbook-viewport .flipbook {
-		width: 860px;
-		height: 500px;
-		left: -430px;
-		top: -250px;
-	}
-
-	.flipbook-viewport .page {
-		width: 430px;
-		height: 500px;
-	}
-
-	.flipbook-viewport .double {
-		width: 860px;
-		height: 500px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.78);
-	}
-
-	.section-title {
-		font-size: 20px;
-	}
-
-	.section-subtitle-jp {
-		font-size: 10px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 12px;
-		padding: 9px 16px;
-	}
-
-	.page-corner {
-		--corner-size: 42px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   ДЕСКТОП (993px – 1201px)
-   ----------------------------------------------------------------- */
-@media (993px <=width < 1201px) {
-	.flipbook-viewport .flipbook {
-		width: 960px;
-		height: 540px;
-		left: -480px;
-		top: -270px;
-	}
-
-	.flipbook-viewport .page {
-		width: 480px;
-		height: 540px;
-	}
-
-	.flipbook-viewport .double {
-		width: 960px;
-		height: 540px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.82);
-	}
-
-	.section-title {
-		font-size: 22px;
-	}
-
-	.section-subtitle-jp {
-		font-size: 11px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 12px;
-		padding: 9px 16px;
-	}
-
-	.page-corner {
-		--corner-size: 40px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   БОЛЬШОЙ ДЕСКТОП (1201px – 1441px)
-   ----------------------------------------------------------------- */
-@media (1201px <=width < 1441px) {
-	.flipbook-viewport .flipbook {
-		width: 1060px;
-		height: 580px;
-		left: -530px;
-		top: -290px;
-	}
-
-	.flipbook-viewport .page {
-		width: 530px;
-		height: 580px;
-	}
-
-	.flipbook-viewport .double {
-		width: 1060px;
-		height: 580px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.88);
-	}
-
-	.section-title {
-		font-size: 24px;
-	}
-
-	.section-subtitle-jp {
-		font-size: 12px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 13px;
-		padding: 10px 18px;
-	}
-
-	.page-corner {
-		--corner-size: 38px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   ОЧЕНЬ БОЛЬШОЙ ДЕСКТОП (1441px – 1921px)
-   ----------------------------------------------------------------- */
-@media (1441px <=width < 1921px) {
-	.flipbook-viewport .flipbook {
-		width: 1200px;
-		height: 640px;
-		left: -600px;
-		top: -320px;
-	}
-
-	.flipbook-viewport .page {
-		width: 600px;
-		height: 640px;
-	}
-
-	.flipbook-viewport .double {
-		width: 1200px;
-		height: 640px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(0.92);
-	}
-
-	.section-title {
-		font-size: 26px;
-	}
-
-	.section-subtitle-jp {
-		font-size: 13px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 14px;
-		padding: 11px 20px;
-	}
-
-	.page-corner {
-		--corner-size: 36px;
-	}
-}
-
-/* -----------------------------------------------------------------
-   УЛЬТРАШИРОКИЕ (≥ 1921px)
-   ----------------------------------------------------------------- */
-@media (width >=1921px) {
-	.flipbook-viewport .flipbook {
-		width: 1400px;
-		height: 720px;
-		left: -700px;
-		top: -360px;
-	}
-
-	.flipbook-viewport .page {
-		width: 700px;
-		height: 720px;
-	}
-
-	.flipbook-viewport .double {
-		width: 1400px;
-		height: 720px;
-	}
-
-	.flipbook-viewport .container {
-		transform: scale(1);
-	}
-
-	.section-title {
-		font-size: 30px;
-	}
-
-	.section-subtitle-jp {
-		font-size: 15px;
-	}
-
-	.back-btn,
-	.section-nav-item {
-		font-size: 16px;
-		padding: 13px 24px;
-	}
-
-	.page-corner {
-		--corner-size: 36px;
-	}
+	--section-accent: #C9A96E;
 }
 
 /* ============================================
-   12. ПОДДЕРЖКА ЦВЕТОВЫХ СХЕМ
+   11. АДАПТИВНОСТЬ
+   Так как используем vw/vh, дополнительное
+   масштабирование не требуется — страницы
+   всегда заполняют экран
    ============================================ */
-@media (prefers-color-scheme: light) {
-
-	html,
-	body {
-		background-color: var(--bg-primary);
-	}
-}

@@ -6,8 +6,10 @@
 	<meta name="viewport" content="width=1050, user-scalable=no">
 	<title>Купеческий дом — Красная нить</title>
 
+	<!-- Стили -->
 	<link rel="stylesheet" href="../css/section.css">
 
+	<!-- Шрифты -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
@@ -17,6 +19,7 @@
 
 <body class="section-home">
 
+	<!-- Индикатор загрузки -->
 	<div class="loader-overlay" id="loader">
 		<div class="loader-seal">
 			<svg width="50" height="50" viewBox="0 0 50 50" fill="none">
@@ -29,71 +32,80 @@
 		<p class="loader-text">Загрузка...</p>
 	</div>
 
-	<div class="section-header">
-		<a href="../index.html" class="back-btn">
-			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-				<polyline points="15 18 9 12 15 6"></polyline>
-			</svg>
-			<span>Обложка</span>
-		</a>
-		<div class="section-title-group">
-			<span class="section-subtitle-jp">家族</span>
-			<h1 class="section-title">Купеческий дом</h1>
-		</div>
-		<div class="page-indicator">
-			<span id="currentPage">1</span>
-			<span class="indicator-divider">/</span>
-			<span id="totalPages">6</span>
-		</div>
+	<!-- Заголовок раздела -->
+	<div class="section-title-group">
+		<span class="section-subtitle-jp">家族</span>
+		<h1 class="section-title">Купеческий дом</h1>
 	</div>
 
+	<!-- Счётчик страниц -->
+	<div class="page-indicator">
+		<span id="currentPage">1</span>
+		<span class="indicator-divider">/</span>
+		<span id="totalPages">8</span>
+	</div>
+
+	<!-- Кнопка «Обложка» -->
+	<a href="../index.html" class="btn-back">
+		<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+			<polyline points="15 18 9 12 15 6"></polyline>
+		</svg>
+		<span>Обложка</span>
+	</a>
+
+	<!-- Кнопка «Далее» (последний раздел — неактивна) -->
+	<span class="btn-next btn-disabled">
+		<span>Дом</span>
+		<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+			<polyline points="9 18 15 12 9 6"></polyline>
+		</svg>
+	</span>
+
+	<!-- Кнопка «ЗАГС» (предыдущий раздел) -->
+	<a href="zags.html" class="btn-prev">
+		<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+			<polyline points="15 18 9 12 15 6"></polyline>
+		</svg>
+		<span>ЗАГС</span>
+	</a>
+
+	<!-- Viewport книги -->
 	<div class="flipbook-viewport">
 		<div class="container">
 			<div class="flipbook" id="flipbook">
-				<div class="page first-page" style="background-image:url(../photos/home/home-01.jpg)">
-					<div class="page-corner page-corner-tr" title="Перелистнуть"></div>
-				</div>
 
-				<div class="double" style="background-image:url(../photos/home/home-02.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+				<!-- Передняя обложка -->
+				<div class="hard" style="background-image:url(../photos/home/cover-front.jpg)"></div>
 
-				<div class="double" style="background-image:url(../photos/home/home-03.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+				<!-- Страница 1 -->
+				<div class="page" style="background-image:url(../photos/home/home-01.jpg)"></div>
 
-				<div class="double" style="background-image:url(../photos/home/home-04.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+				<!-- Разворот 2–3 -->
+				<div class="double" style="background-image:url(../photos/home/home-02.jpg)"></div>
 
-				<div class="double" style="background-image:url(../photos/home/home-05.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+				<!-- Разворот 4–5 -->
+				<div class="double" style="background-image:url(../photos/home/home-03.jpg)"></div>
 
-				<div class="page last-page" style="background-image:url(../photos/home/home-06.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-				</div>
+				<!-- Разворот 6–7 -->
+				<div class="double" style="background-image:url(../photos/home/home-04.jpg)"></div>
+
+				<!-- Страница 8 -->
+				<div class="page" style="background-image:url(../photos/home/home-05.jpg)"></div>
+
+				<!-- Задняя обложка -->
+				<div class="hard" style="background-image:url(../photos/home/cover-back.jpg)"></div>
+
 			</div>
 		</div>
 	</div>
 
-	<nav class="section-nav">
-		<a href="zags.html" class="section-nav-item prev">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-				<polyline points="15 18 9 12 15 6"></polyline>
-			</svg>
-			ЗАГС
-		</a>
-		<span class="section-nav-item disabled">Дом →</span>
-	</nav>
-
+	<!-- Скрипты -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+	<script src="../lib/turn.min.js"></script>
+	<script src="../lib/scissor.min.js"></script>
+	<script src="../lib/zoom.min.js"></script>
 	<script src="../js/section.js"></script>
+
 </body>
 
 </html>

@@ -3,13 +3,9 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=1050, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<title>Японский сад — Красная нить</title>
-
 	<link rel="stylesheet" href="../css/section.css">
-
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
 		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
 		rel="stylesheet">
@@ -45,42 +41,38 @@
 		<div class="page-indicator">
 			<span id="currentPage">1</span>
 			<span class="indicator-divider">/</span>
-			<span id="totalPages">5</span>
+			<span id="totalPages">0</span>
 		</div>
 	</div>
 
 	<!-- Viewport книги -->
 	<div class="flipbook-viewport">
-		<div class="container">
-			<div class="flipbook" id="flipbook">
-				<!-- Страница 1 — справа (открывает книгу) -->
-				<div class="page first-page" style="background-image:url(../photos/garden/garden-01.jpg)">
-					<div class="page-corner page-corner-tr" title="Перелистнуть"></div>
-				</div>
+		<div class="flipbook" id="flipbook">
 
-				<!-- Разворот 2-3 -->
-				<div class="double" style="background-image:url(../photos/garden/garden-02.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+			<!-- ПРИМЕРЫ ТРЁХ ТИПОВ СТРАНИЦ -->
+			<!-- Копируй эти блоки сколько нужно, меняй только путь к фото -->
 
-				<!-- Разворот 4-5 -->
-				<div class="double" style="background-image:url(../photos/garden/garden-03.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+			<!-- Тип 1: Одна вертикальная фотография на всю страницу -->
+			<div class="page" style="background-image:url(../photos/garden/garden-01.jpg)"></div>
 
-				<!-- Разворот 6-7 -->
-				<div class="double" style="background-image:url(../photos/garden/garden-04.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-					<div class="page-corner page-corner-tr" title="Вперёд"></div>
-				</div>
+			<!-- Тип 2: Одна горизонтальная фотография на весь разворот -->
+			<div class="double" style="background-image:url(../photos/garden/garden-02.jpeg)"></div>
 
-				<!-- Страница 8 — слева (закрывает книгу) -->
-				<div class="page last-page" style="background-image:url(../photos/garden/garden-05.jpg)">
-					<div class="page-corner page-corner-tl" title="Назад"></div>
-				</div>
+			<!-- Тип 3: Две горизонтальные фотографии (по пол-страницы каждая) -->
+			<div class="double-split">
+				<div class="split-top" style="background-image:url(../photos/garden/garden-03.jpg)"></div>
+				<div class="split-bottom" style="background-image:url(../photos/garden/garden-04.jpg)"></div>
 			</div>
+
+			<div class="page" style="background-image:url(../photos/garden/garden-05.jpeg)"></div>
+			<div class="double" style="background-image:url(../photos/garden/garden-06.jpg)"></div>
+			<div class="double-split">
+				<div class="split-top" style="background-image:url(../photos/garden/garden-02.jpeg)"></div>
+				<div class="split-bottom" style="background-image:url(../photos/garden/garden-03.jpg)"></div>
+			</div>
+			<div class="page" style="background-image:url(../photos/garden/garden-09.jpg)"></div>
+			<div class="double" style="background-image:url(../photos/garden/garden-10.jpg)"></div>
+
 		</div>
 	</div>
 
@@ -95,8 +87,13 @@
 		</a>
 	</nav>
 
+	<!-- jQuery 1.7 (требуется для Turn.js) -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+	<!-- Turn.js -->
+	<script src="../lib/turn.min.js"></script>
+	<!-- Scissor (для разрезания double страниц) -->
+	<script src="../lib/scissor.min.js"></script>
+	<!-- Наш скрипт -->
 	<script src="../js/section.js"></script>
 </body>
 

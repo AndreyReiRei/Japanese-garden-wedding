@@ -11,54 +11,39 @@
    8.  Оверлей с историей
    9.  Лепестки сакуры
    10. Светлячки
-   11. Адаптивность (планшеты, большие экраны)
+   11. Адаптивность по брейкпоинтам
    ============================================================ */
 
 /* ============================================================
    1. СБРОС СТИЛЕЙ И CSS-ПЕРЕМЕННЫЕ
    ============================================================ */
 
-/* Убираем все отступы и включаем border-box для удобства вёрстки.
-   Отключаем подсветку нажатий на мобильных устройствах. */
 * {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
 	-webkit-tap-highlight-color: transparent;
-	/* Убирает синюю подсветку при тапе */
 }
 
-/* CSS-переменные (кастомные свойства) для всей цветовой схемы.
-   Меняя значения здесь, можно перекрасить весь сайт. */
 :root {
 	/* Основные цвета фона */
 	--bg-primary: #060606;
-	/* Глубокий чёрный */
 
 	/* Акцентные цвета */
 	--red-accent: #E84040;
-	/* Киноварь (ярко-красный) */
 	--red-glow: rgba(232, 64, 64, 0.5);
-	/* Свечение для красных элементов */
 	--gold: #C9A96E;
-	/* Золотой / охра */
 	--gold-light: #D4BC80;
-	/* Светлое золото */
 
 	/* Цвета текста */
 	--white: #F5F1EC;
-	/* Молочно-белый (не чисто белый) */
 	--text-muted: rgba(255, 255, 255, 0.55);
-	/* Приглушённый белый */
 	--text-dim: rgba(255, 255, 255, 0.6);
-	/* Ещё более тусклый */
 
-	/* Тени для текста (три уровня глубины) */
+	/* Тени для текста */
 	--text-shadow-strong:
 		0 2px 12px rgba(0, 0, 0, 0.7),
-		/* Ближняя тень */
 		0 0 40px rgba(0, 0, 0, 0.4);
-	/* Дальнее размытие */
 	--text-shadow-medium:
 		0 1px 8px rgba(0, 0, 0, 0.6),
 		0 0 20px rgba(0, 0, 0, 0.3);
@@ -67,55 +52,80 @@
 
 	/* Скругления */
 	--radius-sm: 8px;
-	/* Маленькое скругление */
 	--radius-md: 10px;
-	/* Среднее */
 	--radius-lg: 14px;
-	/* Крупное (навигация) */
 	--radius-pill: 24px;
-	/* Капсула (кнопки) */
 
 	/* Анимация */
 	--ease-out-expo: cubic-bezier(0.22, 0.61, 0.36, 1);
-	/* Плавное торможение */
 	--transition-fast: 0.15s ease;
-	/* Быстрый переход (нажатия) */
 	--transition-normal: 0.3s ease;
-	/* Обычный переход */
 	--transition-slow: 0.35s var(--ease-out-expo);
-	/* Медленный */
 	--transition-very-slow: 0.55s var(--ease-out-expo);
-	/* Самый медленный */
+
+	/* 
+	 * БАЗОВЫЕ РАЗМЕРЫ (для мобильных < 481px)
+	 * Все остальные брейкпоинты масштабируют эти значения
+	 * через clamp() или относительные единицы
+	 */
+
+	/* Навигация */
+	--nav-padding-y: 10px;
+	--nav-padding-x: 6px;
+	--nav-gap: 4px;
+	--nav-icon-size: 14px;
+	--nav-label-size: 11px;
+	--nav-radius: 12px;
+
+	/* Имена */
+	--name-size: clamp(24px, 6vw, 32px);
+	--ampersand-size: clamp(18px, 4.5vw, 24px);
+
+	/* Дата и локация */
+	--date-size: 11px;
+	--location-size: 10px;
+
+	/* Кнопка истории */
+	--story-btn-padding-y: 10px;
+	--story-btn-padding-x: 18px;
+	--story-btn-font-size: 14px;
+
+	/* Оверлей */
+	--overlay-padding: 28px 20px;
+	--story-title-size: 22px;
+	--story-seal-size: 40px;
+	--act-number-size: 32px;
+	--act-title-size: 16px;
+	--act-desc-size: 13px;
+	--act-gap: 20px;
+	--divider-width: 30px;
+	--story-close-size: 14px;
+
+	/* Контейнер */
+	--container-padding: 16px 12px 20px;
+
+	/* Рамка и уголки */
+	--frame-inset: 8px;
+	--corner-offset: 12px;
+	--corner-size: 14px;
 }
 
 /* ============================================================
    2. БАЗОВЫЕ СТИЛИ
    ============================================================ */
 
-/* html и body занимают 100% высоты экрана.
-   overflow: hidden — полностью запрещаем скролл (страница фиксирована). */
 html,
 body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-
-	/* Основной шрифт: Cormorant Garamond (латиница), Noto Serif JP (иероглифы).
-       Если оба недоступны — системный шрифт с засечками. */
 	font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
-
 	background: var(--bg-primary);
 	color: var(--white);
-
-	/* Сглаживание шрифтов для чёткости */
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-
-	/* Запрет выделения текста (чтобы страница ощущалась как приложение) */
 	user-select: none;
 	-webkit-user-select: none;
-
-	/* Оптимизация touch-событий */
 	touch-action: manipulation;
 }
 
@@ -123,160 +133,105 @@ body {
    3. ФОНОВЫЙ ШУМ
    ============================================================ */
 
-/* Создаёт едва заметную текстуру "бумаги ручного отлива" 
-   с помощью SVG-фильтра. Не влияет на производительность. */
 .bg-noise {
 	position: fixed;
-	/* Фиксирован относительно окна */
 	inset: 0;
-	/* Растянут на весь экран (аналог top/right/bottom/left: 0) */
 	z-index: 0;
-	/* Самый нижний слой */
 	pointer-events: none;
-	/* Не перехватывает клики */
-
-	/* SVG в base64 генерирует шум через feTurbulence */
 	background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
 	opacity: 0.5;
-	/* Приглушаем шум */
 }
 
 /* ============================================================
    4. ОСНОВНОЙ КОНТЕЙНЕР
    ============================================================ */
 
-/* Flex-контейнер, распределяющий контент по вертикали:
-   - навигация вверху
-   - фото по центру (фоном)
-   - текст внизу */
 .cover-container {
 	width: 100%;
 	height: 100vh;
-	/* 100% высоты viewport */
 	height: 100dvh;
-	/* Динамический viewport (для iPhone с чёлкой) */
-
 	display: flex;
 	flex-direction: column;
-	/* Элементы идут сверху вниз */
 	justify-content: space-between;
-	/* Крайние элементы прижаты к краям */
 	align-items: center;
-	/* Центрирование по горизонтали */
-
-	padding: 20px 16px 28px;
-	/* Отступы: сверху, по бокам, снизу */
+	padding: var(--container-padding);
 	position: relative;
 	z-index: 1;
-	/* Над шумом, под оверлеем */
+	/* Убираем ограничения ширины — контейнер всегда 100% */
+	max-width: none;
+	margin: 0;
 }
 
 /* ============================================================
    5. ФОТО НА ВЕСЬ ЭКРАН (ФОН)
    ============================================================ */
 
-/* Контейнер фото — растянут на весь экран позади контента */
 .photo-fullscreen {
 	position: absolute;
 	inset: 0;
 	z-index: -1;
-	/* Позади всех элементов */
 	overflow: hidden;
-	/* Обрезает края фото */
 }
 
-/* Обёртка для 3D-движения фона.
-   inset: -10px — фото чуть больше экрана, 
-   чтобы при смещении не было чёрных полей. */
 .photo-bg-wrapper {
 	position: absolute;
 	inset: -10px;
 	transform-style: preserve-3d;
-	/* Для будущих 3D-эффектов */
 	transition: transform 0.3s ease-out;
-	/* Плавное возвращение */
 	will-change: transform;
-	/* Оптимизация: браузер готовит GPU */
 }
 
-/* Само изображение */
 .photo-bg {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	/* Заполняет контейнер, сохраняя пропорции */
 	object-position: center 30%;
-	/* Фокус чуть выше центра (лица обычно сверху) */
 	display: block;
-
-	/* Фильтры для атмосферности */
-	filter: brightness(0.8)
-		/* Затемнение */
-		contrast(1.05)
-		/* Лёгкий контраст */
-		saturate(0.85);
-	/* Приглушение цвета (под японскую эстетику) */
+	filter: brightness(0.8) contrast(1.05) saturate(0.85);
 }
 
-/* Затемняющий градиент поверх фото.
-   Верх и низ темнее — для читаемости текста. */
 .photo-overlay {
 	position: absolute;
 	inset: 0;
 	background: linear-gradient(to bottom,
 			rgba(6, 6, 6, 0.55) 0%,
-			/* Сильное затемнение сверху (для навигации) */
 			rgba(6, 6, 6, 0.2) 25%,
-			/* Плавное осветление */
 			rgba(6, 6, 6, 0.1) 50%,
-			/* Почти прозрачный центр */
 			rgba(6, 6, 6, 0.25) 75%,
-			/* Начало затемнения снизу */
-			rgba(6, 6, 6, 0.65) 100%
-			/* Сильное затемнение снизу (для имён) */
-		);
+			rgba(6, 6, 6, 0.65) 100%);
 	z-index: 1;
 	pointer-events: none;
-	/* Пропускает клики к фото */
 }
 
-/* Виньетка — затемнение по краям, как в объективе */
 .photo-vignette {
 	position: absolute;
 	inset: 0;
 	background: radial-gradient(ellipse at center,
 			transparent 50%,
-			/* Центр полностью прозрачный */
 			rgba(0, 0, 0, 0.3) 80%,
-			/* Лёгкое затемнение */
-			rgba(0, 0, 0, 0.6) 100%
-			/* Края заметно темнее */
-		);
+			rgba(0, 0, 0, 0.6) 100%);
 	z-index: 1;
 	pointer-events: none;
 }
 
-/* Тонкая рамка по периметру экрана */
 .photo-frame-border {
 	position: absolute;
-	inset: 10px;
-	/* Отступ от краёв экрана */
+	inset: var(--frame-inset);
 	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: 2px;
 	z-index: 2;
 	pointer-events: none;
 }
 
-/* Угловые акценты — декоративные уголки в стиле японских рамок */
+/* Угловые акценты */
 .corner {
 	position: absolute;
-	width: 20px;
-	height: 20px;
+	width: var(--corner-size);
+	height: var(--corner-size);
 	z-index: 3;
 	pointer-events: none;
 }
 
-/* Псевдоэлементы рисуют линии уголка */
 .corner::before,
 .corner::after {
 	content: '';
@@ -287,22 +242,18 @@ body {
 .corner::before {
 	width: 100%;
 	height: 1px;
-	/* Горизонтальная линия */
 }
 
 .corner::after {
 	width: 1px;
 	height: 100%;
-	/* Вертикальная линия */
 }
 
-/* Позиционирование уголков */
 .corner-tl {
-	top: 16px;
-	left: 16px;
+	top: var(--corner-offset);
+	left: var(--corner-offset);
 }
 
-/* Top-Left */
 .corner-tl::before {
 	top: 0;
 	left: 0;
@@ -314,11 +265,10 @@ body {
 }
 
 .corner-tr {
-	top: 16px;
-	right: 16px;
+	top: var(--corner-offset);
+	right: var(--corner-offset);
 }
 
-/* Top-Right */
 .corner-tr::before {
 	top: 0;
 	right: 0;
@@ -330,11 +280,10 @@ body {
 }
 
 .corner-bl {
-	bottom: 16px;
-	left: 16px;
+	bottom: var(--corner-offset);
+	left: var(--corner-offset);
 }
 
-/* Bottom-Left */
 .corner-bl::before {
 	bottom: 0;
 	left: 0;
@@ -346,11 +295,10 @@ body {
 }
 
 .corner-br {
-	bottom: 16px;
-	right: 16px;
+	bottom: var(--corner-offset);
+	right: var(--corner-offset);
 }
 
-/* Bottom-Right */
 .corner-br::before {
 	bottom: 0;
 	right: 0;
@@ -365,86 +313,71 @@ body {
    6. ВЕРХНЯЯ НАВИГАЦИЯ
    ============================================================ */
 
-/* Полупрозрачная плашка с размытием (glass-эффект) */
 .top-nav {
 	display: flex;
-	gap: 6px;
-	/* Расстояние между кнопками */
+	gap: var(--nav-gap);
 	width: 100%;
 	max-width: 400px;
-	/* Ограничение ширины */
 	position: relative;
 	z-index: 10;
-	/* Поверх фото */
-
-	padding: 5px;
+	padding: 4px;
 	background: rgba(0, 0, 0, 0.35);
-	/* Полупрозрачный чёрный */
 	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: var(--radius-lg);
-
-	/* Размытие фона (glassmorphism) */
+	border-radius: var(--nav-radius);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-	/* Префикс для Safari */
 }
 
-/* Кнопка навигации */
 .nav-item {
 	flex: 1;
-	/* Равномерное распределение */
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 7px;
-
-	padding: 11px 8px;
+	gap: 5px;
+	padding: var(--nav-padding-y) var(--nav-padding-x);
 	background: transparent;
 	border: none;
-	border-radius: var(--radius-md);
-
+	border-radius: var(--radius-sm);
 	color: rgba(255, 255, 255, 0.6);
 	cursor: pointer;
-
 	font-family: 'Inter', sans-serif;
 	text-shadow: var(--text-shadow-light);
-
 	transition: all var(--transition-slow);
 }
 
-/* Иконка (эмодзи) */
 .nav-item .nav-icon {
-	font-size: 16px;
+	font-size: var(--nav-icon-size);
 	filter: grayscale(0.3);
-	/* Слегка обесцвечена в неактивном состоянии */
 	transition: all var(--transition-normal);
 }
 
-/* Текстовая метка */
 .nav-item .nav-label {
-	font-size: 14px;
+	font-size: var(--nav-label-size);
 	font-weight: 500;
 	letter-spacing: 0.04em;
 }
 
-/* Активная кнопка */
+/* Скрываем японский подзаголовок на малых экранах */
+.nav-item .nav-subtitle {
+	display: none;
+	font-family: 'Noto Serif JP', serif;
+	font-size: 9px;
+	font-weight: 300;
+	opacity: 0.6;
+}
+
 .nav-item.active {
 	background: rgba(232, 64, 64, 0.2);
-	/* Красный полупрозрачный фон */
 	color: #fff;
 }
 
 .nav-item.active .nav-icon {
 	filter: grayscale(0);
-	/* Полноцветная иконка */
 	transform: scale(1.08);
-	/* Лёгкое увеличение */
 }
 
-/* Эффект нажатия (тап) */
 .nav-item:active {
 	transform: scale(0.95);
-	/* Кнопка "вдавливается" */
 	transition: transform var(--transition-fast);
 }
 
@@ -456,64 +389,56 @@ body {
 	text-align: center;
 	position: relative;
 	z-index: 10;
-	/* Поверх фото */
 	width: 100%;
 }
 
-/* Дата вверху блока */
 .date-top {
 	font-family: 'Inter', sans-serif;
-	font-size: 13px;
+	font-size: var(--date-size);
 	font-weight: 400;
 	letter-spacing: 0.25em;
-	/* Широкий межбуквенный интервал */
 	color: var(--gold-light);
 	text-transform: uppercase;
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 	text-shadow: var(--text-shadow-medium);
 }
 
-/* Строка с именами */
 .names-line {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 12px;
-	margin-bottom: 6px;
+	gap: clamp(8px, 2vw, 14px);
+	margin-bottom: 4px;
+	flex-wrap: wrap;
 }
 
-/* Имя */
 .name {
-	font-size: 32px;
+	font-size: var(--name-size);
 	font-weight: 300;
-	/* Тонкое начертание */
 	letter-spacing: 0.06em;
 	color: #fff;
 	text-shadow: var(--text-shadow-strong);
-	/* Сильная тень для читаемости */
+	white-space: nowrap;
 }
 
-/* Амперсанд (&) между именами */
 .ampersand {
-	font-size: 24px;
+	font-size: var(--ampersand-size);
 	font-style: italic;
 	color: var(--red-accent);
 	font-weight: 400;
 	text-shadow:
 		0 0 20px var(--red-glow),
-		/* Красное свечение */
 		var(--text-shadow-medium);
 }
 
-/* Локация */
 .location {
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
+	font-size: var(--location-size);
 	font-weight: 400;
 	letter-spacing: 0.15em;
 	color: var(--text-muted);
 	text-transform: uppercase;
-	margin-bottom: 18px;
+	margin-bottom: clamp(12px, 3vh, 18px);
 	text-shadow: var(--text-shadow-light);
 }
 
@@ -521,37 +446,31 @@ body {
 .story-toggle {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-
+	gap: 6px;
 	background: rgba(0, 0, 0, 0.35);
-	/* Полупрозрачный фон */
 	border: 1px solid rgba(201, 169, 110, 0.3);
-	/* Золотая окантовка */
 	border-radius: var(--radius-pill);
-	padding: 11px 22px;
-
+	padding: var(--story-btn-padding-y) var(--story-btn-padding-x);
 	color: var(--gold-light);
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 15px;
+	font-size: var(--story-btn-font-size);
 	font-weight: 400;
 	letter-spacing: 0.05em;
 	cursor: pointer;
-
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-
 	text-shadow: var(--text-shadow-light);
 	transition: all var(--transition-slow);
+	max-width: 90vw;
 }
 
-/* Иконка стрелки */
 .story-toggle .story-icon {
 	display: flex;
 	align-items: center;
 	transition: transform var(--transition-very-slow);
+	flex-shrink: 0;
 }
 
-/* Нажатие на кнопку */
 .story-toggle:active {
 	background: rgba(201, 169, 110, 0.1);
 	border-color: rgba(201, 169, 110, 0.5);
@@ -561,85 +480,69 @@ body {
    8. ОВЕРЛЕЙ С ИСТОРИЕЙ
    ============================================================ */
 
-/* Затемнённый фон поверх всего, выезжает снизу */
 .story-overlay {
 	position: fixed;
 	inset: 0;
 	z-index: 100;
-	/* Самый верхний слой */
-
 	background: rgba(3, 3, 3, 0.97);
-	/* Почти непрозрачный чёрный */
 	backdrop-filter: blur(40px);
 	-webkit-backdrop-filter: blur(40px);
-
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: flex-end;
-	/* Контент прижат к низу */
-
 	transform: translateY(100%);
-	/* По умолчанию скрыт за экраном */
 	transition: transform var(--transition-very-slow);
 	pointer-events: none;
-	/* Не перехватывает клики когда скрыт */
 }
 
-/* Открытое состояние */
 .story-overlay.open {
 	transform: translateY(0);
 	pointer-events: all;
-	/* Можно взаимодействовать */
 }
 
-/* Панель с контентом */
 .story-panel {
 	width: 100%;
 	flex: 1;
-	/* Занимает всё доступное пространство */
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-	/* Вертикальное центрирование */
 	align-items: center;
-	padding: 40px 28px;
+	padding: var(--overlay-padding);
 	text-align: center;
 	overflow-y: auto;
-	/* Скролл если контент не влезает */
 	-webkit-overflow-scrolling: touch;
-	/* Плавный скролл на iOS */
 }
 
-/* Печать ханко (круглая) */
 .story-seal {
-	margin-bottom: 24px;
+	margin-bottom: clamp(16px, 3vh, 24px);
 	opacity: 0.9;
 }
 
-/* Заголовок */
+.story-seal svg {
+	width: var(--story-seal-size);
+	height: var(--story-seal-size);
+}
+
 .story-title {
-	font-size: 26px;
+	font-size: var(--story-title-size);
 	font-weight: 300;
 	letter-spacing: 0.05em;
 	color: #fff;
-	margin-bottom: 18px;
-	line-height: 1.4;
-	text-shadow:
-		0 2px 8px rgba(255, 1, 1, 0.6),
-		0 1px 20px rgba(255, 0, 0, 0.3);
+	margin-bottom: clamp(12px, 2vh, 18px);
+	line-height: 1.3;
+	text-shadow: var(--text-shadow-medium);
 }
 
-/* Разделитель с точкой */
 .story-divider {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	margin-bottom: 32px;
+	gap: 10px;
+	margin-bottom: clamp(20px, 4vh, 32px);
 }
 
 .divider-line {
-	width: 40px;
+	width: var(--divider-width);
 	height: 1px;
 	background: rgba(201, 169, 110, 0.3);
 }
@@ -652,80 +555,73 @@ body {
 	box-shadow: 0 0 8px var(--red-glow);
 }
 
-/* Контейнер для трёх актов */
 .story-content {
-	max-width: 380px;
+	width: 100%;
+	max-width: 500px;
 	display: flex;
 	flex-direction: column;
-	gap: 28px;
+	gap: var(--act-gap);
+	padding: 0 4px;
 }
 
-/* Один акт истории */
 .story-act {
 	display: flex;
-	gap: 16px;
+	gap: clamp(10px, 2vw, 16px);
 	text-align: left;
 	align-items: flex-start;
 }
 
-/* Номер акта (I, II, III) */
 .act-number {
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 46px;
+	font-size: var(--act-number-size);
 	font-weight: 300;
 	color: var(--red-accent);
 	opacity: 0.8;
-	line-height: 1.5;
-	min-width: 50px;
+	line-height: 1;
+	min-width: clamp(28px, 8vw, 40px);
 	text-shadow: 0 0 15px var(--red-glow);
-	margin: 0 10px;
 	text-align: center;
-	overflow: hidden;
+	flex-shrink: 0;
 }
 
-/* Информация акта */
 .act-info {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 3px;
+	flex: 1;
+	min-width: 0;
 }
 
-/* Название акта */
 .act-title {
-	font-size: 24px;
+	font-size: var(--act-title-size);
 	font-weight: 400;
-	letter-spacing: 0.06em;
+	letter-spacing: 0.04em;
 	color: #fff;
 	text-shadow: var(--text-shadow-light);
 }
 
-/* Описание */
 .act-desc {
-	font-size: 20px;
+	font-size: var(--act-desc-size);
 	font-weight: 300;
-	line-height: 1.6;
+	line-height: 1.5;
 	color: var(--text-dim);
 }
 
-/* Кнопка "Свернуть" */
 .story-close {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-
+	gap: 6px;
 	background: rgba(232, 64, 64, 0.08);
 	border: 1px solid rgba(232, 64, 64, 0.3);
 	border-radius: var(--radius-pill);
-	padding: 12px 28px;
-
+	padding: clamp(10px, 2vh, 14px) clamp(20px, 5vw, 28px);
 	color: var(--red-accent);
 	font-family: 'Cormorant Garamond', serif;
-	font-size: 15px;
+	font-size: var(--story-close-size);
 	font-weight: 400;
 	letter-spacing: 0.05em;
 	cursor: pointer;
-	margin-top: 36px;
-
+	margin-top: clamp(24px, 4vh, 36px);
 	text-shadow: var(--text-shadow-light);
 	transition: all var(--transition-normal);
 }
@@ -735,15 +631,14 @@ body {
 	border-color: rgba(232, 64, 64, 0.5);
 }
 
-/* Индикатор свайпа (полоска внизу) */
 .swipe-indicator {
-	padding: 12px 0 24px;
+	padding: 10px 0 18px;
 	display: flex;
 	justify-content: center;
 }
 
 .swipe-line {
-	width: 44px;
+	width: 40px;
 	height: 4px;
 	background: rgba(255, 255, 255, 0.2);
 	border-radius: 2px;
@@ -753,69 +648,430 @@ body {
    9. ЛЕПЕСТКИ САКУРЫ
    ============================================================ */
 
-/* Контейнер для всех летящих частиц */
 .petals-container {
 	position: fixed;
 	inset: 0;
 	z-index: 5;
-	/* Над фото, под текстом и навигацией */
 	pointer-events: none;
-	/* Клики проходят сквозь */
 	overflow: hidden;
-	/* Всё что вылетело за экран — обрезается */
 }
 
 /* ============================================================
    10. СВЕТЛЯЧКИ
    ============================================================ */
 
-/* Стили для светящихся точек (создаются в JS) */
-/* .petal-glow — динамически добавляется к некоторым лепесткам */
+/* Стили создаются динамически в JS */
 
 /* ============================================================
-   11. АДАПТИВНОСТЬ
+   11. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
    ============================================================ */
 
-/* Экраны шире 420px (большие телефоны) */
-@media (min-width: 420px) {
+/* 
+ * Стратегия:
+ * - На самых маленьких экранах (< 481px) используем базовые переменные
+ * - С каждым брейкпоинтом плавно увеличиваем размеры
+ * - Используем clamp() для критичных элементов
+ * - Проверяем, чтобы ничего не вылезало за пределы экрана
+ */
+
+/* ==========================================
+   Мобильные (< 481px) — БАЗОВЫЙ РАЗМЕР
+   Уже задан в :root, здесь только уточнения
+   ========================================== */
+@media (width < 481px) {
+	:root {
+		--name-size: clamp(22px, 5.5vw, 28px);
+		--ampersand-size: clamp(16px, 4vw, 20px);
+		--date-size: 10px;
+		--location-size: 9px;
+		--story-btn-font-size: 12px;
+		--story-btn-padding-y: 8px;
+		--story-btn-padding-x: 14px;
+		--nav-label-size: 10px;
+		--nav-icon-size: 13px;
+		--nav-padding-y: 8px;
+		--nav-padding-x: 4px;
+		--nav-gap: 3px;
+		--container-padding: 12px 8px 14px;
+		--frame-inset: 6px;
+		--corner-offset: 10px;
+		--corner-size: 12px;
+
+		/* Оверлей */
+		--overlay-padding: 24px 16px;
+		--story-title-size: 18px;
+		--story-seal-size: 34px;
+		--act-number-size: 28px;
+		--act-title-size: 14px;
+		--act-desc-size: 12px;
+		--act-gap: 16px;
+		--divider-width: 24px;
+		--story-close-size: 13px;
+	}
+
+	/* Уменьшаем отступы в навигации */
+	.top-nav {
+		max-width: 100%;
+		gap: 2px;
+		padding: 3px;
+	}
+
+	.nav-item {
+		gap: 3px;
+	}
+
+	/* Имена не должны переноситься */
 	.name {
-		font-size: 36px;
+		white-space: nowrap;
 	}
 
-	.date-top {
-		font-size: 14px;
+	/* Кнопка истории — меньше скругление */
+	.story-toggle {
+		border-radius: 20px;
 	}
 
-	.location {
-		font-size: 13px;
+	/* В оверлее — компактнее */
+	.story-act {
+		gap: 8px;
+	}
+
+	.act-number {
+		min-width: 24px;
 	}
 }
 
-/* Планшеты и десктоп (шире 768px) */
-@media (min-width: 768px) {
-	.cover-container {
-		padding: 28px 40px 36px;
+/* ==========================================
+   Мобильные L (481px – 576px)
+   ========================================== */
+@media (481px <=width < 577px) {
+	:root {
+		--name-size: 28px;
+		--ampersand-size: 20px;
+		--date-size: 11px;
+		--location-size: 10px;
+		--story-btn-font-size: 13px;
+		--story-btn-padding-y: 9px;
+		--story-btn-padding-x: 16px;
+		--nav-label-size: 11px;
+		--nav-icon-size: 14px;
+		--nav-padding-y: 9px;
+		--nav-padding-x: 6px;
+		--container-padding: 16px 14px 18px;
+		--frame-inset: 8px;
+		--corner-offset: 12px;
+		--corner-size: 14px;
+
+		--overlay-padding: 30px 20px;
+		--story-title-size: 20px;
+		--story-seal-size: 38px;
+		--act-number-size: 30px;
+		--act-title-size: 15px;
+		--act-desc-size: 13px;
+		--act-gap: 18px;
+		--divider-width: 30px;
+		--story-close-size: 14px;
 	}
 
-	.name {
-		font-size: 42px;
+	.top-nav {
+		max-width: 420px;
+	}
+
+	/* Показываем японский подзаголовок */
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+}
+
+/* ==========================================
+   Большие мобильные (577px – 768px)
+   ========================================== */
+@media (577px <=width < 769px) {
+	:root {
+		--name-size: 32px;
+		--ampersand-size: 22px;
+		--date-size: 12px;
+		--location-size: 11px;
+		--story-btn-font-size: 14px;
+		--story-btn-padding-y: 10px;
+		--story-btn-padding-x: 18px;
+		--nav-label-size: 12px;
+		--nav-icon-size: 15px;
+		--nav-padding-y: 10px;
+		--nav-padding-x: 8px;
+		--nav-gap: 5px;
+		--container-padding: 18px 16px 22px;
+		--frame-inset: 8px;
+		--corner-offset: 14px;
+		--corner-size: 16px;
+
+		--overlay-padding: 32px 24px;
+		--story-title-size: 22px;
+		--story-seal-size: 40px;
+		--act-number-size: 34px;
+		--act-title-size: 17px;
+		--act-desc-size: 14px;
+		--act-gap: 22px;
+		--divider-width: 34px;
+		--story-close-size: 14px;
+	}
+
+	.top-nav {
+		max-width: 460px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	/* Увеличиваем максимальную ширину контента оверлея */
+	.story-content {
+		max-width: 440px;
+	}
+}
+
+/* ==========================================
+   Планшеты (769px – 992px)
+   ========================================== */
+@media (769px <=width < 993px) {
+	:root {
+		--name-size: 38px;
+		--ampersand-size: 26px;
+		--date-size: 13px;
+		--location-size: 12px;
+		--story-btn-font-size: 15px;
+		--story-btn-padding-y: 11px;
+		--story-btn-padding-x: 22px;
+		--nav-label-size: 13px;
+		--nav-icon-size: 16px;
+		--nav-padding-y: 11px;
+		--nav-padding-x: 12px;
+		--nav-gap: 6px;
+		--nav-radius: 14px;
+		--container-padding: 24px 28px 30px;
+		--frame-inset: 14px;
+		--corner-offset: 20px;
+		--corner-size: 18px;
+
+		--overlay-padding: 40px 32px;
+		--story-title-size: 24px;
+		--story-seal-size: 42px;
+		--act-number-size: 38px;
+		--act-title-size: 18px;
+		--act-desc-size: 15px;
+		--act-gap: 24px;
+		--divider-width: 38px;
+		--story-close-size: 15px;
 	}
 
 	.top-nav {
 		max-width: 520px;
-		gap: 10px;
 	}
 
-	.nav-item {
-		padding: 14px 20px;
+	.nav-item .nav-subtitle {
+		display: inline;
 	}
 
-	.nav-item .nav-label {
-		font-size: 15px;
+	.story-content {
+		max-width: 480px;
 	}
 
-	.story-toggle {
-		font-size: 16px;
-		padding: 12px 28px;
+	/* На планшетах можно чуть увеличить фото */
+	.photo-bg {
+		object-position: center 25%;
+	}
+}
+
+/* ==========================================
+   Десктоп (993px – 1200px)
+   ========================================== */
+@media (993px <=width < 1201px) {
+	:root {
+		--name-size: 46px;
+		--ampersand-size: 30px;
+		--date-size: 14px;
+		--location-size: 13px;
+		--story-btn-font-size: 16px;
+		--story-btn-padding-y: 12px;
+		--story-btn-padding-x: 26px;
+		--nav-label-size: 14px;
+		--nav-icon-size: 17px;
+		--nav-padding-y: 13px;
+		--nav-padding-x: 16px;
+		--nav-gap: 8px;
+		--container-padding: 28px 40px 36px;
+		--frame-inset: 18px;
+		--corner-offset: 24px;
+		--corner-size: 20px;
+
+		--overlay-padding: 48px 40px;
+		--story-title-size: 28px;
+		--story-seal-size: 46px;
+		--act-number-size: 44px;
+		--act-title-size: 20px;
+		--act-desc-size: 16px;
+		--act-gap: 28px;
+		--divider-width: 44px;
+		--story-close-size: 16px;
+	}
+
+	.top-nav {
+		max-width: 560px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 540px;
+	}
+
+	/* На десктопе можно показать больше фото */
+	.photo-bg {
+		object-position: center 20%;
+	}
+}
+
+/* ==========================================
+   Большой десктоп (1201px – 1440px)
+   ========================================== */
+@media (1201px <=width < 1441px) {
+	:root {
+		--name-size: 52px;
+		--ampersand-size: 34px;
+		--date-size: 15px;
+		--location-size: 14px;
+		--story-btn-font-size: 17px;
+		--story-btn-padding-y: 13px;
+		--story-btn-padding-x: 28px;
+		--nav-label-size: 15px;
+		--nav-icon-size: 18px;
+		--nav-padding-y: 14px;
+		--nav-padding-x: 20px;
+		--nav-gap: 10px;
+		--container-padding: 32px 48px 40px;
+		--frame-inset: 24px;
+		--corner-offset: 30px;
+		--corner-size: 22px;
+
+		--overlay-padding: 56px 48px;
+		--story-title-size: 30px;
+		--story-seal-size: 50px;
+		--act-number-size: 50px;
+		--act-title-size: 22px;
+		--act-desc-size: 17px;
+		--act-gap: 30px;
+		--divider-width: 50px;
+		--story-close-size: 17px;
+	}
+
+	.top-nav {
+		max-width: 600px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 580px;
+	}
+}
+
+/* ==========================================
+   Очень большой десктоп (1441px – 1920px)
+   ========================================== */
+@media (1441px <=width < 1921px) {
+	:root {
+		--name-size: 58px;
+		--ampersand-size: 38px;
+		--date-size: 16px;
+		--location-size: 15px;
+		--story-btn-font-size: 18px;
+		--story-btn-padding-y: 14px;
+		--story-btn-padding-x: 32px;
+		--nav-label-size: 16px;
+		--nav-icon-size: 19px;
+		--nav-padding-y: 15px;
+		--nav-padding-x: 24px;
+		--nav-gap: 10px;
+		--container-padding: 36px 56px 44px;
+		--frame-inset: 28px;
+		--corner-offset: 34px;
+		--corner-size: 24px;
+
+		--overlay-padding: 64px 56px;
+		--story-title-size: 34px;
+		--story-seal-size: 54px;
+		--act-number-size: 56px;
+		--act-title-size: 24px;
+		--act-desc-size: 18px;
+		--act-gap: 34px;
+		--divider-width: 56px;
+		--story-close-size: 18px;
+	}
+
+	.top-nav {
+		max-width: 640px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 620px;
+	}
+}
+
+/* ==========================================
+   Ультраширокие (≥ 1921px)
+   ========================================== */
+@media (width >=1921px) {
+	:root {
+		--name-size: 64px;
+		--ampersand-size: 42px;
+		--date-size: 17px;
+		--location-size: 16px;
+		--story-btn-font-size: 19px;
+		--story-btn-padding-y: 15px;
+		--story-btn-padding-x: 34px;
+		--nav-label-size: 17px;
+		--nav-icon-size: 20px;
+		--nav-padding-y: 16px;
+		--nav-padding-x: 28px;
+		--nav-gap: 12px;
+		--container-padding: 40px 64px 48px;
+		--frame-inset: 32px;
+		--corner-offset: 38px;
+		--corner-size: 26px;
+
+		--overlay-padding: 72px 64px;
+		--story-title-size: 38px;
+		--story-seal-size: 58px;
+		--act-number-size: 62px;
+		--act-title-size: 26px;
+		--act-desc-size: 19px;
+		--act-gap: 38px;
+		--divider-width: 60px;
+		--story-close-size: 19px;
+	}
+
+	.top-nav {
+		max-width: 680px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 660px;
+	}
+
+	/* На очень широких экранах фото не должно растягиваться */
+	.photo-bg {
+		object-fit: contain;
+		background: #000;
 	}
 }
