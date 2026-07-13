@@ -16,20 +16,35 @@
 
 <body data-theme="zags">
 
-	<!-- Фоновый шум -->
 	<div class="bg-noise"></div>
 
 	<!-- Шапка -->
 	<header class="gallery-header">
 		<div class="header-inner">
-			<button class="back-btn" onclick="history.back()">
+			<a href="../index.html" class="back-btn">
 				<span class="back-arrow">←</span>
 				<span>Назад</span>
-			</button>
+			</a>
 
 			<div class="title-block">
 				<div class="section-title-jp">婚姻</div>
 				<h1 class="section-title">Бракосочетание</h1>
+
+				<!-- Навигация -->
+				<nav class="section-nav">
+					<!-- Предыдущий -->
+					<a href="garden.html" class="nav-arrow" title="Японский сад">←</a>
+
+					<!-- Точки -->
+					<div class="section-dots">
+						<a href="garden.html" class="section-dot" title="Японский сад"></a>
+						<span class="section-dot active" title="Бракосочетание"></span>
+						<a href="home.html" class="section-dot" title="Купеческий дом"></a>
+					</div>
+
+					<!-- Следующий -->
+					<a href="home.html" class="nav-arrow" title="Купеческий дом">→</a>
+				</nav>
 			</div>
 
 			<span class="photo-counter" id="photoCounter"></span>
@@ -38,10 +53,36 @@
 
 	<!-- Галерея -->
 	<main class="gallery-container">
-		<div class="gallery-grid" id="galleryGrid">
-			<!-- Фото добавятся через JS -->
-		</div>
+		<div class="gallery-grid" id="galleryGrid"></div>
 	</main>
+
+	<!-- Нижняя навигация -->
+	<nav class="section-bottom-nav">
+		<a href="garden.html" class="bottom-nav-btn">
+			<span class="arrow arrow-left">←</span>
+			<div>
+				<div class="bottom-nav-label">Предыдущий</div>
+				<div class="bottom-nav-title">Японский сад</div>
+			</div>
+		</a>
+
+		<div class="bottom-nav-divider"></div>
+
+		<a href="../index.html" class="bottom-nav-home">
+			<span class="bottom-nav-home-icon">🏠</span>
+			<span>Домой</span>
+		</a>
+
+		<div class="bottom-nav-divider"></div>
+
+		<a href="home.html" class="bottom-nav-btn">
+			<div>
+				<div class="bottom-nav-label">Следующий</div>
+				<div class="bottom-nav-title">Купеческий дом</div>
+			</div>
+			<span class="arrow arrow-right">→</span>
+		</a>
+	</nav>
 
 	<!-- Подвал -->
 	<footer class="section-footer">
@@ -66,7 +107,7 @@
 			section: 'zags',
 			photos: [
 				// Замени на свои фото
-				{ src: '../photos/zags/01.jpg', alt: 'Здание ЗАГСа', span: '2-cols' },
+				{ src: '../photos/zags/01.jpeg', alt: 'Здание ЗАГСа', span: '2-cols' },
 				{ src: '../photos/zags/02.jpeg', alt: 'Ожидание', span: '2-rows' },
 				{ src: '../photos/zags/03.jpeg', alt: 'Роспись в книге', span: '' },
 				{ src: '../photos/zags/04.jpeg', alt: 'Крупно руки', span: '2-rows' },

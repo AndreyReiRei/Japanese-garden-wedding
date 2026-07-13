@@ -22,14 +22,32 @@
 	<!-- Шапка -->
 	<header class="gallery-header">
 		<div class="header-inner">
-			<button class="back-btn" onclick="history.back()">
+			<!-- Кнопка назад (на обложку) -->
+			<a href="../index.html" class="back-btn">
 				<span class="back-arrow">←</span>
-				<span>Назад</span>
-			</button>
+				<span>Домой</span>
+			</a>
 
+			<!-- Заголовок + точки разделов + стрелки -->
 			<div class="title-block">
 				<div class="section-title-jp">日本庭園</div>
 				<h1 class="section-title">Японский сад</h1>
+
+				<!-- Навигация между разделами -->
+				<nav class="section-nav">
+					<!-- Предыдущий раздел (неактивен — мы на первом) -->
+					<span class="nav-arrow disabled" title="Это первый раздел">←</span>
+
+					<!-- Точки-индикаторы -->
+					<div class="section-dots">
+						<span class="section-dot active" title="Японский сад"></span>
+						<a href="zags.html" class="section-dot" title="Бракосочетание"></a>
+						<a href="home.html" class="section-dot" title="Купеческий дом"></a>
+					</div>
+
+					<!-- Следующий раздел -->
+					<a href="zags.html" class="nav-arrow" title="Бракосочетание">→</a>
+				</nav>
 			</div>
 
 			<span class="photo-counter" id="photoCounter"></span>
@@ -42,6 +60,37 @@
 			<!-- Фото добавятся через JS -->
 		</div>
 	</main>
+
+	<!-- Нижняя навигация -->
+	<nav class="section-bottom-nav">
+		<!-- Предыдущий (неактивен) -->
+		<span class="bottom-nav-btn" style="opacity: 0.3; pointer-events: none;">
+			<span class="arrow arrow-left">←</span>
+			<div>
+				<div class="bottom-nav-label">Предыдущий</div>
+				<div class="bottom-nav-title">—</div>
+			</div>
+		</span>
+
+		<div class="bottom-nav-divider"></div>
+
+		<!-- На обложку -->
+		<a href="../index.html" class="bottom-nav-home">
+			<span class="bottom-nav-home-icon">🏠</span>
+			<span>Домой</span>
+		</a>
+
+		<div class="bottom-nav-divider"></div>
+
+		<!-- Следующий -->
+		<a href="zags.html" class="bottom-nav-btn">
+			<div>
+				<div class="bottom-nav-label">Следующий</div>
+				<div class="bottom-nav-title">ЗАГС</div>
+			</div>
+			<span class="arrow arrow-right">→</span>
+		</a>
+	</nav>
 
 	<!-- Подвал -->
 	<footer class="section-footer">

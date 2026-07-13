@@ -496,6 +496,239 @@ body {
 }
 
 /* ============================================================
+   8.5. НАВИГАЦИЯ МЕЖДУ РАЗДЕЛАМИ
+   ============================================================ */
+
+/* Контейнер навигации в шапке */
+.section-nav {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* Кнопки-стрелки */
+.nav-arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	color: var(--text-muted);
+	font-size: 14px;
+	cursor: pointer;
+	transition: all var(--transition-normal);
+	text-decoration: none;
+	flex-shrink: 0;
+}
+
+.nav-arrow:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: var(--white);
+	border-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-arrow:active {
+	transform: scale(0.92);
+	transition: transform 0.12s ease;
+}
+
+/* Стрелка неактивна (когда некуда идти) */
+.nav-arrow.disabled {
+	opacity: 0.25;
+	pointer-events: none;
+	cursor: default;
+}
+
+/* Точки-индикаторы разделов */
+.section-dots {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+
+.section-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.2);
+	transition: all var(--transition-normal);
+	cursor: pointer;
+	text-decoration: none;
+	display: block;
+}
+
+.section-dot.active {
+	background: var(--accent-color);
+	box-shadow: 0 0 8px var(--accent-glow);
+	width: 8px;
+	height: 8px;
+}
+
+.section-dot:hover {
+	background: rgba(255, 255, 255, 0.4);
+}
+
+.section-dot.active:hover {
+	background: var(--accent-color);
+}
+
+/* Нижняя навигация (под галереей) */
+.section-bottom-nav {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+	padding: 32px 16px 16px;
+	position: relative;
+	z-index: 1;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.bottom-nav-btn {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 12px 20px;
+	border-radius: var(--radius-pill);
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	color: var(--text-muted);
+	font-family: inherit;
+	font-size: 13px;
+	font-weight: 300;
+	letter-spacing: 0.05em;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all var(--transition-slow);
+}
+
+.bottom-nav-btn:hover {
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(var(--accent-rgb), 0.4);
+	color: var(--white);
+}
+
+.bottom-nav-btn:active {
+	transform: scale(0.96);
+	transition: transform 0.12s ease;
+}
+
+.bottom-nav-btn .arrow {
+	font-size: 16px;
+	transition: transform 0.3s ease;
+}
+
+.bottom-nav-btn:hover .arrow-right {
+	transform: translateX(3px);
+}
+
+.bottom-nav-btn:hover .arrow-left {
+	transform: translateX(-3px);
+}
+
+.bottom-nav-label {
+	font-size: 10px;
+	font-weight: 400;
+	letter-spacing: 0.12em;
+	color: var(--text-muted);
+	text-transform: uppercase;
+}
+
+.bottom-nav-title {
+	font-size: 14px;
+	font-weight: 400;
+	color: var(--white);
+}
+
+.bottom-nav-divider {
+	width: 1px;
+	height: 24px;
+	background: rgba(255, 255, 255, 0.08);
+}
+
+/* Центральная кнопка "На обложку" */
+.bottom-nav-home {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 10px 16px;
+	border-radius: var(--radius-pill);
+	background: transparent;
+	border: 1px solid rgba(var(--accent-rgb), 0.25);
+	color: var(--accent-color);
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all var(--transition-slow);
+}
+
+.bottom-nav-home:hover {
+	background: rgba(var(--accent-rgb), 0.1);
+	border-color: rgba(var(--accent-rgb), 0.5);
+}
+
+.bottom-nav-home-icon {
+	font-size: 18px;
+}
+
+/* Адаптивность для навигации */
+@media (width < 481px) {
+	.section-dots {
+		gap: 4px;
+	}
+
+	.section-dot {
+		width: 5px;
+		height: 5px;
+	}
+
+	.section-dot.active {
+		width: 7px;
+		height: 7px;
+	}
+
+	.nav-arrow {
+		width: 28px;
+		height: 28px;
+		font-size: 12px;
+	}
+
+	.bottom-nav-btn {
+		padding: 10px 14px;
+		font-size: 12px;
+		gap: 4px;
+	}
+
+	.bottom-nav-title {
+		font-size: 12px;
+	}
+
+	.bottom-nav-divider {
+		height: 18px;
+	}
+}
+
+@media (width < 370px) {
+
+	/* На очень маленьких экранах убираем текст, оставляем только стрелки */
+	.bottom-nav-label {
+		display: none;
+	}
+
+	.bottom-nav-title {
+		font-size: 11px;
+	}
+}
+
+/* ============================================================
    9. АДАПТИВНОСТЬ
    ============================================================ */
 
