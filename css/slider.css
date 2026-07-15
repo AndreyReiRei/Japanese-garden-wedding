@@ -444,3 +444,155 @@
 		bottom: 40px;
 	}
 }
+
+/* ============================================================
+   11. ЗУМ ФОТО
+   ============================================================ */
+
+/* Изображение в режиме зума */
+[data-zoom-img] {
+	transition: transform 0.3s ease;
+	will-change: transform;
+}
+
+[data-zoom-img].zoomed {
+	transition: transform 0.1s linear;
+}
+
+/* Обёртка при зуме */
+[data-zoom-wrapper] {
+	overflow: hidden;
+}
+
+[data-zoom-wrapper].zoomed {
+	overflow: visible;
+}
+
+/* Подсказка о зуме */
+.slider-zoom-hint {
+	position: absolute;
+	top: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
+
+	font-family: 'Inter', sans-serif;
+	font-size: 12px;
+	font-weight: 400;
+	letter-spacing: 0.06em;
+	color: rgba(255, 255, 255, 0.5);
+	background: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 100px;
+	padding: 6px 14px;
+
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+}
+
+.slider-zoom-hint.visible {
+	opacity: 1;
+}
+
+/* Адаптивность подсказки */
+@media (width < 481px) {
+	.slider-zoom-hint {
+		font-size: 10px;
+		padding: 4px 10px;
+		top: 18px;
+	}
+}
+
+/* ============================================================
+   11.1. КНОПКИ ЗУМА
+   ============================================================ */
+
+.slider-zoom-controls {
+	position: absolute;
+	bottom: 60px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
+
+	display: flex;
+	align-items: center;
+	gap: 10px;
+
+	background: rgba(0, 0, 0, 0.55);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 100px;
+	padding: 6px 8px;
+
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+}
+
+.slider-zoom-controls.visible {
+	opacity: 1;
+	pointer-events: all;
+}
+
+.zoom-btn {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 18px;
+	font-weight: 300;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	font-family: 'Inter', sans-serif;
+	line-height: 1;
+}
+
+.zoom-btn:hover {
+	background: rgba(255, 255, 255, 0.12);
+	color: #fff;
+}
+
+.zoom-btn:active {
+	transform: scale(0.9);
+	background: rgba(255, 255, 255, 0.18);
+}
+
+.zoom-level {
+	font-family: 'Inter', sans-serif;
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.7);
+	min-width: 32px;
+	text-align: center;
+	user-select: none;
+}
+
+/* Адаптивность кнопок зума */
+@media (width < 481px) {
+	.slider-zoom-controls {
+		bottom: 50px;
+		gap: 6px;
+		padding: 4px 6px;
+	}
+
+	.zoom-btn {
+		width: 30px;
+		height: 30px;
+		font-size: 16px;
+	}
+
+	.zoom-level {
+		font-size: 11px;
+		min-width: 26px;
+	}
+}
