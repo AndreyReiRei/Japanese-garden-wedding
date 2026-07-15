@@ -5,47 +5,44 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>Японский сад — Александр & Екатерина</title>
+
+	<!-- Галерея -->
 	<link rel="stylesheet" href="../css/gallery.css">
+	<!-- Swiper -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+	<!-- Наш слайдер -->
+	<link rel="stylesheet" href="../css/slider.css">
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
-		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500&display=swap"
 		rel="stylesheet">
 </head>
 
 <body data-theme="garden">
 
-	<!-- Фоновый шум -->
 	<div class="bg-noise"></div>
 
-	<!-- Шапка -->
 	<header class="gallery-header">
 		<div class="header-inner">
-			<!-- Кнопка назад (на обложку) -->
 			<a href="../index.html" class="back-btn">
 				<span class="back-arrow">←</span>
-				<span>Домой</span>
+				<span>Обложка</span>
 			</a>
 
-			<!-- Заголовок + точки разделов + стрелки -->
 			<div class="title-block">
-				<div class="section-title-jp">日本庭園</div>
 				<h1 class="section-title">Японский сад</h1>
 
-				<!-- Навигация между разделами -->
 				<nav class="section-nav">
-					<!-- Предыдущий раздел (неактивен — мы на первом) -->
-					<span class="nav-arrow disabled" title="Это первый раздел">←</span>
+					<span class="nav-arrow disabled">←</span>
 
-					<!-- Точки-индикаторы -->
 					<div class="section-dots">
 						<span class="section-dot active" title="Японский сад"></span>
 						<a href="zags.html" class="section-dot" title="Бракосочетание"></a>
 						<a href="home.html" class="section-dot" title="Купеческий дом"></a>
 					</div>
 
-					<!-- Следующий раздел -->
 					<a href="zags.html" class="nav-arrow" title="Бракосочетание">→</a>
 				</nav>
 			</div>
@@ -54,67 +51,41 @@
 		</div>
 	</header>
 
-	<!-- Галерея -->
 	<main class="gallery-container">
-		<div class="gallery-grid" id="galleryGrid">
-			<!-- Фото добавятся через JS -->
-		</div>
+		<div class="gallery-grid" id="galleryGrid"></div>
 	</main>
 
-	<!-- Нижняя навигация -->
 	<nav class="section-bottom-nav">
-		<!-- Предыдущий (неактивен) -->
-		<span class="bottom-nav-btn" style="opacity: 0.3; pointer-events: none;">
-			<span class="arrow arrow-left">←</span>
-			<div>
-				<div class="bottom-nav-label">Предыдущий</div>
-				<div class="bottom-nav-title">—</div>
-			</div>
-		</span>
-
-		<div class="bottom-nav-divider"></div>
-
-		<!-- На обложку -->
 		<a href="../index.html" class="bottom-nav-home">
-			<span class="bottom-nav-home-icon">🏠</span>
-			<span>Домой</span>
+			<span class="bottom-nav-home-icon">⟡</span>
+			<span>Обложка</span>
 		</a>
 
-		<div class="bottom-nav-divider"></div>
-
-		<!-- Следующий -->
 		<a href="zags.html" class="bottom-nav-btn">
-			<div>
-				<div class="bottom-nav-label">Следующий</div>
-				<div class="bottom-nav-title">ЗАГС</div>
+			<div class="bottom-nav-content">
+				<span class="bottom-nav-label">Следующий раздел</span>
+				<span class="bottom-nav-title">Бракосочетание</span>
 			</div>
 			<span class="arrow arrow-right">→</span>
 		</a>
 	</nav>
 
-	<!-- Подвал -->
 	<footer class="section-footer">
-		<div class="footer-seal"><span>静</span></div>
+		<div class="footer-accent"></div>
 		<p class="footer-text">Тишина, которую слышно только вдвоём</p>
 	</footer>
 
-	<!-- Лайтбокс -->
-	<div class="lightbox" id="lightbox">
-		<button class="lightbox-close" id="lightboxClose">✕</button>
-		<button class="lightbox-nav prev" id="lightboxPrev">←</button>
-		<img src="" alt="" id="lightboxImg">
-		<button class="lightbox-nav next" id="lightboxNext">→</button>
-		<span class="lightbox-counter" id="lightboxCounter"></span>
-		<span class="lightbox-swipe-hint">← свайп →</span>
-	</div>
-
+	<!-- Swiper JS -->
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<!-- Наш слайдер -->
+	<script src="../js/slider.js"></script>
+	<!-- Галерея -->
 	<script src="../js/gallery.js"></script>
+
 	<script>
-		// Инициализация галереи для раздела Сад
 		initGallery( {
 			section: 'garden',
 			photos: [
-				// Замени на свои фото
 				{ src: '../photos/garden/01.jpeg', alt: 'Вход в сад', span: '2-rows' },
 				{ src: '../photos/garden/02.jpeg', alt: 'Каменная дорожка', span: '' },
 				{ src: '../photos/garden/03.jpg', alt: 'Мостик', span: '2-cols' },

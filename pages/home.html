@@ -10,7 +10,7 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
-		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Serif+JP:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500&display=swap"
 		rel="stylesheet">
 </head>
 
@@ -23,27 +23,23 @@
 		<div class="header-inner">
 			<a href="../index.html" class="back-btn">
 				<span class="back-arrow">←</span>
-				<span>Назад</span>
+				<span>Обложка</span>
 			</a>
 
 			<div class="title-block">
-				<div class="section-title-jp">家族</div>
 				<h1 class="section-title">Купеческий дом</h1>
 
-				<!-- Навигация -->
 				<nav class="section-nav">
-					<!-- Предыдущий -->
 					<a href="zags.html" class="nav-arrow" title="Бракосочетание">←</a>
 
-					<!-- Точки -->
 					<div class="section-dots">
 						<a href="garden.html" class="section-dot" title="Японский сад"></a>
 						<a href="zags.html" class="section-dot" title="Бракосочетание"></a>
 						<span class="section-dot active" title="Купеческий дом"></span>
 					</div>
 
-					<!-- Следующий (неактивен — последний раздел) -->
-					<span class="nav-arrow disabled" title="Это последний раздел">→</span>
+					<!-- Последний раздел — стрелка скрыта -->
+					<span class="nav-arrow disabled">→</span>
 				</nav>
 			</div>
 
@@ -60,34 +56,23 @@
 	<nav class="section-bottom-nav">
 		<a href="zags.html" class="bottom-nav-btn">
 			<span class="arrow arrow-left">←</span>
-			<div>
-				<div class="bottom-nav-label">Предыдущий</div>
-				<div class="bottom-nav-title">ЗАГС</div>
+			<div class="bottom-nav-content">
+				<span class="bottom-nav-label">Предыдущий раздел</span>
+				<span class="bottom-nav-title">Бракосочетание</span>
 			</div>
 		</a>
-
-		<div class="bottom-nav-divider"></div>
 
 		<a href="../index.html" class="bottom-nav-home">
-			<span class="bottom-nav-home-icon">🏠</span>
-			<span>Домой</span>
+			<span class="bottom-nav-home-icon">⟡</span>
+			<span>Обложка</span>
 		</a>
 
-		<div class="bottom-nav-divider"></div>
-
-		<!-- Следующий (неактивен) -->
-		<span class="bottom-nav-btn" style="opacity: 0.3; pointer-events: none;">
-			<div>
-				<div class="bottom-nav-label">Следующий</div>
-				<div class="bottom-nav-title">—</div>
-			</div>
-			<span class="arrow arrow-right">→</span>
-		</span>
+		<!-- Следующий раздел скрыт — последний -->
 	</nav>
 
 	<!-- Подвал -->
 	<footer class="section-footer">
-		<div class="footer-seal"><span>和</span></div>
+		<div class="footer-accent"></div>
 		<p class="footer-text">Вечер. Родные лица. Тёплый свет старинного дома и смех до утра.</p>
 	</footer>
 

@@ -1,0 +1,446 @@
+/* ============================================================
+   SLIDER.CSS — Полноэкранный слайдер на Swiper
+   Современная японская эстетика
+   ============================================================ */
+
+/* ============================================================
+   1. СБРОС И ПЕРЕМЕННЫЕ
+   ============================================================ */
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+:root {
+	--slider-bg: #0a0a0a;
+	--slider-text: rgba(240, 255, 255, 0.9);
+	--slider-text-muted: rgba(240, 255, 255, 0.35);
+	--accent-color: #E84040;
+	--accent-glow: rgba(232, 64, 64, 0.3);
+
+	/* Переходы */
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	--transition-slow: 0.6s var(--ease-out-expo);
+}
+
+/* Тема передаётся через data-theme на body */
+[data-theme="garden"] {
+	--accent-color: #C0392B;
+	--accent-glow: rgba(192, 57, 43, 0.3);
+}
+
+[data-theme="zags"] {
+	--accent-color: #E84040;
+	--accent-glow: rgba(232, 64, 64, 0.35);
+}
+
+[data-theme="home"] {
+	--accent-color: #D4A24E;
+	--accent-glow: rgba(212, 162, 78, 0.3);
+}
+
+/* ============================================================
+   2. КОНТЕЙНЕР СЛАЙДЕРА (фоновый слой)
+   ============================================================ */
+
+.slider-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	background: var(--slider-bg);
+
+	/* Скрыт по умолчанию */
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.4s ease;
+}
+
+.slider-overlay.open {
+	opacity: 1;
+	pointer-events: all;
+}
+
+/* Фоновый шум */
+.slider-overlay::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+	opacity: 0.4;
+}
+
+/* Радиальный градиент для глубины */
+.slider-overlay::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background: radial-gradient(ellipse at center, rgba(60, 60, 65, 0.15) 0%, transparent 70%);
+}
+
+/* ============================================================
+   3. SWIPER-КОНТЕЙНЕР
+   ============================================================ */
+
+.slider-container {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.swiper {
+	width: 100%;
+	height: 85vh;
+	max-height: 900px;
+}
+
+/* ============================================================
+   4. СЛАЙД
+   ============================================================ */
+
+.swiper-slide {
+	position: relative;
+	height: 100%;
+	overflow: hidden;
+	border-radius: 24px;
+
+	/* Тень для глубины */
+	box-shadow:
+		0 20px 60px rgba(0, 0, 0, 0.5),
+		0 0 0 1px rgba(255, 255, 255, 0.04);
+
+	transition: box-shadow var(--transition-slow);
+}
+
+.swiper-slide-active {
+	box-shadow:
+		0 30px 80px rgba(0, 0, 0, 0.6),
+		0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Обёртка для параллакс-эффекта */
+.swiper-slide .image-wrapper {
+	width: 100%;
+	height: 100%;
+	transform: scale(1.25);
+	transition: transform 0.8s var(--ease-out-expo);
+	will-change: transform;
+}
+
+.swiper-slide-active .image-wrapper {
+	transform: scale(1);
+}
+
+/* Изображение */
+.swiper-slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	user-select: none;
+	-webkit-user-drag: none;
+
+	/* Неактивные — ч/б */
+	filter: grayscale(1) brightness(0.7);
+	transition: filter var(--transition-slow);
+}
+
+/* Активный — полноцветный */
+.swiper-slide-active img {
+	filter: grayscale(0) brightness(0.95);
+}
+
+/* Затемнение для читаемости подписи */
+.swiper-slide::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(to top,
+			rgba(0, 0, 0, 0.5) 0%,
+			transparent 35%);
+	pointer-events: none;
+	z-index: 1;
+	opacity: 0;
+	transition: opacity var(--transition-slow);
+}
+
+.swiper-slide-active::after {
+	opacity: 1;
+}
+
+/* ============================================================
+   5. ПОДПИСЬ
+   ============================================================ */
+
+.swiper-slide .slide-caption {
+	position: absolute;
+	left: 28px;
+	bottom: 28px;
+	z-index: 2;
+
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 22px;
+	font-weight: 400;
+	letter-spacing: 0.04em;
+	color: var(--slider-text-muted);
+
+	user-select: none;
+	transition: all var(--transition-slow);
+
+	/* Лёгкое смещение */
+	transform: translateY(8px);
+}
+
+.swiper-slide-active .slide-caption {
+	color: var(--slider-text);
+	transform: translateY(0);
+
+	text-shadow:
+		0 2px 8px rgba(0, 0, 0, 0.5),
+		0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   6. НАВИГАЦИОННЫЕ СТРЕЛКИ
+   ============================================================ */
+
+.swiper-button-prev,
+.swiper-button-next {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+
+	color: rgba(255, 255, 255, 0.7);
+	transition: all 0.3s ease;
+
+	/* Убираем стандартные иконки Swiper */
+	&::after {
+		font-size: 18px;
+		font-weight: 300;
+	}
+}
+
+.swiper-button-prev:hover,
+.swiper-button-next:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: #fff;
+	border-color: rgba(255, 255, 255, 0.2);
+	transform: scale(1.05);
+}
+
+.swiper-button-prev:active,
+.swiper-button-next:active {
+	transform: scale(0.93);
+	transition: transform 0.12s ease;
+}
+
+/* Скрываем если слайдер заблокирован */
+.swiper-button-disabled {
+	opacity: 0.2 !important;
+	pointer-events: none;
+}
+
+/* ============================================================
+   7. ПАГИНАЦИЯ (ТОЧКИ)
+   ============================================================ */
+
+.swiper-pagination {
+	bottom: 16px !important;
+}
+
+.swiper-pagination-bullet {
+	width: 8px;
+	height: 8px;
+	background: rgba(255, 255, 255, 0.3);
+	opacity: 1;
+	transition: all 0.35s ease;
+	margin: 0 6px !important;
+}
+
+.swiper-pagination-bullet-active {
+	background: var(--accent-color);
+	box-shadow: 0 0 12px var(--accent-glow);
+	width: 24px;
+	border-radius: 4px;
+}
+
+/* ============================================================
+   8. КНОПКА ЗАКРЫТИЯ
+   ============================================================ */
+
+.slider-close {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	z-index: 10;
+
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.05);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 20px;
+	cursor: pointer;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	transition: all 0.3s ease;
+}
+
+.slider-close:hover {
+	background: rgba(255, 255, 255, 0.1);
+	color: #fff;
+	transform: scale(1.05);
+}
+
+.slider-close:active {
+	transform: scale(0.92);
+	transition: transform 0.12s ease;
+}
+
+/* ============================================================
+   9. СЧЁТЧИК
+   ============================================================ */
+
+.slider-counter {
+	position: absolute;
+	bottom: 28px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
+
+	font-family: 'Inter', sans-serif;
+	font-size: 13px;
+	font-weight: 400;
+	letter-spacing: 0.1em;
+	color: rgba(255, 255, 255, 0.35);
+
+	pointer-events: none;
+}
+
+/* ============================================================
+   10. АДАПТИВНОСТЬ
+   ============================================================ */
+
+/* Мобильные */
+@media (width < 481px) {
+	.swiper {
+		height: 75vh;
+	}
+
+	.swiper-slide {
+		border-radius: 16px;
+	}
+
+	.swiper-slide .slide-caption {
+		font-size: 16px;
+		left: 18px;
+		bottom: 18px;
+	}
+
+	.swiper-button-prev,
+	.swiper-button-next {
+		width: 38px;
+		height: 38px;
+	}
+
+	.swiper-button-prev::after,
+	.swiper-button-next::after {
+		font-size: 14px;
+	}
+
+	.slider-close {
+		top: 14px;
+		right: 14px;
+		width: 38px;
+		height: 38px;
+		font-size: 18px;
+	}
+
+	.slider-counter {
+		bottom: 20px;
+		font-size: 11px;
+	}
+}
+
+/* Мобильные L */
+@media (481px <=width < 577px) {
+	.swiper {
+		height: 78vh;
+	}
+
+	.swiper-slide {
+		border-radius: 20px;
+	}
+
+	.swiper-slide .slide-caption {
+		font-size: 18px;
+	}
+}
+
+/* Большие мобильные */
+@media (577px <=width < 769px) {
+	.swiper-slide .slide-caption {
+		font-size: 20px;
+	}
+}
+
+/* Планшеты */
+@media (769px <=width < 993px) {
+	.swiper-slide {
+		border-radius: 28px;
+	}
+
+	.swiper-slide .slide-caption {
+		font-size: 22px;
+	}
+}
+
+/* Десктоп */
+@media (993px <=width < 1201px) {
+	.swiper-slide .slide-caption {
+		font-size: 24px;
+		left: 32px;
+		bottom: 32px;
+	}
+}
+
+/* Большой десктоп */
+@media (1201px <=width >=1441px) {
+	.swiper-slide .slide-caption {
+		font-size: 26px;
+		left: 36px;
+		bottom: 36px;
+	}
+}
+
+/* Ультраширокие */
+@media (width >=1441px) {
+	.swiper {
+		max-height: 1000px;
+	}
+
+	.swiper-slide .slide-caption {
+		font-size: 28px;
+		left: 40px;
+		bottom: 40px;
+	}
+}
