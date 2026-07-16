@@ -5,7 +5,7 @@
  * 
  * НАЗНАЧЕНИЕ:
  *   Открывает фото в полноэкранном режиме с возможностью
- *   перелистывания, зума и перетаскивания увеличенного фото.
+ *   перелистывания, зума (двойной тап / пинч) и перетаскивания.
  * 
  * ИСПОЛЬЗОВАНИЕ:
  *   openSlider({
@@ -24,13 +24,13 @@
  *   3.  Защита от дублирования
  *   4.  Построение HTML
  *   5.  Анимация появления
- *   6.  Состояние зума и константы
- *   7.  Функции управления зумом
+ *   6.  Состояние зума (переменные)
+ *   7.  Функции зума
  *   8.  Инициализация Swiper
  *   9.  Обновление счётчика
- *   10. Обработчики зума (двойной тап, пинч, кнопки)
- *   11. Перетаскивание увеличенного фото (мышь + тач)
- *   12. Блокировка/разблокировка Swiper
+ *   10. Обработчики зума (двойной тап, кнопки)
+ *   11. Пинч (два пальца)
+ *   12. Перетаскивание увеличенного фото (мышь + тач)
  *   13. Закрытие слайдера
  *   14. Запуск
  * ============================================================
@@ -38,15 +38,18 @@
 
 // ============================================================
 // 1. ГЛОБАЛЬНАЯ ПЕРЕМЕННАЯ
+// Хранит единственный экземпляр Swiper
 // ============================================================
 let swiperInstance = null;
 
 // ============================================================
 // 2. ФУНКЦИЯ openSlider(config)
+// Главная точка входа — создаёт и открывает слайдер
 // ============================================================
 function openSlider( config ) {
 	'use strict';
 
+	// Деструктуризация с значениями по умолчанию
 	const {
 		photos,
 		startIndex = 0,
@@ -55,12 +58,14 @@ function openSlider( config ) {
 
 	// ============================================================
 	// 3. ЗАЩИТА ОТ ДУБЛИРОВАНИЯ
+	// Если слайдер уже открыт — не создаём второй
 	// ============================================================
 	if ( document.querySelector( '.slider-overlay' ) ) {
 		console.warn( 'Слайдер уже открыт' );
 		return;
 	}
 
+	// Проверка входных данных
 	if ( !photos || !photos.length ) {
 		console.error( 'openSlider: массив photos пуст или не передан' );
 		return;
@@ -68,12 +73,15 @@ function openSlider( config ) {
 
 	// ============================================================
 	// 4. ПОСТРОЕНИЕ HTML
+	// Создаём всю структуру слайдера в памяти
 	// ============================================================
 
+	// 4.1. Контейнер-оверлей (фон)
 	const overlay = document.createElement( 'div' );
 	overlay.className = 'slider-overlay';
 	overlay.setAttribute( 'data-theme', theme );
 
+	// 4.2. HTML-строка слайдов
 	const slidesHTML = photos.map( ( photo, i ) => `
         <div class="swiper-slide">
             <div class="image-wrapper" data-zoom-wrapper>
@@ -91,6 +99,7 @@ function openSlider( config ) {
         </div>
     ` ).join( '' );
 
+	// 4.3. Полный HTML оверлея
 	overlay.innerHTML = `
         <!-- Кнопка закрытия -->
         <button class="slider-close" id="sliderClose" aria-label="Закрыть">✕</button>
@@ -102,7 +111,10 @@ function openSlider( config ) {
                     ${slidesHTML}
                 </div>
                 
+                <!-- Пагинация (точки) -->
                 <div class="swiper-pagination"></div>
+                
+                <!-- Стрелки навигации -->
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
             </div>
@@ -126,36 +138,44 @@ function openSlider( config ) {
         </span>
     `;
 
+	// 4.4. Добавляем в DOM
 	document.body.appendChild( overlay );
+
+	// 4.5. Блокируем скролл страницы пока слайдер открыт
+	document.body.style.overflow = 'hidden';
 
 	// ============================================================
 	// 5. АНИМАЦИЯ ПОЯВЛЕНИЯ
+	// Добавляем класс .open после отрисовки кадра
 	// ============================================================
 	requestAnimationFrame( () => {
 		overlay.classList.add( 'open' );
 	} );
 
 	// ============================================================
-	// 6. СОСТОЯНИЕ ЗУМА И КОНСТАНТЫ
+	// 6. СОСТОЯНИЕ ЗУМА
+	// Все переменные для отслеживания зума/пинча/перетаскивания
+	// ВАЖНО: объявляем ДО функций и ДО Swiper
 	// ============================================================
 
-	let zoomState = {
-		active: false,
-		img: null,
-		wrapper: null,
-		scale: 1,
-		currentScale: 1,
-		translateX: 0,
-		translateY: 0,
-		startDistance: 0,
-		startScale: 1,
-		startTranslateX: 0,
-		startTranslateY: 0,
-		lastTapTime: 0,
-		animFrameId: null,        // ID requestAnimationFrame для плавности
+	const zoomState = {
+		active: false,          // Активен ли зум
+		img: null,              // DOM-элемент изображения
+		wrapper: null,          // DOM-элемент обёртки
+		scale: 1,               // Целевой масштаб
+		currentScale: 1,        // Текущий масштаб
+		translateX: 0,          // Смещение по X
+		translateY: 0,          // Смещение по Y
+		startDistance: 0,       // Начальное расстояние между пальцами
+		startScale: 1,          // Масштаб на момент начала пинча
+		startTranslateX: 0,     // Смещение X на момент начала пинча
+		startTranslateY: 0,     // Смещение Y на момент начала пинча
+		lastTapTime: 0,         // Время последнего тапа (для двойного)
+		animFrameId: null,      // ID requestAnimationFrame для плавности
 	};
 
-	let dragState = {
+	// Состояние перетаскивания
+	const dragState = {
 		active: false,
 		startX: 0,
 		startY: 0,
@@ -164,18 +184,20 @@ function openSlider( config ) {
 		isTouch: false,
 	};
 
-	const MAX_SCALE = 4;
-	const MIN_SCALE = 1;
-	const DOUBLE_TAP_DELAY = 300;
-	const ZOOM_STEP = 0.5;          // Шаг зума кнопками +/−
-	const ZOOM_ANIM_DURATION = 300; // Длительность анимации зума в мс
+	// Константы зума
+	const MAX_SCALE = 4;              // Максимальное увеличение
+	const MIN_SCALE = 1;              // Минимальное (нормальный размер)
+	const DOUBLE_TAP_DELAY = 300;     // Миллисекунды между тапами
+	const ZOOM_STEP = 0.5;            // Шаг зума кнопками +/−
+	const ZOOM_ANIM_DURATION = 300;   // Длительность анимации зума в мс
 
 	// ============================================================
-	// 7. ФУНКЦИИ УПРАВЛЕНИЯ ЗУМОМ
+	// 7. ФУНКЦИИ ЗУМА
+	// ВАЖНО: объявляем ДО Swiper, который их вызывает в on.slideChange
 	// ============================================================
 
 	/**
-	 * 7.1. Обновляет подсказку и кнопки зума.
+	 * 7.1. Обновляет подсказку, уровень зума и видимость кнопок.
 	 */
 	function updateZoomUI() {
 		const hint = document.getElementById( 'sliderZoomHint' );
@@ -230,6 +252,7 @@ function openSlider( config ) {
 
 	/**
 	 * 7.3. Сбрасывает зум для всех слайдов.
+	 * Вызывается при смене слайда и закрытии.
 	 */
 	function resetAllZooms() {
 		// Отменяем текущую анимацию
@@ -238,15 +261,8 @@ function openSlider( config ) {
 			zoomState.animFrameId = null;
 		}
 
-		const allWrappers = overlay.querySelectorAll( '[data-zoom-wrapper]' );
+		// Сбрасываем все изображения
 		const allImages = overlay.querySelectorAll( '[data-zoom-img]' );
-
-		allWrappers.forEach( w => {
-			w.style.transform = '';
-			w.style.cursor = '';
-			w.classList.remove( 'zoomed' );
-		} );
-
 		allImages.forEach( img => {
 			img.style.transition = '';
 			img.style.transform = '';
@@ -254,6 +270,14 @@ function openSlider( config ) {
 			img.classList.remove( 'zoomed' );
 		} );
 
+		// Сбрасываем все обёртки
+		const allWrappers = overlay.querySelectorAll( '[data-zoom-wrapper]' );
+		allWrappers.forEach( w => {
+			w.style.transform = '';
+			w.classList.remove( 'zoomed' );
+		} );
+
+		// Сбрасываем состояние
 		zoomState.active = false;
 		zoomState.img = null;
 		zoomState.wrapper = null;
@@ -262,8 +286,10 @@ function openSlider( config ) {
 		zoomState.translateX = 0;
 		zoomState.translateY = 0;
 
+		// Сбрасываем перетаскивание
 		dragState.active = false;
 
+		// Обновляем интерфейс
 		setSwiperLocked( false );
 		updateZoomUI();
 	}
@@ -272,7 +298,7 @@ function openSlider( config ) {
 	 * 7.4. Плавно устанавливает зум с анимацией.
 	 * 
 	 * @param {HTMLElement} img - Изображение
-	 * @param {HTMLElement} wrapper - Обёртка
+	 * @param {HTMLElement} wrapper - Обёртка изображения
 	 * @param {number} targetScale - Целевой масштаб (1–4)
 	 * @param {number} [targetX=0] - Целевое смещение X
 	 * @param {number} [targetY=0] - Целевое смещение Y
@@ -286,7 +312,6 @@ function openSlider( config ) {
 		}
 
 		const clampedScale = Math.max( MIN_SCALE, Math.min( MAX_SCALE, targetScale ) );
-		const willBeActive = clampedScale > MIN_SCALE;
 
 		// Обновляем состояние
 		zoomState.img = img;
@@ -295,7 +320,9 @@ function openSlider( config ) {
 		zoomState.translateX = targetX;
 		zoomState.translateY = targetY;
 
-		// Функция применения трансформации
+		/**
+		 * Применяет трансформацию к изображению.
+		 */
 		function applyTransform( scale, tx, ty ) {
 			if ( !img ) return;
 			img.style.transform = `scale(${scale}) translate(${tx / scale}px, ${ty / scale}px)`;
@@ -307,12 +334,13 @@ function openSlider( config ) {
 			zoomState.currentScale = scale;
 		}
 
-		if ( animate && zoomState.currentScale !== clampedScale ) {
+		if ( animate && Math.abs( zoomState.currentScale - clampedScale ) > 0.01 ) {
 			// Плавная анимация через requestAnimationFrame
 			const startScale = zoomState.currentScale;
 			const startX = zoomState.translateX;
 			const startY = zoomState.translateY;
 			const startTime = performance.now();
+			img.style.transition = 'none';
 
 			function animateZoom( now ) {
 				const elapsed = now - startTime;
@@ -333,29 +361,52 @@ function openSlider( config ) {
 					// Финальное состояние
 					applyTransform( clampedScale, targetX, targetY );
 					zoomState.animFrameId = null;
-					zoomState.active = willBeActive;
-					setSwiperLocked( willBeActive );
+					zoomState.active = clampedScale > MIN_SCALE;
+					setSwiperLocked( zoomState.active );
 					updateZoomUI();
 				}
 			}
 
-			// Начинаем анимацию
-			img.style.transition = 'none';
 			zoomState.animFrameId = requestAnimationFrame( animateZoom );
 		} else {
 			// Мгновенное применение
 			img.style.transition = 'none';
 			applyTransform( clampedScale, targetX, targetY );
-			zoomState.active = willBeActive;
-			setSwiperLocked( willBeActive );
+			zoomState.active = clampedScale > MIN_SCALE;
+			setSwiperLocked( zoomState.active );
 			updateZoomUI();
 		}
 	}
 
 	// ============================================================
 	// 8. ИНИЦИАЛИЗАЦИЯ SWIPER
+	// Все функции зума уже объявлены — можно безопасно использовать
 	// ============================================================
-	swiperInstance = new Swiper( overlay.querySelector( '.swiper' ), {
+
+	const swiperEl = overlay.querySelector( '.swiper' );
+
+	/**
+	 * СТРАТЕГИЯ ЦЕНТРИРОВАНИЯ:
+	 * 
+	 * Проблема: Swiper инициализируется и показывает слайды до того,
+	 * как изображения загружены и их размеры известны.
+	 * → Соседние слайды неправильно центрированы.
+	 * 
+	 * Решение:
+	 * 1. Скрываем swiper через visibility: hidden
+	 * 2. Инициализируем Swiper
+	 * 3. Ждём загрузки ВСЕХ изображений
+	 * 4. Делаем несколько принудительных обновлений
+	 * 5. Переходим к стартовому слайду
+	 * 6. Показываем swiper через visibility: visible
+	 */
+
+	// Шаг 1: скрываем swiper до готовности
+	swiperEl.style.visibility = 'hidden';
+	swiperEl.style.opacity = '0';
+	swiperEl.style.transition = 'opacity 0.3s ease';
+
+	swiperInstance = new Swiper( swiperEl, {
 		grabCursor: true,
 		slidesPerView: 1.5,
 		centeredSlides: true,
@@ -367,47 +418,133 @@ function openSlider( config ) {
 		preventClicks: false,
 		preventClicksPropagation: false,
 
+		// Навигация
 		navigation: {
 			nextEl: overlay.querySelector( '.swiper-button-next' ),
 			prevEl: overlay.querySelector( '.swiper-button-prev' ),
 		},
 
+		// Пагинация
 		pagination: {
 			el: overlay.querySelector( '.swiper-pagination' ),
 			clickable: true,
 		},
 
+		// Колёсико мыши
 		mousewheel: {
 			thresholdDelta: 50,
 			sensitivity: 1,
 		},
 
+		// Клавиатура
 		keyboard: {
 			enabled: true,
 			onlyInViewport: true,
 		},
 
+		// Адаптивность
 		breakpoints: {
-			320: { slidesPerView: 1.1, spaceBetween: 16 },
-			481: { slidesPerView: 1.2, spaceBetween: 24 },
-			769: { slidesPerView: 1.4, spaceBetween: 32 },
+			320: { slidesPerView: 1.1, spaceBetween: 12 },
+			481: { slidesPerView: 1.2, spaceBetween: 20 },
+			769: { slidesPerView: 1.4, spaceBetween: 30 },
 			993: { slidesPerView: 1.5, spaceBetween: 40 },
 		},
 
+		// События
 		on: {
+			// При смене слайда — сбрасываем зум и обновляем счётчик
 			slideChange: function () {
 				resetAllZooms();
 				updateCounter( this.activeIndex, photos.length );
 			},
+			// При начале перехода — тоже сбрасываем зум
 			slideChangeTransitionStart: function () {
 				resetAllZooms();
 			},
 		},
 	} );
 
+	/**
+	 * Принудительно обновляет Swiper и переходит к стартовому слайду.
+	 */
+	function refreshSwiper() {
+		if ( !swiperInstance || swiperInstance.destroyed ) return;
+		swiperInstance.updateSize();
+		swiperInstance.updateSlides();
+		swiperInstance.update();
+		swiperInstance.slideTo( startIndex, 0 );
+	}
+
+	/**
+	 * Показывает swiper после полной готовности.
+	 */
+	function showSwiper() {
+		if ( !swiperEl ) return;
+		swiperEl.style.visibility = 'visible';
+		swiperEl.style.opacity = '1';
+		console.log( '📸 Слайдер показан — позиции скорректированы' );
+	}
+
+	/**
+	 * Отслеживание загрузки всех изображений.
+	 * Когда все готовы — обновляем Swiper и показываем его.
+	 */
+	const allSliderImages = overlay.querySelectorAll( '[data-zoom-img]' );
+	const totalImages = allSliderImages.length;
+	let loadedCount = 0;
+	let isReady = false;
+
+	function onImageReady() {
+		loadedCount++;
+		if ( loadedCount >= totalImages && !isReady ) {
+			isReady = true;
+
+			// Даём браузеру время на пересчёт layout
+			requestAnimationFrame( () => {
+				// Тройное обновление для надёжности
+				refreshSwiper();
+
+				requestAnimationFrame( () => {
+					refreshSwiper();
+
+					requestAnimationFrame( () => {
+						refreshSwiper();
+						showSwiper();
+					} );
+				} );
+			} );
+		}
+	}
+
+	allSliderImages.forEach( img => {
+		if ( img.complete && img.naturalWidth > 0 ) {
+			// Уже загружено (из кеша)
+			onImageReady();
+		} else {
+			// Ждём загрузки
+			img.addEventListener( 'load', onImageReady, { once: true } );
+			img.addEventListener( 'error', onImageReady, { once: true } );
+		}
+	} );
+
+	// Запасной вариант: если что-то пошло не так —
+	// показываем слайдер принудительно через 1.5 секунды
+	setTimeout( () => {
+		if ( !isReady ) {
+			isReady = true;
+			refreshSwiper();
+			showSwiper();
+			console.warn( '📸 Таймаут загрузки — слайдер показан принудительно' );
+		}
+	}, 1500 );
+
 	// ============================================================
 	// 9. ОБНОВЛЕНИЕ СЧЁТЧИКА
 	// ============================================================
+
+	/**
+	 * Обновляет текст счётчика «3 / 12».
+	 */
 	function updateCounter( index, total ) {
 		const counter = document.getElementById( 'sliderCounter' );
 		if ( counter ) {
@@ -416,16 +553,15 @@ function openSlider( config ) {
 	}
 
 	// ============================================================
-	// 10. ОБРАБОТЧИКИ ЗУМА
+	// 10. ОБРАБОТЧИКИ ЗУМА — ДВОЙНОЙ ТАП И КНОПКИ
 	// ============================================================
-
-	const swiperEl = overlay.querySelector( '.swiper' );
 
 	// 10.1. Двойной тап — переключение зума
 	swiperEl.addEventListener( 'click', function ( e ) {
 		const now = Date.now();
 		const timeSinceLastTap = now - zoomState.lastTapTime;
 
+		// Проверяем, что тап был по изображению
 		const img = e.target.closest( '[data-zoom-img]' );
 		if ( !img ) {
 			zoomState.lastTapTime = now;
@@ -433,9 +569,10 @@ function openSlider( config ) {
 		}
 
 		if ( timeSinceLastTap < DOUBLE_TAP_DELAY && timeSinceLastTap > 0 ) {
+			// Это двойной тап
 			e.preventDefault();
 			e.stopPropagation();
-			handleDoubleTap( e );
+			handleDoubleTap( e, img );
 			zoomState.lastTapTime = 0;
 		} else {
 			zoomState.lastTapTime = now;
@@ -444,14 +581,13 @@ function openSlider( config ) {
 
 	/**
 	 * 10.2. Логика двойного тапа.
+	 * Увеличивает в точке тапа или сбрасывает зум.
 	 */
-	function handleDoubleTap( e ) {
-		const img = e.target.closest( '[data-zoom-img]' );
-		if ( !img ) return;
-
+	function handleDoubleTap( e, img ) {
 		const wrapper = img.closest( '[data-zoom-wrapper]' );
 		if ( !wrapper ) return;
 
+		// Координаты тапа относительно изображения
 		const rect = img.getBoundingClientRect();
 		const tapX = e.clientX - rect.left;
 		const tapY = e.clientY - rect.top;
@@ -459,10 +595,10 @@ function openSlider( config ) {
 		const centerY = rect.height / 2;
 
 		if ( zoomState.active && zoomState.img === img ) {
-			// Сбрасываем зум — плавно
+			// Уже увеличено — сбрасываем
 			setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
 		} else {
-			// Увеличиваем с центром на точку тапа — плавно
+			// Увеличиваем с центром на точку тапа
 			const targetScale = 2.5;
 			const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
 			const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
@@ -471,6 +607,7 @@ function openSlider( config ) {
 			setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
 		}
 
+		// Виброотклик
 		if ( window.navigator?.vibrate ) {
 			window.navigator.vibrate( 8 );
 		}
@@ -516,8 +653,13 @@ function openSlider( config ) {
 		if ( window.navigator?.vibrate ) window.navigator.vibrate( 5 );
 	} );
 
-	// 10.4. Пинч (два пальца) — плавный зум без анимации
+	// ============================================================
+	// 11. ПИНЧ (ДВА ПАЛЬЦА) — ПЛАВНЫЙ ЗУМ
+	// ============================================================
 
+	/**
+	 * Начало пинча.
+	 */
 	function handlePinchStart( e ) {
 		if ( e.touches.length !== 2 ) return;
 
@@ -535,6 +677,7 @@ function openSlider( config ) {
 			zoomState.img.style.transition = 'none';
 		}
 
+		// Если зум не активен для этого изображения — инициализируем
 		if ( !zoomState.active || zoomState.img !== img ) {
 			resetAllZooms();
 			zoomState.img = img;
@@ -546,6 +689,7 @@ function openSlider( config ) {
 			setSwiperLocked( true );
 		}
 
+		// Запоминаем начальное расстояние между пальцами
 		const dx = e.touches[0].clientX - e.touches[1].clientX;
 		const dy = e.touches[0].clientY - e.touches[1].clientY;
 		zoomState.startDistance = Math.sqrt( dx * dx + dy * dy );
@@ -556,13 +700,19 @@ function openSlider( config ) {
 		e.preventDefault();
 	}
 
+	/**
+	 * Движение пинча.
+	 */
 	function handlePinchMove( e ) {
 		if ( e.touches.length !== 2 ) return;
 		if ( !zoomState.img || zoomState.startDistance === 0 ) return;
 
+		// Текущее расстояние между пальцами
 		const dx = e.touches[0].clientX - e.touches[1].clientX;
 		const dy = e.touches[0].clientY - e.touches[1].clientY;
 		const distance = Math.sqrt( dx * dx + dy * dy );
+
+		// Вычисляем новый масштаб
 		const ratio = distance / zoomState.startDistance;
 		const newScale = zoomState.startScale * ratio;
 
@@ -579,9 +729,13 @@ function openSlider( config ) {
 		e.preventDefault();
 	}
 
+	/**
+	 * Окончание пинча.
+	 */
 	function handlePinchEnd() {
 		if ( !zoomState.img ) return;
 
+		// Если масштаб почти 1 — сбрасываем
 		if ( zoomState.currentScale < 1.05 ) {
 			resetAllZooms();
 		}
@@ -590,17 +744,21 @@ function openSlider( config ) {
 		updateZoomUI();
 	}
 
+	// Навешиваем обработчики пинча
 	swiperEl.addEventListener( 'touchstart', handlePinchStart, { passive: false } );
 	swiperEl.addEventListener( 'touchmove', handlePinchMove, { passive: false } );
 	swiperEl.addEventListener( 'touchend', handlePinchEnd );
 	swiperEl.addEventListener( 'touchcancel', handlePinchEnd );
 
 	// ============================================================
-	// 11. ПЕРЕТАСКИВАНИЕ УВЕЛИЧЕННОГО ФОТО
+	// 12. ПЕРЕТАСКИВАНИЕ УВЕЛИЧЕННОГО ФОТО
 	// Работает ТОЛЬКО при активном зуме
 	// Swiper заблокирован — перелистывания не будет
 	// ============================================================
 
+	/**
+	 * Начало перетаскивания (мышь или один палец).
+	 */
 	function handleDragStart( e ) {
 		// Перетаскивание только при активном зуме
 		if ( !zoomState.active || !zoomState.img ) return;
@@ -632,6 +790,9 @@ function openSlider( config ) {
 		e.stopPropagation();
 	}
 
+	/**
+	 * Движение при перетаскивании.
+	 */
 	function handleDragMove( e ) {
 		if ( !dragState.active || !zoomState.active || !zoomState.img ) return;
 
@@ -652,6 +813,9 @@ function openSlider( config ) {
 		);
 	}
 
+	/**
+	 * Окончание перетаскивания.
+	 */
 	function handleDragEnd() {
 		if ( !dragState.active ) return;
 
@@ -702,12 +866,17 @@ function openSlider( config ) {
 	} );
 
 	// ============================================================
-	// 12. ЗАКРЫТИЕ СЛАЙДЕРА
+	// 13. ЗАКРЫТИЕ СЛАЙДЕРА
 	// ============================================================
 
+	/**
+	 * Закрывает слайдер с анимацией и очищает ресурсы.
+	 */
 	function closeSlider() {
+		// Убираем класс, запускаем анимацию исчезновения
 		overlay.classList.remove( 'open' );
 
+		// Ждём окончания анимации (400мс), затем удаляем из DOM
 		setTimeout( () => {
 			if ( swiperInstance ) {
 				swiperInstance.destroy( true, true );
@@ -718,20 +887,24 @@ function openSlider( config ) {
 			document.body.style.overflow = '';
 		}, 400 );
 
+		// Тактильный отклик
 		if ( window.navigator?.vibrate ) {
 			window.navigator.vibrate( 8 );
 		}
 	}
 
+	// 13.1. Кнопка закрытия (крестик)
 	const closeBtn = overlay.querySelector( '#sliderClose' );
 	closeBtn.addEventListener( 'click', closeSlider );
 
+	// 13.2. Клик по затемнённому фону (мимо слайда)
 	overlay.addEventListener( 'click', function ( e ) {
 		if ( e.target === overlay || e.target.classList.contains( 'slider-container' ) ) {
 			closeSlider();
 		}
 	} );
 
+	// 13.3. Клавиша Escape
 	function handleEscape( e ) {
 		if ( e.key === 'Escape' ) {
 			closeSlider();
@@ -740,18 +913,19 @@ function openSlider( config ) {
 	}
 	document.addEventListener( 'keydown', handleEscape );
 
-	document.body.style.overflow = 'hidden';
-
 	// ============================================================
-	// 13. ЗАПУСК
+	// 14. ЗАПУСК
 	// ============================================================
 
+	// Показываем подсказку о зуме
 	updateZoomUI();
 
+	// Тактильный отклик при открытии
 	if ( window.navigator?.vibrate ) {
 		window.navigator.vibrate( 10 );
 	}
 
+	// Логирование
 	console.log( `📸 Слайдер открыт: фото ${startIndex + 1} из ${photos.length}` );
-	console.log( '💡 Двойной тап — увеличить | Пинч — зум | +/− — кнопки | Drag — двигать' );
+	console.log( '💡 Двойной тап — увеличить | Пинч — плавный зум | +/− — кнопки | Drag — двигать' );
 }
