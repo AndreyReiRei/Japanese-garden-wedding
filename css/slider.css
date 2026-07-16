@@ -121,12 +121,17 @@
    ============================================================ */
 
 /*
- * Стратегия:
- * - Обёртка всегда 100% × 100%, масштабируется через scale
- * - Неактивные слайды: scale(1.15) — фото чуть приближено
- * - Активный слайд: scale(1) — фото на своём месте
- * - Изображение: object-fit: contain — видно целиком
- * - При двойном тапе/зуме изображение переходит в cover
+ * Стратегия зума (переработано):
+ * 
+ * Раньше: contain → cover при зуме.
+ * Проблема: cover меняет виртуальный размер, края обрезаются.
+ * 
+ * Теперь: ВСЕГДА contain.
+ * - Без зума:  scale = 1.15 (неактивные) / 1 (активный)
+ * - С зумом:   scale = 2.5 и больше
+ * - Изображение всегда внутри контейнера, но масштабируется.
+ * - При зуме слайд получает overflow: visible —
+ *   увеличенное изображение выходит за границы слайда.
  */
 
 .swiper-slide .image-wrapper {
@@ -140,6 +145,8 @@
 	align-items: center;
 	justify-content: center;
 	background: #080808;
+	/* Без zoom — обрезаем внутри */
+	overflow: hidden;
 }
 
 .swiper-slide-active .image-wrapper {
@@ -419,25 +426,60 @@
 }
 
 /* ============================================================
-   12. ЗУМ — ПЕРЕХОД НА COVER
+   12. ЗУМ — СКРЫВАЕМ ПОДПИСЬ И ФИЛЬТРЫ
    ============================================================ */
 
+/*
+ * Принцип:
+ * - Изображение всегда object-fit: contain
+ * - Увеличение достигается через transform: scale() на самом img
+ * - При активном зуме:
+ *   - img получает класс .zoomed → scale увеличивается
+ *   - .image-wrapper получает overflow: visible
+ *   - .swiper-slide получает overflow: visible
+ *   - Подпись и затемнение скрываются
+ *   - Все фильтры (grayscale, brightness) убираются
+ */
+
+/* Без зума — плавные переходы */
 [data-zoom-img] {
 	transition: transform 0.3s ease;
 	will-change: transform;
 }
 
+/* При зуме — быстрое следование */
 [data-zoom-img].zoomed {
-	object-fit: cover !important;
 	transition: transform 0.1s linear;
+	/* Убираем все фильтры — фото всегда цветное и яркое при зуме */
+	filter: none !important;
 }
 
+/* Обёртка: при зуме показываем содержимое полностью */
 [data-zoom-wrapper] {
 	overflow: hidden;
 }
 
 [data-zoom-wrapper].zoomed {
-	overflow: visible;
+	overflow: visible !important;
+}
+
+/* Слайд: при зуме тоже visible */
+.swiper-slide.zoomed-slide {
+	overflow: visible !important;
+	z-index: 10 !important;
+}
+
+/* Скрываем подпись при зуме */
+.swiper-slide.zoomed-slide .slide-caption {
+	opacity: 0 !important;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+}
+
+/* Скрываем затемнение при зуме */
+.swiper-slide.zoomed-slide::after {
+	opacity: 0 !important;
+	transition: opacity 0.2s ease;
 }
 
 /* ============================================================

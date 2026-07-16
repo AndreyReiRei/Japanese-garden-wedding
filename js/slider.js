@@ -252,32 +252,60 @@ function openSlider( config ) {
 
 	/**
 	 * 7.3. Сбрасывает зум для всех слайдов.
-	 * Вызывается при смене слайда и закрытии.
+	 * 
+	 * Вызывается при:
+	 * - смене слайда
+	 * - закрытии слайдера
+	 * - уменьшении масштаба до 1×
+	 * 
+	 * Сбрасывает ВСЁ:
+	 * - трансформации изображений
+	 * - overflow у обёрток и слайдов
+	 * - CSS-классы .zoomed и .zoomed-slide
+	 * - состояние zoomState и dragState
+	 * - блокировку Swiper
+	 * - интерфейс (подсказка, кнопки)
 	 */
 	function resetAllZooms() {
-		// Отменяем текущую анимацию
+		// --- 1. Отменяем текущую анимацию зума ---
 		if ( zoomState.animFrameId ) {
 			cancelAnimationFrame( zoomState.animFrameId );
 			zoomState.animFrameId = null;
 		}
 
-		// Сбрасываем все изображения
+		// --- 2. Сбрасываем все изображения ---
 		const allImages = overlay.querySelectorAll( '[data-zoom-img]' );
 		allImages.forEach( img => {
+			// Убираем инлайновые стили
 			img.style.transition = '';
 			img.style.transform = '';
 			img.style.cursor = '';
+			// Убираем класс зума
 			img.classList.remove( 'zoomed' );
 		} );
 
-		// Сбрасываем все обёртки
+		// --- 3. Сбрасываем все обёртки ---
 		const allWrappers = overlay.querySelectorAll( '[data-zoom-wrapper]' );
-		allWrappers.forEach( w => {
-			w.style.transform = '';
-			w.classList.remove( 'zoomed' );
+		allWrappers.forEach( wrapper => {
+			// Убираем инлайновый overflow (возвращаем к CSS-значению hidden)
+			wrapper.style.overflow = '';
+			// Убираем класс зума
+			wrapper.classList.remove( 'zoomed' );
 		} );
 
-		// Сбрасываем состояние
+		// --- 4. Сбрасываем все слайды ---
+		// Это важно: при зуме слайд получал overflow: visible,
+		// чтобы увеличенное изображение не обрезалось.
+		// Теперь возвращаем обратно.
+		const allSlides = overlay.querySelectorAll( '.swiper-slide' );
+		allSlides.forEach( slide => {
+			// Убираем инлайновый overflow (возвращаем к CSS-значению hidden)
+			slide.style.overflow = '';
+			// Убираем класс, который делал слайд видимым поверх других
+			slide.classList.remove( 'zoomed-slide' );
+		} );
+
+		// --- 5. Сбрасываем состояние зума ---
 		zoomState.active = false;
 		zoomState.img = null;
 		zoomState.wrapper = null;
@@ -285,17 +313,39 @@ function openSlider( config ) {
 		zoomState.currentScale = 1;
 		zoomState.translateX = 0;
 		zoomState.translateY = 0;
+		zoomState.startDistance = 0;
+		zoomState.startScale = 1;
+		zoomState.startTranslateX = 0;
+		zoomState.startTranslateY = 0;
 
-		// Сбрасываем перетаскивание
+		// --- 6. Сбрасываем состояние перетаскивания ---
 		dragState.active = false;
+		dragState.startX = 0;
+		dragState.startY = 0;
+		dragState.startTranslateX = 0;
+		dragState.startTranslateY = 0;
+		dragState.isTouch = false;
 
-		// Обновляем интерфейс
+		// --- 7. Разблокируем Swiper ---
+		// При зуме Swiper был заблокирован, чтобы не перелистывать слайды.
+		// Теперь возвращаем возможность перелистывания.
 		setSwiperLocked( false );
+
+		// --- 8. Обновляем интерфейс ---
+		// Скрываем кнопки +/−, обновляем подсказку и уровень зума
 		updateZoomUI();
+
+		console.log( '🔄 Зум сброшен для всех слайдов' );
 	}
 
 	/**
-	 * 7.4. Плавно устанавливает зум с анимацией.
+	 * 7.4. Плавно устанавливает зум через scale.
+	 * 
+	 * Принцип:
+	 * - Изображение ВСЕГДА object-fit: contain
+	 * - Увеличение = transform: scale() на img
+	 * - Слайд получает overflow: visible — не обрезает края
+	 * - Обёртка получает overflow: visible — не обрезает края
 	 * 
 	 * @param {HTMLElement} img - Изображение
 	 * @param {HTMLElement} wrapper - Обёртка изображения
@@ -312,6 +362,10 @@ function openSlider( config ) {
 		}
 
 		const clampedScale = Math.max( MIN_SCALE, Math.min( MAX_SCALE, targetScale ) );
+		const willBeActive = clampedScale > MIN_SCALE;
+
+		// Находим слайд
+		const slide = wrapper ? wrapper.closest( '.swiper-slide' ) : null;
 
 		// Обновляем состояние
 		zoomState.img = img;
@@ -321,21 +375,33 @@ function openSlider( config ) {
 		zoomState.translateY = targetY;
 
 		/**
-		 * Применяет трансформацию к изображению.
+		 * Применяет трансформацию и обновляет все классы.
 		 */
 		function applyTransform( scale, tx, ty ) {
 			if ( !img ) return;
+
+			// Трансформация изображения
 			img.style.transform = `scale(${scale}) translate(${tx / scale}px, ${ty / scale}px)`;
 			img.style.cursor = scale > MIN_SCALE ? 'grab' : '';
 			img.classList.toggle( 'zoomed', scale > MIN_SCALE );
+
+			// Обёртка
 			if ( wrapper ) {
 				wrapper.classList.toggle( 'zoomed', scale > MIN_SCALE );
+				wrapper.style.overflow = scale > MIN_SCALE ? 'visible' : 'hidden';
 			}
+
+			// СЛАЙД — ключевой момент
+			if ( slide ) {
+				slide.classList.toggle( 'zoomed-slide', scale > MIN_SCALE );
+				slide.style.overflow = scale > MIN_SCALE ? 'visible' : 'hidden';
+			}
+
 			zoomState.currentScale = scale;
 		}
 
+		// Анимация или мгновенно
 		if ( animate && Math.abs( zoomState.currentScale - clampedScale ) > 0.01 ) {
-			// Плавная анимация через requestAnimationFrame
 			const startScale = zoomState.currentScale;
 			const startX = zoomState.translateX;
 			const startY = zoomState.translateY;
@@ -345,35 +411,31 @@ function openSlider( config ) {
 			function animateZoom( now ) {
 				const elapsed = now - startTime;
 				const progress = Math.min( elapsed / ZOOM_ANIM_DURATION, 1 );
-
-				// Ease-out кривая
 				const eased = 1 - Math.pow( 1 - progress, 3 );
 
-				const currentScale = startScale + ( clampedScale - startScale ) * eased;
-				const currentX = startX + ( targetX - startX ) * eased;
-				const currentY = startY + ( targetY - startY ) * eased;
-
-				applyTransform( currentScale, currentX, currentY );
+				applyTransform(
+					startScale + ( clampedScale - startScale ) * eased,
+					startX + ( targetX - startX ) * eased,
+					startY + ( targetY - startY ) * eased
+				);
 
 				if ( progress < 1 ) {
 					zoomState.animFrameId = requestAnimationFrame( animateZoom );
 				} else {
-					// Финальное состояние
 					applyTransform( clampedScale, targetX, targetY );
 					zoomState.animFrameId = null;
-					zoomState.active = clampedScale > MIN_SCALE;
-					setSwiperLocked( zoomState.active );
+					zoomState.active = willBeActive;
+					setSwiperLocked( willBeActive );
 					updateZoomUI();
 				}
 			}
 
 			zoomState.animFrameId = requestAnimationFrame( animateZoom );
 		} else {
-			// Мгновенное применение
 			img.style.transition = 'none';
 			applyTransform( clampedScale, targetX, targetY );
-			zoomState.active = clampedScale > MIN_SCALE;
-			setSwiperLocked( zoomState.active );
+			zoomState.active = willBeActive;
+			setSwiperLocked( willBeActive );
 			updateZoomUI();
 		}
 	}
