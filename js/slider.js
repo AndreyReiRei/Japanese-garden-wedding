@@ -528,6 +528,12 @@ function openSlider( config ) {
 		preventClicks: false,
 		preventClicksPropagation: false,
 
+		// ВАЖНО: встроенная поддержка двойного тапа в Swiper.
+		// Swiper сам различает свайп, одиночный и двойной тап.
+		// Мы слушаем событие doubleTap и выполняем зум.
+		doubleTap: true,
+		doubleTapDelay: 300,
+
 		// Навигация
 		navigation: {
 			nextEl: overlay.querySelector( '.swiper-button-next' ),
@@ -667,96 +673,54 @@ function openSlider( config ) {
 	// ============================================================
 
 	/**
-	 * 10.1. Двойной тап для переключения зума.
+	 * 10.1. Двойной тап через Swiper.
 	 * 
 	 * Как это работает:
-	 * - Десктоп (мышь/тачпад): используем click.
-	 * - Мобильные (палец): используем touchend.
-	 * - Оба обработчика ведут к handleDoubleTapAttempt.
-	 * - Флаг isTouchDevice предотвращает двойное срабатывание на мобильных.
-	 * - preventDefault вызывается ТОЛЬКО когда обнаружен двойной тап,
-	 *   чтобы не блокировать кнопки и перелистывание.
+	 * - Swiper имеет встроенную поддержку двойного тапа
+	 *   (параметр doubleTap: true в конфиге).
+	 * - Swiper сам различает: свайп, одиночный тап, двойной тап.
+	 * - Когда Swiper обнаруживает двойной тап, он вызывает событие 'doubleTap'.
+	 * - Мы слушаем это событие и выполняем зум.
+	 * - Никаких своих таймеров, проверок и touchend —
+	 *   всё отдано на откуп Swiper.
+	 * - Работает одинаково на десктопе (мышь/тачпад) и мобильных (палец).
 	 */
 
-	let isTouchDevice = false;
+	swiperInstance.on( 'doubleTap', function ( swiper, event ) {
+		// Проверяем что тап был по изображению
+		const img = event.target.closest( '[data-zoom-img]' );
+		if ( !img ) return;
 
-	/**
-	 * Проверяет, был ли это двойной тап и выполняет зум.
-	 * Вызывается из click (десктоп) и touchend (мобильные).
-	 * 
-	 * @param {Event} e - Исходное событие
-	 * @param {number} clientX - X-координата тапа
-	 * @param {number} clientY - Y-координата тапа
-	 * @returns {boolean} true если был обработан двойной тап
-	 */
-	function handleDoubleTapAttempt( e, clientX, clientY ) {
-		const img = e.target.closest( '[data-zoom-img]' );
-		if ( !img ) {
-			zoomState.lastTapTime = 0;
-			return false;
-		}
+		const wrapper = img.closest( '[data-zoom-wrapper]' );
+		if ( !wrapper ) return;
 
-		const now = Date.now();
-		const timeSinceLastTap = now - zoomState.lastTapTime;
+		// Координаты тапа относительно изображения
+		const rect = img.getBoundingClientRect();
+		const tapX = event.clientX - rect.left;
+		const tapY = event.clientY - rect.top;
+		const centerX = rect.width / 2;
+		const centerY = rect.height / 2;
 
-		if ( timeSinceLastTap < DOUBLE_TAP_DELAY && timeSinceLastTap > 0 ) {
-			// ДВОЙНОЙ ТАП — выполняем зум
-			e.preventDefault();
-			e.stopPropagation();
-
-			const wrapper = img.closest( '[data-zoom-wrapper]' );
-			if ( !wrapper ) return true;
-
-			const rect = img.getBoundingClientRect();
-			const tapX = clientX - rect.left;
-			const tapY = clientY - rect.top;
-			const centerX = rect.width / 2;
-			const centerY = rect.height / 2;
-
-			if ( zoomState.active && zoomState.img === img ) {
-				setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
-			} else {
-				const targetScale = 2.5;
-				const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
-				const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
-				resetAllZooms();
-				setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
-			}
-
-			zoomState.lastTapTime = 0;
-
-			if ( window.navigator?.vibrate ) {
-				window.navigator.vibrate( 8 );
-			}
-
-			return true;
+		if ( zoomState.active && zoomState.img === img ) {
+			// Фото уже увеличено — плавно сбрасываем зум до 1×
+			setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
 		} else {
-			// Первый тап — запоминаем время, не блокируем ничего
-			zoomState.lastTapTime = now;
-			return false;
+			// Фото ещё не увеличено — увеличиваем до 2.5×
+			// Центрируем увеличение на точке тапа
+			const targetScale = 2.5;
+			const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
+			const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
+
+			// Сбрасываем предыдущий зум если был на другом слайде
+			resetAllZooms();
+
+			// Запускаем плавное увеличение
+			setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
 		}
-	}
 
-	// --- Десктоп: обработчик click ---
-	swiperEl.addEventListener( 'click', function ( e ) {
-		if ( isTouchDevice ) return;
-		handleDoubleTapAttempt( e, e.clientX, e.clientY );
-	} );
-
-	// --- Мобильные: обработчик touchend ---
-	swiperEl.addEventListener( 'touchend', function ( e ) {
-		isTouchDevice = true;
-
-		// Игнорируем если пальцев больше одного (пинч)
-		if ( e.changedTouches.length !== 1 ) return;
-
-		const touch = e.changedTouches[0];
-		const wasDoubleTap = handleDoubleTapAttempt( e, touch.clientX, touch.clientY );
-
-		// preventDefault вызывается только если был двойной тап.
-		// Если не вызван — кнопки и свайпы работают как обычно.
-		if ( !wasDoubleTap ) {
-			// Не блокируем — Swiper и кнопки работают
+		// Тактильный отклик на телефоне
+		if ( window.navigator?.vibrate ) {
+			window.navigator.vibrate( 8 );
 		}
 	} );
 
@@ -827,8 +791,10 @@ function openSlider( config ) {
 	 *   изменению расстояния: newScale = startScale * (currentDistance / startDistance).
 	 * - Масштаб ограничен значениями MIN_SCALE (1) и MAX_SCALE (4).
 	 * - При окончании пинча проверяем: если масштаб < 1.05 — сбрасываем зум.
-	 * - Все изменения применяются мгновенно (без анимации) для точного следования за пальцами.
+	 * - Все изменения применяются мгновенно (без анимации) для точного
+	 *   следования за пальцами.
 	 * - passive: false нужен для возможности вызвать preventDefault.
+	 * - НЕ блокируем одиночные тапы — только когда два пальца.
 	 */
 
 	function handlePinchStart( e ) {
