@@ -1,6 +1,8 @@
 /* ============================================================
-   ТАБЛИЦА СОДЕРЖАНИЯ
-   ────────────────────────────────────────────────────────────
+   COVER.CSS — Обложка свадебного альбома
+   Современная японская эстетика | Крупный текст | WOW-эффекты
+   ============================================================
+   СОДЕРЖАНИЕ:
    1.  Сброс стилей и CSS-переменные
    2.  Базовые стили (html, body)
    3.  Фоновый шум
@@ -26,21 +28,49 @@
 }
 
 :root {
-	/* Основные цвета фона */
+	/* 
+     * ОСНОВНЫЕ ЦВЕТА
+     */
 	--bg-primary: #060606;
+	/* Глубокий чёрный */
+	--bg-overlay: rgba(2, 2, 2, 0.97);
+	/* Фон оверлея */
 
-	/* Акцентные цвета */
+	/* 
+     * АКЦЕНТНЫЕ ЦВЕТА
+     */
 	--red-accent: #E84040;
+	/* Киноварь */
+	--red-accent-light: #FF6B6B;
+	/* Светло-красный */
 	--red-glow: rgba(232, 64, 64, 0.5);
+	/* Красное свечение */
+	--red-glow-strong: rgba(232, 64, 64, 0.7);
+	/* Сильное красное свечение */
 	--gold: #C9A96E;
+	/* Золотой / охра */
 	--gold-light: #D4BC80;
+	/* Светлое золото */
+	--gold-glow: rgba(201, 169, 110, 0.3);
+	/* Золотое свечение */
 
-	/* Цвета текста */
+	/* 
+     * ЦВЕТА ТЕКСТА
+     */
 	--white: #F5F1EC;
-	--text-muted: rgba(255, 255, 255, 0.55);
-	--text-dim: rgba(255, 255, 255, 0.6);
+	/* Молочно-белый */
+	--text-primary: rgba(255, 255, 255, 0.9);
+	/* Основной текст */
+	--text-secondary: rgba(255, 255, 255, 0.6);
+	/* Второстепенный */
+	--text-muted: rgba(255, 255, 255, 0.45);
+	/* Приглушённый */
+	--text-dim: rgba(255, 255, 255, 0.3);
+	/* Едва заметный */
 
-	/* Тени для текста */
+	/* 
+     * ТЕНИ ДЛЯ ТЕКСТА
+     */
 	--text-shadow-strong:
 		0 2px 12px rgba(0, 0, 0, 0.7),
 		0 0 40px rgba(0, 0, 0, 0.4);
@@ -50,64 +80,77 @@
 	--text-shadow-light:
 		0 1px 4px rgba(0, 0, 0, 0.5);
 
-	/* Скругления */
+	/* 
+     * СКРУГЛЕНИЯ
+     */
 	--radius-sm: 8px;
 	--radius-md: 10px;
 	--radius-lg: 14px;
-	--radius-pill: 24px;
-
-	/* Анимация */
-	--ease-out-expo: cubic-bezier(0.22, 0.61, 0.36, 1);
-	--transition-fast: 0.15s ease;
-	--transition-normal: 0.3s ease;
-	--transition-slow: 0.35s var(--ease-out-expo);
-	--transition-very-slow: 0.55s var(--ease-out-expo);
+	--radius-xl: 18px;
+	--radius-pill: 100px;
 
 	/* 
-	 * БАЗОВЫЕ РАЗМЕРЫ (для мобильных < 481px)
-	 * Все остальные брейкпоинты масштабируют эти значения
-	 * через clamp() или относительные единицы
-	 */
+     * АНИМАЦИЯ
+     */
+	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	--ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--transition-fast: 0.15s ease;
+	--transition-normal: 0.35s ease;
+	--transition-slow: 0.4s var(--ease-out-expo);
+	--transition-very-slow: 0.55s var(--ease-out-expo);
+	--transition-spring: 0.5s var(--ease-out-back);
+
+	/* 
+     * ТИПОГРАФИКА — японские шрифты
+     */
+	--font-display: 'Cormorant Garamond', 'Zen Old Mincho', 'Noto Serif JP', serif;
+	--font-japanese: 'Zen Old Mincho', 'Noto Serif JP', serif;
+	--font-body: 'Inter', system-ui, -apple-system, sans-serif;
+
+	/* 
+     * БАЗОВЫЕ РАЗМЕРЫ (мобильные < 481px)
+     * Все последующие брейкпоинты увеличивают эти значения
+     */
 
 	/* Навигация */
-	--nav-padding-y: 10px;
-	--nav-padding-x: 6px;
-	--nav-gap: 4px;
-	--nav-icon-size: 14px;
-	--nav-label-size: 11px;
-	--nav-radius: 12px;
+	--nav-padding-y: 11px;
+	--nav-padding-x: 8px;
+	--nav-gap: 5px;
+	--nav-icon-size: 15px;
+	--nav-label-size: 12px;
+	--nav-radius: 14px;
 
 	/* Имена */
-	--name-size: clamp(24px, 6vw, 32px);
-	--ampersand-size: clamp(18px, 4.5vw, 24px);
+	--name-size: clamp(26px, 6vw, 34px);
+	--ampersand-size: clamp(20px, 4.5vw, 26px);
 
 	/* Дата и локация */
-	--date-size: 11px;
-	--location-size: 10px;
+	--date-size: 12px;
+	--location-size: 11px;
 
 	/* Кнопка истории */
-	--story-btn-padding-y: 10px;
-	--story-btn-padding-x: 18px;
-	--story-btn-font-size: 14px;
+	--story-btn-padding-y: 11px;
+	--story-btn-padding-x: 20px;
+	--story-btn-font-size: 15px;
 
 	/* Оверлей */
-	--overlay-padding: 28px 20px;
-	--story-title-size: 22px;
-	--story-seal-size: 40px;
-	--act-number-size: 32px;
-	--act-title-size: 16px;
-	--act-desc-size: 13px;
-	--act-gap: 20px;
-	--divider-width: 30px;
-	--story-close-size: 14px;
+	--overlay-padding: 32px 24px;
+	--story-title-size: 26px;
+	--story-seal-size: 44px;
+	--act-number-size: 38px;
+	--act-title-size: 18px;
+	--act-desc-size: 15px;
+	--act-gap: 24px;
+	--divider-width: 36px;
+	--story-close-size: 15px;
 
 	/* Контейнер */
-	--container-padding: 16px 12px 20px;
+	--container-padding: 20px 16px 24px;
 
 	/* Рамка и уголки */
-	--frame-inset: 8px;
-	--corner-offset: 12px;
-	--corner-size: 14px;
+	--frame-inset: 10px;
+	--corner-offset: 14px;
+	--corner-size: 16px;
 }
 
 /* ============================================================
@@ -119,7 +162,7 @@ body {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
-	font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+	font-family: var(--font-display);
 	background: var(--bg-primary);
 	color: var(--white);
 	-webkit-font-smoothing: antialiased;
@@ -127,6 +170,20 @@ body {
 	user-select: none;
 	-webkit-user-select: none;
 	touch-action: manipulation;
+}
+
+/* 
+ * ФОНОВЫЙ ГРАДИЕНТ — лёгкое акцентное свечение 
+ */
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: 0;
+	pointer-events: none;
+	background:
+		radial-gradient(ellipse at 50% 30%, rgba(232, 64, 64, 0.04) 0%, transparent 60%),
+		radial-gradient(ellipse at 50% 80%, rgba(201, 169, 110, 0.03) 0%, transparent 50%);
 }
 
 /* ============================================================
@@ -138,12 +195,13 @@ body {
 	inset: 0;
 	z-index: 0;
 	pointer-events: none;
-	background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
-	opacity: 0.5;
+	background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+	opacity: 0.4;
 }
 
 /* ============================================================
    4. ОСНОВНОЙ КОНТЕЙНЕР
+   Flex-контейнер: навигация вверху, фото по центру, текст внизу
    ============================================================ */
 
 .cover-container {
@@ -157,7 +215,6 @@ body {
 	padding: var(--container-padding);
 	position: relative;
 	z-index: 1;
-	/* Убираем ограничения ширины — контейнер всегда 100% */
 	max-width: none;
 	margin: 0;
 }
@@ -173,6 +230,7 @@ body {
 	overflow: hidden;
 }
 
+/* Обёртка для 3D-движения */
 .photo-bg-wrapper {
 	position: absolute;
 	inset: -10px;
@@ -181,43 +239,47 @@ body {
 	will-change: transform;
 }
 
+/* Само изображение */
 .photo-bg {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 	object-position: center 30%;
 	display: block;
-	filter: brightness(0.8) contrast(1.05) saturate(0.85);
+	filter: brightness(0.75) contrast(1.05) saturate(0.85);
 }
 
+/* Затемняющий градиент поверх фото */
 .photo-overlay {
 	position: absolute;
 	inset: 0;
 	background: linear-gradient(to bottom,
 			rgba(6, 6, 6, 0.55) 0%,
 			rgba(6, 6, 6, 0.2) 25%,
-			rgba(6, 6, 6, 0.1) 50%,
+			rgba(6, 6, 6, 0.08) 50%,
 			rgba(6, 6, 6, 0.25) 75%,
-			rgba(6, 6, 6, 0.65) 100%);
+			rgba(6, 6, 6, 0.7) 100%);
 	z-index: 1;
 	pointer-events: none;
 }
 
+/* Виньетка по краям */
 .photo-vignette {
 	position: absolute;
 	inset: 0;
 	background: radial-gradient(ellipse at center,
-			transparent 50%,
-			rgba(0, 0, 0, 0.3) 80%,
-			rgba(0, 0, 0, 0.6) 100%);
+			transparent 45%,
+			rgba(0, 0, 0, 0.35) 80%,
+			rgba(0, 0, 0, 0.65) 100%);
 	z-index: 1;
 	pointer-events: none;
 }
 
+/* Тонкая рамка по периметру */
 .photo-frame-border {
 	position: absolute;
 	inset: var(--frame-inset);
-	border: 1px solid rgba(255, 255, 255, 0.12);
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	border-radius: 2px;
 	z-index: 2;
 	pointer-events: none;
@@ -236,7 +298,7 @@ body {
 .corner::after {
 	content: '';
 	position: absolute;
-	background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.45);
 }
 
 .corner::before {
@@ -311,16 +373,17 @@ body {
 
 /* ============================================================
    6. ВЕРХНЯЯ НАВИГАЦИЯ
+   Стеклянные кнопки с blur-эффектом
    ============================================================ */
 
 .top-nav {
 	display: flex;
 	gap: var(--nav-gap);
 	width: 100%;
-	max-width: 400px;
+	max-width: 420px;
 	position: relative;
 	z-index: 10;
-	padding: 4px;
+	padding: 5px;
 	background: rgba(0, 0, 0, 0.35);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	border-radius: var(--nav-radius);
@@ -328,61 +391,66 @@ body {
 	-webkit-backdrop-filter: blur(20px);
 }
 
+/* Кнопка навигации */
 .nav-item {
 	flex: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 5px;
+	gap: 6px;
 	padding: var(--nav-padding-y) var(--nav-padding-x);
 	background: transparent;
 	border: none;
 	border-radius: var(--radius-sm);
-	color: rgba(255, 255, 255, 0.6);
+	color: var(--text-secondary);
 	cursor: pointer;
-	font-family: 'Inter', sans-serif;
+	font-family: var(--font-body);
+	font-size: var(--nav-label-size);
+	font-weight: 500;
+	letter-spacing: 0.04em;
 	text-shadow: var(--text-shadow-light);
 	transition: all var(--transition-slow);
+	position: relative;
 }
 
+/* Иконка */
 .nav-item .nav-icon {
 	font-size: var(--nav-icon-size);
 	filter: grayscale(0.3);
 	transition: all var(--transition-normal);
 }
 
-.nav-item .nav-label {
-	font-size: var(--nav-label-size);
-	font-weight: 500;
-	letter-spacing: 0.04em;
-}
-
-/* Скрываем японский подзаголовок на малых экранах */
+/* Японский подзаголовок — скрыт на малых экранах */
 .nav-item .nav-subtitle {
 	display: none;
-	font-family: 'Noto Serif JP', serif;
-	font-size: 9px;
+	font-family: var(--font-japanese);
+	font-size: 10px;
 	font-weight: 300;
 	opacity: 0.6;
+	letter-spacing: 0.05em;
 }
 
+/* Активная кнопка */
 .nav-item.active {
-	background: rgba(232, 64, 64, 0.2);
+	background: rgba(232, 64, 64, 0.18);
 	color: #fff;
+	box-shadow: 0 0 20px rgba(232, 64, 64, 0.08);
 }
 
 .nav-item.active .nav-icon {
 	filter: grayscale(0);
-	transform: scale(1.08);
+	transform: scale(1.1);
 }
 
+/* Эффект нажатия */
 .nav-item:active {
-	transform: scale(0.95);
+	transform: scale(0.94);
 	transition: transform var(--transition-fast);
 }
 
 /* ============================================================
    7. НИЖНИЙ ИНФОРМАЦИОННЫЙ БЛОК
+   Имена, дата, кнопка истории
    ============================================================ */
 
 .info-block {
@@ -392,35 +460,39 @@ body {
 	width: 100%;
 }
 
+/* Дата */
 .date-top {
-	font-family: 'Inter', sans-serif;
+	font-family: var(--font-body);
 	font-size: var(--date-size);
-	font-weight: 400;
+	font-weight: 500;
 	letter-spacing: 0.25em;
 	color: var(--gold-light);
 	text-transform: uppercase;
-	margin-bottom: 8px;
+	margin-bottom: 10px;
 	text-shadow: var(--text-shadow-medium);
 }
 
+/* Строка с именами */
 .names-line {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: clamp(8px, 2vw, 14px);
-	margin-bottom: 4px;
+	gap: clamp(10px, 2vw, 16px);
+	margin-bottom: 6px;
 	flex-wrap: wrap;
 }
 
+/* Имя */
 .name {
 	font-size: var(--name-size);
-	font-weight: 300;
+	font-weight: 400;
 	letter-spacing: 0.06em;
 	color: #fff;
 	text-shadow: var(--text-shadow-strong);
 	white-space: nowrap;
 }
 
+/* Амперсанд (&) */
 .ampersand {
 	font-size: var(--ampersand-size);
 	font-style: italic;
@@ -431,30 +503,34 @@ body {
 		var(--text-shadow-medium);
 }
 
+/* Локация */
 .location {
-	font-family: 'Inter', sans-serif;
+	font-family: var(--font-body);
 	font-size: var(--location-size);
-	font-weight: 400;
+	font-weight: 500;
 	letter-spacing: 0.15em;
 	color: var(--text-muted);
 	text-transform: uppercase;
-	margin-bottom: clamp(12px, 3vh, 18px);
+	margin-bottom: clamp(14px, 3vh, 20px);
 	text-shadow: var(--text-shadow-light);
 }
 
-/* Кнопка "История одного дня..." */
+/* 
+ * КНОПКА «История одного дня...»
+ * Стеклянная, с золотой окантовкой
+ */
 .story-toggle {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	background: rgba(0, 0, 0, 0.35);
-	border: 1px solid rgba(201, 169, 110, 0.3);
+	gap: 8px;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid rgba(201, 169, 110, 0.35);
 	border-radius: var(--radius-pill);
 	padding: var(--story-btn-padding-y) var(--story-btn-padding-x);
 	color: var(--gold-light);
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--font-display);
 	font-size: var(--story-btn-font-size);
-	font-weight: 400;
+	font-weight: 500;
 	letter-spacing: 0.05em;
 	cursor: pointer;
 	backdrop-filter: blur(20px);
@@ -471,20 +547,29 @@ body {
 	flex-shrink: 0;
 }
 
-.story-toggle:active {
-	background: rgba(201, 169, 110, 0.1);
+.story-toggle:hover {
+	background: rgba(201, 169, 110, 0.08);
 	border-color: rgba(201, 169, 110, 0.5);
+	box-shadow: 0 0 30px rgba(201, 169, 110, 0.08);
+}
+
+.story-toggle:active {
+	background: rgba(201, 169, 110, 0.12);
+	border-color: rgba(201, 169, 110, 0.6);
+	transform: scale(0.96);
+	transition: transform 0.12s ease;
 }
 
 /* ============================================================
    8. ОВЕРЛЕЙ С ИСТОРИЕЙ
+   Выезжает снизу, занимает весь экран
    ============================================================ */
 
 .story-overlay {
 	position: fixed;
 	inset: 0;
 	z-index: 100;
-	background: rgba(3, 3, 3, 0.97);
+	background: var(--bg-overlay);
 	backdrop-filter: blur(40px);
 	-webkit-backdrop-filter: blur(40px);
 	display: flex;
@@ -501,6 +586,10 @@ body {
 	pointer-events: all;
 }
 
+/* 
+ * ПАНЕЛЬ С КОНТЕНТОМ
+ * Занимает всю доступную высоту и ширину
+ */
 .story-panel {
 	width: 100%;
 	flex: 1;
@@ -514,9 +603,15 @@ body {
 	-webkit-overflow-scrolling: touch;
 }
 
+/* Печать ханко */
 .story-seal {
-	margin-bottom: clamp(16px, 3vh, 24px);
+	margin-bottom: clamp(20px, 3vh, 28px);
 	opacity: 0.9;
+	transition: transform var(--transition-spring);
+}
+
+.story-seal:hover {
+	transform: scale(1.05);
 }
 
 .story-seal svg {
@@ -524,123 +619,151 @@ body {
 	height: var(--story-seal-size);
 }
 
+/* Заголовок истории */
 .story-title {
 	font-size: var(--story-title-size);
-	font-weight: 300;
+	font-weight: 400;
 	letter-spacing: 0.05em;
 	color: #fff;
-	margin-bottom: clamp(12px, 2vh, 18px);
+	margin-bottom: clamp(14px, 2vh, 20px);
 	line-height: 1.3;
 	text-shadow: var(--text-shadow-medium);
 }
 
+/* Разделитель с точкой */
 .story-divider {
 	display: flex;
 	align-items: center;
-	gap: 10px;
-	margin-bottom: clamp(20px, 4vh, 32px);
+	gap: 12px;
+	margin-bottom: clamp(24px, 4vh, 36px);
 }
 
 .divider-line {
 	width: var(--divider-width);
 	height: 1px;
-	background: rgba(201, 169, 110, 0.3);
+	background: rgba(201, 169, 110, 0.25);
 }
 
 .divider-dot {
-	width: 4px;
-	height: 4px;
+	width: 5px;
+	height: 5px;
 	border-radius: 50%;
 	background: var(--red-accent);
-	box-shadow: 0 0 8px var(--red-glow);
+	box-shadow:
+		0 0 8px var(--red-glow),
+		0 0 16px var(--red-glow);
 }
 
+/* 
+ * КОНТЕНТ — ТРИ АКТА
+ * Занимает почти всю ширину экрана
+ */
 .story-content {
 	width: 100%;
-	max-width: 500px;
+	max-width: 600px;
 	display: flex;
 	flex-direction: column;
 	gap: var(--act-gap);
-	padding: 0 4px;
+	padding: 0 8px;
 }
 
+/* Один акт */
 .story-act {
 	display: flex;
-	gap: clamp(10px, 2vw, 16px);
+	gap: clamp(14px, 3vw, 20px);
 	text-align: left;
 	align-items: flex-start;
 }
 
+/* Номер акта (I, II, III) */
 .act-number {
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--font-display);
 	font-size: var(--act-number-size);
 	font-weight: 300;
 	color: var(--red-accent);
-	opacity: 0.8;
+	opacity: 0.85;
 	line-height: 1;
-	min-width: clamp(28px, 8vw, 40px);
-	text-shadow: 0 0 15px var(--red-glow);
+	min-width: clamp(32px, 8vw, 44px);
+	text-shadow:
+		0 0 15px var(--red-glow),
+		0 0 30px var(--red-glow);
 	text-align: center;
 	flex-shrink: 0;
 }
 
+/* Информация акта */
 .act-info {
 	display: flex;
 	flex-direction: column;
-	gap: 3px;
+	gap: 4px;
 	flex: 1;
 	min-width: 0;
 }
 
+/* Название акта */
 .act-title {
 	font-size: var(--act-title-size);
-	font-weight: 400;
+	font-weight: 500;
 	letter-spacing: 0.04em;
 	color: #fff;
 	text-shadow: var(--text-shadow-light);
 }
 
+/* Описание акта */
 .act-desc {
 	font-size: var(--act-desc-size);
 	font-weight: 300;
-	line-height: 1.5;
-	color: var(--text-dim);
+	line-height: 1.6;
+	color: var(--text-secondary);
 }
 
+/* 
+ * КНОПКА «СВЕРНУТЬ»
+ */
 .story-close {
 	display: inline-flex;
 	align-items: center;
-	gap: 6px;
-	background: rgba(232, 64, 64, 0.08);
+	gap: 8px;
+	background: rgba(232, 64, 64, 0.06);
 	border: 1px solid rgba(232, 64, 64, 0.3);
 	border-radius: var(--radius-pill);
-	padding: clamp(10px, 2vh, 14px) clamp(20px, 5vw, 28px);
+	padding: clamp(12px, 2vh, 15px) clamp(24px, 5vw, 32px);
 	color: var(--red-accent);
-	font-family: 'Cormorant Garamond', serif;
+	font-family: var(--font-display);
 	font-size: var(--story-close-size);
-	font-weight: 400;
+	font-weight: 500;
 	letter-spacing: 0.05em;
 	cursor: pointer;
-	margin-top: clamp(24px, 4vh, 36px);
+	margin-top: clamp(28px, 5vh, 40px);
 	text-shadow: var(--text-shadow-light);
-	transition: all var(--transition-normal);
+	transition: all var(--transition-slow);
+}
+
+.story-close:hover {
+	background: rgba(232, 64, 64, 0.12);
+	border-color: rgba(232, 64, 64, 0.5);
+	box-shadow: 0 0 30px var(--red-glow);
+	transform: translateY(-2px);
 }
 
 .story-close:active {
-	background: rgba(232, 64, 64, 0.15);
-	border-color: rgba(232, 64, 64, 0.5);
+	background: rgba(232, 64, 64, 0.18);
+	border-color: rgba(232, 64, 64, 0.6);
+	transform: scale(0.95);
+	transition: transform 0.12s ease;
 }
 
+/* Индикатор свайпа */
 .swipe-indicator {
-	padding: 10px 0 18px;
+	padding: 12px 0 22px;
 	display: flex;
 	justify-content: center;
 }
 
 .swipe-line {
-	width: 40px;
+	width: 44px;
 	height: 4px;
-	background: rgba(255, 255, 255, 0.2);
+	background: rgba(255, 255, 255, 0.15);
 	border-radius: 2px;
 }
 
@@ -658,95 +781,23 @@ body {
 
 /* ============================================================
    10. СВЕТЛЯЧКИ
+   Стили создаются динамически в JS
    ============================================================ */
-
-/* Стили создаются динамически в JS */
 
 /* ============================================================
    11. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
+   Каждый брейкпоинт увеличивает размеры текста
    ============================================================ */
 
 /* 
- * Стратегия:
- * - На самых маленьких экранах (< 481px) используем базовые переменные
- * - С каждым брейкпоинтом плавно увеличиваем размеры
- * - Используем clamp() для критичных элементов
- * - Проверяем, чтобы ничего не вылезало за пределы экрана
+ * МОБИЛЬНЫЕ (< 481px)
+ * Базовые размеры уже заданы в :root.
+ * Здесь только уточнения для самых маленьких экранов.
  */
-
-/* ==========================================
-   Мобильные (< 481px) — БАЗОВЫЙ РАЗМЕР
-   Уже задан в :root, здесь только уточнения
-   ========================================== */
 @media (width < 481px) {
 	:root {
-		--name-size: clamp(22px, 5.5vw, 28px);
-		--ampersand-size: clamp(16px, 4vw, 20px);
-		--date-size: 10px;
-		--location-size: 9px;
-		--story-btn-font-size: 12px;
-		--story-btn-padding-y: 8px;
-		--story-btn-padding-x: 14px;
-		--nav-label-size: 10px;
-		--nav-icon-size: 13px;
-		--nav-padding-y: 8px;
-		--nav-padding-x: 4px;
-		--nav-gap: 3px;
-		--container-padding: 12px 8px 14px;
-		--frame-inset: 6px;
-		--corner-offset: 10px;
-		--corner-size: 12px;
-
-		/* Оверлей */
-		--overlay-padding: 24px 16px;
-		--story-title-size: 18px;
-		--story-seal-size: 34px;
-		--act-number-size: 28px;
-		--act-title-size: 14px;
-		--act-desc-size: 12px;
-		--act-gap: 16px;
-		--divider-width: 24px;
-		--story-close-size: 13px;
-	}
-
-	/* Уменьшаем отступы в навигации */
-	.top-nav {
-		max-width: 100%;
-		gap: 2px;
-		padding: 3px;
-	}
-
-	.nav-item {
-		gap: 3px;
-	}
-
-	/* Имена не должны переноситься */
-	.name {
-		white-space: nowrap;
-	}
-
-	/* Кнопка истории — меньше скругление */
-	.story-toggle {
-		border-radius: 20px;
-	}
-
-	/* В оверлее — компактнее */
-	.story-act {
-		gap: 8px;
-	}
-
-	.act-number {
-		min-width: 24px;
-	}
-}
-
-/* ==========================================
-   Мобильные L (481px – 576px)
-   ========================================== */
-@media (481px <=width < 577px) {
-	:root {
-		--name-size: 28px;
-		--ampersand-size: 20px;
+		--name-size: clamp(24px, 6vw, 30px);
+		--ampersand-size: clamp(18px, 4.5vw, 22px);
 		--date-size: 11px;
 		--location-size: 10px;
 		--story-btn-font-size: 13px;
@@ -755,39 +806,50 @@ body {
 		--nav-label-size: 11px;
 		--nav-icon-size: 14px;
 		--nav-padding-y: 9px;
-		--nav-padding-x: 6px;
-		--container-padding: 16px 14px 18px;
+		--nav-padding-x: 5px;
+		--nav-gap: 3px;
+		--container-padding: 14px 10px 16px;
 		--frame-inset: 8px;
 		--corner-offset: 12px;
 		--corner-size: 14px;
 
-		--overlay-padding: 30px 20px;
-		--story-title-size: 20px;
+		/* Оверлей */
+		--overlay-padding: 28px 18px;
+		--story-title-size: 22px;
 		--story-seal-size: 38px;
-		--act-number-size: 30px;
-		--act-title-size: 15px;
-		--act-desc-size: 13px;
-		--act-gap: 18px;
-		--divider-width: 30px;
+		--act-number-size: 32px;
+		--act-title-size: 16px;
+		--act-desc-size: 14px;
+		--act-gap: 20px;
+		--divider-width: 28px;
 		--story-close-size: 14px;
 	}
 
 	.top-nav {
-		max-width: 420px;
+		max-width: 100%;
+		gap: 2px;
+		padding: 4px;
 	}
 
-	/* Показываем японский подзаголовок */
-	.nav-item .nav-subtitle {
-		display: inline;
+	.nav-item {
+		gap: 4px;
+	}
+
+	.name {
+		white-space: nowrap;
+	}
+
+	.story-content {
+		max-width: 100%;
 	}
 }
 
-/* ==========================================
-   Большие мобильные (577px – 768px)
-   ========================================== */
-@media (577px <=width < 769px) {
+/* 
+ * МОБИЛЬНЫЕ L (481px – 576px)
+ */
+@media (481px <=width < 577px) {
 	:root {
-		--name-size: 32px;
+		--name-size: 30px;
 		--ampersand-size: 22px;
 		--date-size: 12px;
 		--location-size: 11px;
@@ -798,73 +860,24 @@ body {
 		--nav-icon-size: 15px;
 		--nav-padding-y: 10px;
 		--nav-padding-x: 8px;
-		--nav-gap: 5px;
-		--container-padding: 18px 16px 22px;
-		--frame-inset: 8px;
+		--container-padding: 18px 16px 20px;
+		--frame-inset: 10px;
 		--corner-offset: 14px;
 		--corner-size: 16px;
 
-		--overlay-padding: 32px 24px;
-		--story-title-size: 22px;
-		--story-seal-size: 40px;
-		--act-number-size: 34px;
-		--act-title-size: 17px;
-		--act-desc-size: 14px;
-		--act-gap: 22px;
-		--divider-width: 34px;
-		--story-close-size: 14px;
-	}
-
-	.top-nav {
-		max-width: 460px;
-	}
-
-	.nav-item .nav-subtitle {
-		display: inline;
-	}
-
-	/* Увеличиваем максимальную ширину контента оверлея */
-	.story-content {
-		max-width: 440px;
-	}
-}
-
-/* ==========================================
-   Планшеты (769px – 992px)
-   ========================================== */
-@media (769px <=width < 993px) {
-	:root {
-		--name-size: 38px;
-		--ampersand-size: 26px;
-		--date-size: 13px;
-		--location-size: 12px;
-		--story-btn-font-size: 15px;
-		--story-btn-padding-y: 11px;
-		--story-btn-padding-x: 22px;
-		--nav-label-size: 13px;
-		--nav-icon-size: 16px;
-		--nav-padding-y: 11px;
-		--nav-padding-x: 12px;
-		--nav-gap: 6px;
-		--nav-radius: 14px;
-		--container-padding: 24px 28px 30px;
-		--frame-inset: 14px;
-		--corner-offset: 20px;
-		--corner-size: 18px;
-
-		--overlay-padding: 40px 32px;
+		--overlay-padding: 34px 24px;
 		--story-title-size: 24px;
 		--story-seal-size: 42px;
-		--act-number-size: 38px;
-		--act-title-size: 18px;
+		--act-number-size: 36px;
+		--act-title-size: 17px;
 		--act-desc-size: 15px;
-		--act-gap: 24px;
-		--divider-width: 38px;
+		--act-gap: 22px;
+		--divider-width: 32px;
 		--story-close-size: 15px;
 	}
 
 	.top-nav {
-		max-width: 520px;
+		max-width: 440px;
 	}
 
 	.nav-item .nav-subtitle {
@@ -874,48 +887,43 @@ body {
 	.story-content {
 		max-width: 480px;
 	}
-
-	/* На планшетах можно чуть увеличить фото */
-	.photo-bg {
-		object-position: center 25%;
-	}
 }
 
-/* ==========================================
-   Десктоп (993px – 1200px)
-   ========================================== */
-@media (993px <=width < 1201px) {
+/* 
+ * БОЛЬШИЕ МОБИЛЬНЫЕ (577px – 768px)
+ */
+@media (577px <=width < 769px) {
 	:root {
-		--name-size: 46px;
-		--ampersand-size: 30px;
-		--date-size: 14px;
-		--location-size: 13px;
-		--story-btn-font-size: 16px;
-		--story-btn-padding-y: 12px;
-		--story-btn-padding-x: 26px;
-		--nav-label-size: 14px;
-		--nav-icon-size: 17px;
-		--nav-padding-y: 13px;
-		--nav-padding-x: 16px;
-		--nav-gap: 8px;
-		--container-padding: 28px 40px 36px;
-		--frame-inset: 18px;
-		--corner-offset: 24px;
-		--corner-size: 20px;
+		--name-size: 34px;
+		--ampersand-size: 24px;
+		--date-size: 13px;
+		--location-size: 12px;
+		--story-btn-font-size: 15px;
+		--story-btn-padding-y: 11px;
+		--story-btn-padding-x: 20px;
+		--nav-label-size: 13px;
+		--nav-icon-size: 16px;
+		--nav-padding-y: 11px;
+		--nav-padding-x: 10px;
+		--nav-gap: 6px;
+		--container-padding: 20px 20px 24px;
+		--frame-inset: 12px;
+		--corner-offset: 16px;
+		--corner-size: 18px;
 
-		--overlay-padding: 48px 40px;
-		--story-title-size: 28px;
-		--story-seal-size: 46px;
-		--act-number-size: 44px;
-		--act-title-size: 20px;
+		--overlay-padding: 40px 28px;
+		--story-title-size: 26px;
+		--story-seal-size: 44px;
+		--act-number-size: 40px;
+		--act-title-size: 19px;
 		--act-desc-size: 16px;
-		--act-gap: 28px;
-		--divider-width: 44px;
+		--act-gap: 24px;
+		--divider-width: 36px;
 		--story-close-size: 16px;
 	}
 
 	.top-nav {
-		max-width: 560px;
+		max-width: 480px;
 	}
 
 	.nav-item .nav-subtitle {
@@ -923,22 +931,64 @@ body {
 	}
 
 	.story-content {
-		max-width: 540px;
-	}
-
-	/* На десктопе можно показать больше фото */
-	.photo-bg {
-		object-position: center 20%;
+		max-width: 520px;
 	}
 }
 
-/* ==========================================
-   Большой десктоп (1201px – 1440px)
-   ========================================== */
-@media (1201px <=width < 1441px) {
+/* 
+ * ПЛАНШЕТЫ (769px – 992px)
+ */
+@media (769px <=width < 993px) {
 	:root {
-		--name-size: 52px;
-		--ampersand-size: 34px;
+		--name-size: 40px;
+		--ampersand-size: 28px;
+		--date-size: 14px;
+		--location-size: 13px;
+		--story-btn-font-size: 16px;
+		--story-btn-padding-y: 12px;
+		--story-btn-padding-x: 24px;
+		--nav-label-size: 14px;
+		--nav-icon-size: 17px;
+		--nav-padding-y: 12px;
+		--nav-padding-x: 14px;
+		--nav-gap: 8px;
+		--nav-radius: 14px;
+		--container-padding: 24px 32px 30px;
+		--frame-inset: 16px;
+		--corner-offset: 22px;
+		--corner-size: 20px;
+
+		--overlay-padding: 48px 40px;
+		--story-title-size: 28px;
+		--story-seal-size: 48px;
+		--act-number-size: 44px;
+		--act-title-size: 21px;
+		--act-desc-size: 17px;
+		--act-gap: 28px;
+		--divider-width: 42px;
+		--story-close-size: 17px;
+	}
+
+	.top-nav {
+		max-width: 540px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 560px;
+	}
+}
+
+/* 
+ * ДЕСКТОП (993px – 1200px)
+ */
+@media (993px <=width < 1201px) {
+	:root {
+		--name-size: 48px;
+		--ampersand-size: 32px;
 		--date-size: 15px;
 		--location-size: 14px;
 		--story-btn-font-size: 17px;
@@ -946,73 +996,27 @@ body {
 		--story-btn-padding-x: 28px;
 		--nav-label-size: 15px;
 		--nav-icon-size: 18px;
-		--nav-padding-y: 14px;
-		--nav-padding-x: 20px;
+		--nav-padding-y: 13px;
+		--nav-padding-x: 18px;
 		--nav-gap: 10px;
-		--container-padding: 32px 48px 40px;
-		--frame-inset: 24px;
-		--corner-offset: 30px;
+		--container-padding: 28px 40px 36px;
+		--frame-inset: 20px;
+		--corner-offset: 28px;
 		--corner-size: 22px;
 
 		--overlay-padding: 56px 48px;
-		--story-title-size: 30px;
-		--story-seal-size: 50px;
-		--act-number-size: 50px;
-		--act-title-size: 22px;
-		--act-desc-size: 17px;
-		--act-gap: 30px;
-		--divider-width: 50px;
-		--story-close-size: 17px;
-	}
-
-	.top-nav {
-		max-width: 600px;
-	}
-
-	.nav-item .nav-subtitle {
-		display: inline;
-	}
-
-	.story-content {
-		max-width: 580px;
-	}
-}
-
-/* ==========================================
-   Очень большой десктоп (1441px – 1920px)
-   ========================================== */
-@media (1441px <=width < 1921px) {
-	:root {
-		--name-size: 58px;
-		--ampersand-size: 38px;
-		--date-size: 16px;
-		--location-size: 15px;
-		--story-btn-font-size: 18px;
-		--story-btn-padding-y: 14px;
-		--story-btn-padding-x: 32px;
-		--nav-label-size: 16px;
-		--nav-icon-size: 19px;
-		--nav-padding-y: 15px;
-		--nav-padding-x: 24px;
-		--nav-gap: 10px;
-		--container-padding: 36px 56px 44px;
-		--frame-inset: 28px;
-		--corner-offset: 34px;
-		--corner-size: 24px;
-
-		--overlay-padding: 64px 56px;
-		--story-title-size: 34px;
-		--story-seal-size: 54px;
-		--act-number-size: 56px;
-		--act-title-size: 24px;
+		--story-title-size: 32px;
+		--story-seal-size: 52px;
+		--act-number-size: 48px;
+		--act-title-size: 23px;
 		--act-desc-size: 18px;
-		--act-gap: 34px;
-		--divider-width: 56px;
+		--act-gap: 30px;
+		--divider-width: 48px;
 		--story-close-size: 18px;
 	}
 
 	.top-nav {
-		max-width: 640px;
+		max-width: 580px;
 	}
 
 	.nav-item .nav-subtitle {
@@ -1020,17 +1024,63 @@ body {
 	}
 
 	.story-content {
-		max-width: 620px;
+		max-width: 600px;
 	}
 }
 
-/* ==========================================
-   Ультраширокие (≥ 1921px)
-   ========================================== */
-@media (width >=1921px) {
+/* 
+ * БОЛЬШОЙ ДЕСКТОП (1201px – 1440px)
+ */
+@media (1201px <=width < 1441px) {
 	:root {
-		--name-size: 64px;
-		--ampersand-size: 42px;
+		--name-size: 54px;
+		--ampersand-size: 36px;
+		--date-size: 16px;
+		--location-size: 15px;
+		--story-btn-font-size: 18px;
+		--story-btn-padding-y: 14px;
+		--story-btn-padding-x: 30px;
+		--nav-label-size: 16px;
+		--nav-icon-size: 19px;
+		--nav-padding-y: 14px;
+		--nav-padding-x: 22px;
+		--nav-gap: 12px;
+		--container-padding: 32px 48px 40px;
+		--frame-inset: 26px;
+		--corner-offset: 34px;
+		--corner-size: 24px;
+
+		--overlay-padding: 64px 56px;
+		--story-title-size: 36px;
+		--story-seal-size: 56px;
+		--act-number-size: 54px;
+		--act-title-size: 25px;
+		--act-desc-size: 19px;
+		--act-gap: 34px;
+		--divider-width: 54px;
+		--story-close-size: 19px;
+	}
+
+	.top-nav {
+		max-width: 620px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 640px;
+	}
+}
+
+/* 
+ * ОЧЕНЬ БОЛЬШОЙ ДЕСКТОП (1441px – 1920px)
+ */
+@media (1441px <=width < 1921px) {
+	:root {
+		--name-size: 60px;
+		--ampersand-size: 40px;
 		--date-size: 17px;
 		--location-size: 16px;
 		--story-btn-font-size: 19px;
@@ -1038,27 +1088,27 @@ body {
 		--story-btn-padding-x: 34px;
 		--nav-label-size: 17px;
 		--nav-icon-size: 20px;
-		--nav-padding-y: 16px;
-		--nav-padding-x: 28px;
+		--nav-padding-y: 15px;
+		--nav-padding-x: 26px;
 		--nav-gap: 12px;
-		--container-padding: 40px 64px 48px;
-		--frame-inset: 32px;
+		--container-padding: 36px 56px 44px;
+		--frame-inset: 30px;
 		--corner-offset: 38px;
 		--corner-size: 26px;
 
 		--overlay-padding: 72px 64px;
-		--story-title-size: 38px;
-		--story-seal-size: 58px;
-		--act-number-size: 62px;
-		--act-title-size: 26px;
-		--act-desc-size: 19px;
+		--story-title-size: 40px;
+		--story-seal-size: 60px;
+		--act-number-size: 60px;
+		--act-title-size: 27px;
+		--act-desc-size: 20px;
 		--act-gap: 38px;
 		--divider-width: 60px;
-		--story-close-size: 19px;
+		--story-close-size: 20px;
 	}
 
 	.top-nav {
-		max-width: 680px;
+		max-width: 660px;
 	}
 
 	.nav-item .nav-subtitle {
@@ -1066,12 +1116,56 @@ body {
 	}
 
 	.story-content {
-		max-width: 660px;
+		max-width: 680px;
+	}
+}
+
+/* 
+ * УЛЬТРАШИРОКИЕ (≥ 1921px)
+ */
+@media (width >=1921px) {
+	:root {
+		--name-size: 68px;
+		--ampersand-size: 44px;
+		--date-size: 18px;
+		--location-size: 17px;
+		--story-btn-font-size: 20px;
+		--story-btn-padding-y: 16px;
+		--story-btn-padding-x: 36px;
+		--nav-label-size: 18px;
+		--nav-icon-size: 21px;
+		--nav-padding-y: 16px;
+		--nav-padding-x: 30px;
+		--nav-gap: 14px;
+		--container-padding: 40px 64px 48px;
+		--frame-inset: 34px;
+		--corner-offset: 42px;
+		--corner-size: 28px;
+
+		--overlay-padding: 80px 72px;
+		--story-title-size: 44px;
+		--story-seal-size: 64px;
+		--act-number-size: 68px;
+		--act-title-size: 30px;
+		--act-desc-size: 22px;
+		--act-gap: 42px;
+		--divider-width: 68px;
+		--story-close-size: 21px;
 	}
 
-	/* На очень широких экранах фото не должно растягиваться */
+	.top-nav {
+		max-width: 700px;
+	}
+
+	.nav-item .nav-subtitle {
+		display: inline;
+	}
+
+	.story-content {
+		max-width: 720px;
+	}
+
 	.photo-bg {
-		object-fit: contain;
-		background: #000;
+		object-fit: cover;
 	}
 }

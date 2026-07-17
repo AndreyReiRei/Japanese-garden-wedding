@@ -1,96 +1,171 @@
 /**
- * main.js — Обложка с фото на весь экран
- * Мягкий 3D-эффект | Красная нить
+ * ============================================================
+ * main.js — Логика обложки свадебного альбома
+ * «Красная нить» — японская эстетика
+ * ============================================================
+ * 
+ * СОДЕРЖАНИЕ:
+ *   1.  DOM-элементы
+ *   2.  Состояние приложения
+ *   3.  Мягкий 3D-эффект фонового фото
+ *   4.  Оверлей «История одного дня»
+ *   5.  Навигация между разделами
+ *   6.  Анимация появления
+ *   7.  Запуск приложения
+ * 
+ * ЗАВИСИМОСТИ:
+ *   - effects.js (для светлячков в оверлее)
+ *   - cover.css
+ * ============================================================
  */
 
 ( function () {
 	'use strict';
 
-	// ============================================
-	// DOM
-	// ============================================
+	// ============================================================
+	// 1. DOM-ЭЛЕМЕНТЫ
+	// Кешируем ссылки на все нужные элементы страницы.
+	// ============================================================
+
 	const storyToggle = document.getElementById( 'storyToggle' );
 	const storyOverlay = document.getElementById( 'storyOverlay' );
 	const storyClose = document.getElementById( 'storyClose' );
 	const navItems = document.querySelectorAll( '.nav-item' );
-	const petalsContainer = document.getElementById( 'petalsContainer' );
 	const photoBgWrapper = document.getElementById( 'photoBgWrapper' );
 
-	// ============================================
-	// СОСТОЯНИЕ
-	// ============================================
+	// ============================================================
+	// 2. СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+	// Флаги и переменные, которые меняются во время работы.
+	// ============================================================
+
+	/** Открыт ли оверлей с историей */
 	let isStoryOpen = false;
+
+	/** Текущий активный раздел (сад / загс / дом) */
 	let activeSection = 'garden';
 
-	// Таймеры для светлячков оверлея
-	let overlayFirefliesInterval = null;
-	let overlayFireflies = [];
+	/** Контроллер светлячков в оверлее (возвращается из effects.js) */
+	let overlayFirefliesController = null;
 
-	// ============================================
-	// МЯГКИЙ 3D-ЭФФЕКТ ФОНА
-	// ============================================
+	// ============================================================
+	// 3. МЯГКИЙ 3D-ЭФФЕКТ ФОНОВОГО ФОТО
+	// Фото на весь экран плавно смещается при движении
+	// мыши, пальца или наклоне устройства (гироскоп).
+	// ============================================================
 
+	/**
+	 * Максимальное смещение фона в пикселях.
+	 * Чем больше — тем заметнее эффект.
+	 */
 	const MAX_MOVE = 12;
+
+	/**
+	 * Коэффициент плавности (0..1).
+	 * Чем меньше — тем мягче и медленнее движение.
+	 */
 	const SMOOTHING = 0.06;
 
+	/** Текущее положение фона (плавно меняется каждый кадр) */
 	let currentMoveX = 0;
 	let currentMoveY = 0;
+
+	/** Целевое положение (меняется резко при движении мыши/пальца) */
 	let targetMoveX = 0;
 	let targetMoveY = 0;
 
+	/**
+	 * 3.1. Главный цикл анимации фона.
+	 * Вызывается 60 раз в секунду через requestAnimationFrame.
+	 * Плавно приближает текущее положение к целевому.
+	 */
 	function updateBackgroundMove() {
 		if ( !photoBgWrapper ) return;
 
+		// Линейная интерполяция: каждый кадр приближаемся на SMOOTHING * 100%
 		currentMoveX += ( targetMoveX - currentMoveX ) * SMOOTHING;
 		currentMoveY += ( targetMoveY - currentMoveY ) * SMOOTHING;
 
-		photoBgWrapper.style.transform = `translate(${currentMoveX}px, ${currentMoveY}px) scale(1.04)`;
+		// Применяем трансформацию + небольшой зум чтобы не было полей
+		photoBgWrapper.style.transform =
+			`translate(${currentMoveX}px, ${currentMoveY}px) scale(1.04)`;
 
+		// Рекурсивно продолжаем цикл
 		requestAnimationFrame( updateBackgroundMove );
 	}
 
+	/**
+	 * 3.2. Движение мыши (десктоп).
+	 * Вычисляем отклонение курсора от центра экрана.
+	 */
 	function handleMouseMove( e ) {
 		const centerX = window.innerWidth / 2;
 		const centerY = window.innerHeight / 2;
 
+		// Нормализация: -1 (край слева/сверху) до +1 (край справа/снизу)
 		const normalizedX = ( e.clientX - centerX ) / centerX;
 		const normalizedY = ( e.clientY - centerY ) / centerY;
 
+		// Смещаем фон в противоположную сторону для эффекта параллакса
 		targetMoveX = -normalizedX * MAX_MOVE;
 		targetMoveY = -normalizedY * MAX_MOVE;
 	}
 
+	/** 3.3. Сброс при уходе мыши с экрана */
 	function handleMouseLeave() {
 		targetMoveX = 0;
 		targetMoveY = 0;
 	}
 
+	/**
+	 * 3.4. Гироскоп (мобильные устройства).
+	 * beta  — наклон вперёд-назад (-180 до 180)
+	 * gamma — наклон влево-вправо (-90 до 90)
+	 */
 	function handleOrientation( e ) {
 		const beta = e.beta || 0;
 		const gamma = e.gamma || 0;
 
+		// Ограничиваем углы и нормализуем
 		const normalizedBeta = Math.max( -30, Math.min( 30, beta ) ) / 30;
 		const normalizedGamma = Math.max( -20, Math.min( 20, gamma ) ) / 20;
 
+		// Уменьшаем чувствительность (0.6)
 		targetMoveX = -normalizedGamma * MAX_MOVE * 0.6;
 		targetMoveY = -normalizedBeta * MAX_MOVE * 0.6;
 	}
 
+	/**
+	 * 3.5. Запрос разрешения на гироскоп.
+	 * На iOS 13+ нужно явно запрашивать разрешение.
+	 * На Android работает без запроса.
+	 */
 	function requestGyroPermission() {
 		if ( typeof DeviceOrientationEvent !== 'undefined' &&
 			typeof DeviceOrientationEvent.requestPermission === 'function' ) {
+			// iOS 13+
 			DeviceOrientationEvent.requestPermission()
 				.then( permission => {
 					if ( permission === 'granted' ) {
 						window.addEventListener( 'deviceorientation', handleOrientation );
+						console.log( '📱 Гироскоп активирован (iOS)' );
 					}
 				} )
-				.catch( () => { } );
+				.catch( () => {
+					console.log( '📱 Гироскоп отклонён' );
+				} );
 		} else if ( 'DeviceOrientationEvent' in window ) {
+			// Android и старые iOS
 			window.addEventListener( 'deviceorientation', handleOrientation );
+			console.log( '📱 Гироскоп активирован (Android)' );
+		} else {
+			console.log( '📱 Гироскоп не поддерживается' );
 		}
 	}
 
+	/**
+	 * 3.6. Касание пальцем (мобильные).
+	 * Аналогично мыши, но с меньшей чувствительностью.
+	 */
 	function handleTouchMove( e ) {
 		if ( e.touches.length === 0 ) return;
 
@@ -101,80 +176,134 @@
 		const normalizedX = ( touch.clientX - centerX ) / centerX;
 		const normalizedY = ( touch.clientY - centerY ) / centerY;
 
+		// Чувствительность 0.5 (вдвое меньше чем мышь)
 		targetMoveX = -normalizedX * MAX_MOVE * 0.5;
 		targetMoveY = -normalizedY * MAX_MOVE * 0.5;
 	}
 
+	/** 3.7. Сброс при окончании касания */
 	function handleTouchEnd() {
 		targetMoveX = 0;
 		targetMoveY = 0;
 	}
 
+	/**
+	 * 3.8. Инициализация 3D-эффекта.
+	 * Определяет тип устройства и вешает нужные обработчики.
+	 */
 	function init3D() {
+		// Десктоп (есть hover — значит есть мышь)
 		if ( window.matchMedia( '(hover: hover)' ).matches ) {
 			document.addEventListener( 'mousemove', handleMouseMove );
 			document.addEventListener( 'mouseleave', handleMouseLeave );
+			console.log( '🖱️ 3D: режим мыши' );
 		}
 
+		// Мобильные устройства
 		document.addEventListener( 'touchmove', handleTouchMove, { passive: true } );
 		document.addEventListener( 'touchend', handleTouchEnd );
 		document.addEventListener( 'touchcancel', handleTouchEnd );
 
+		// Пробуем подключить гироскоп
 		requestGyroPermission();
+
+		// Запускаем цикл анимации
 		updateBackgroundMove();
+		console.log( '✨ 3D-эффект фона активирован' );
 	}
 
-	// ============================================
-	// ИСТОРИЯ (ОВЕРЛЕЙ)
-	// ============================================
+	// ============================================================
+	// 4. ОВЕРЛЕЙ «ИСТОРИЯ ОДНОГО ДНЯ»
+	// Панель выезжает снизу и перекрывает весь экран.
+	// Внутри панели — светлячки из effects.js.
+	// ============================================================
 
+	/**
+	 * 4.1. Открывает панель с историей.
+	 */
 	function openStory() {
 		if ( isStoryOpen ) return;
 		isStoryOpen = true;
+
+		// Добавляем CSS-класс, который меняет transform
 		storyOverlay.classList.add( 'open' );
 
+		// Поворачиваем стрелку на кнопке
 		const icon = storyToggle.querySelector( '.story-icon' );
 		if ( icon ) icon.style.transform = 'rotate(180deg)';
 
-		if ( window.navigator?.vibrate ) window.navigator.vibrate( 10 );
+		// Тактильный отклик
+		if ( window.navigator?.vibrate ) {
+			window.navigator.vibrate( 10 );
+		}
 
-		// Запускаем светлячков в оверлее
-		startOverlayFireflies();
+		// Запускаем светлячков в оверлее (функция из effects.js)
+		if ( typeof window.startOverlayFireflies === 'function' ) {
+			overlayFirefliesController = window.startOverlayFireflies( storyOverlay );
+		}
 	}
 
+	/**
+	 * 4.2. Закрывает панель с историей.
+	 */
 	function closeStory() {
 		if ( !isStoryOpen ) return;
 		isStoryOpen = false;
+
 		storyOverlay.classList.remove( 'open' );
 
+		// Возвращаем стрелку
 		const icon = storyToggle.querySelector( '.story-icon' );
 		if ( icon ) icon.style.transform = 'rotate(0deg)';
 
-		if ( window.navigator?.vibrate ) window.navigator.vibrate( 8 );
+		// Тактильный отклик
+		if ( window.navigator?.vibrate ) {
+			window.navigator.vibrate( 8 );
+		}
 
-		// Останавливаем светлячков в оверлее
-		stopOverlayFireflies();
+		// Останавливаем светлячков в оверлее (функция из effects.js)
+		if ( typeof window.stopOverlayFireflies === 'function' ) {
+			window.stopOverlayFireflies( overlayFirefliesController );
+			overlayFirefliesController = null;
+		}
 	}
 
-	storyToggle.addEventListener( 'click', () => isStoryOpen ? closeStory() : openStory() );
+	// 4.3. Подписка на события оверлея
+
+	/** Клик по кнопке «История одного дня...» */
+	storyToggle.addEventListener( 'click', () => {
+		isStoryOpen ? closeStory() : openStory();
+	} );
+
+	/** Клик по кнопке «Свернуть» */
 	storyClose.addEventListener( 'click', closeStory );
 
+	/** Свайп вниз для закрытия */
 	let touchStartY = 0;
 	storyOverlay.addEventListener( 'touchstart', e => {
 		touchStartY = e.touches[0].clientY;
 	}, { passive: true } );
 
 	storyOverlay.addEventListener( 'touchmove', e => {
-		if ( e.touches[0].clientY - touchStartY > 70 && isStoryOpen ) closeStory();
+		const diff = e.touches[0].clientY - touchStartY;
+		// Если палец ушёл вниз больше чем на 70px — закрываем
+		if ( diff > 70 && isStoryOpen ) {
+			closeStory();
+		}
 	}, { passive: true } );
 
+	/** Клик по затемнённому фону (мимо панели) — закрываем */
 	storyOverlay.addEventListener( 'click', e => {
-		if ( e.target === storyOverlay ) closeStory();
+		if ( e.target === storyOverlay ) {
+			closeStory();
+		}
 	} );
 
-	// ============================================
-	// НАВИГАЦИЯ (ОБНОВЛЁННАЯ — с переходами)
-	// ============================================
+	// ============================================================
+	// 5. НАВИГАЦИЯ МЕЖДУ РАЗДЕЛАМИ
+	// Кнопки в верхней части обложки: Сад | ЗАГС | Дом.
+	// При клике — переход на соответствующую страницу.
+	// ============================================================
 
 	/**
 	 * Карта переходов: какой data-section ведёт на какую страницу.
@@ -193,9 +322,6 @@
 	navItems.forEach( item => {
 		item.addEventListener( 'click', function () {
 			const section = this.getAttribute( 'data-section' );
-
-			// Если тап по уже активному разделу — всё равно переходим
-			// (на случай если пользователь хочет вернуться)
 
 			// Обновляем активный раздел
 			activeSection = section;
@@ -224,244 +350,27 @@
 		} );
 	} );
 
-	// ============================================
-	// ЛЕПЕСТКИ САКУРЫ
-	// ============================================
+	// ============================================================
+	// 6. АНИМАЦИЯ ПОЯВЛЕНИЯ
+	// Плавное появление контейнера при загрузке страницы.
+	// ============================================================
 
-	const petalStyle = document.createElement( 'style' );
-	petalStyle.textContent = `
-        @keyframes petalFall {
-            0% { transform: translateY(-30px) rotate(0deg) translateX(0px); opacity: 0; }
-            10% { opacity: 1; }
-            60% { transform: translateY(60vh) rotate(180deg) translateX(35px); opacity: 0.7; }
-            100% { transform: translateY(105vh) rotate(360deg) translateX(-10px); opacity: 0; }
-        }
-        @keyframes petalSway {
-            0%, 100% { margin-left: 0; }
-            25% { margin-left: 10px; }
-            75% { margin-left: -6px; }
-        }
-    `;
-	document.head.appendChild( petalStyle );
-
-	function createPetal() {
-		const petal = document.createElement( 'div' );
-		const size = Math.random() * 8 + 5;
-		const duration = Math.random() * 10 + 8;
-		const delay = Math.random() * 10;
-		const opacity = Math.random() * 0.2 + 0.06;
-		const isPink = Math.random() > 0.4;
-
-		petal.style.cssText = `
-            position: absolute;
-            top: -25px;
-            left: ${Math.random() * 95}%;
-            width: ${size}px;
-            height: ${size * 1.5}px;
-            background: radial-gradient(ellipse at 30% 30%,
-                ${isPink ? 'rgba(232, 64, 64,' : 'rgba(201, 169, 110,'} ${opacity + 0.08}) 0%,
-                ${isPink ? 'rgba(176, 32, 32,' : 'rgba(160, 130, 80,'} ${opacity}) 100%);
-            border-radius: ${Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%'};
-            animation: petalFall ${duration}s ${delay}s linear infinite,
-                       petalSway ${duration * 0.6}s ${delay}s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        `;
-		return petal;
-	}
-
-	const PETAL_COUNT = 15;
-	for ( let i = 0; i < PETAL_COUNT; i++ ) {
-		petalsContainer.appendChild( createPetal() );
-	}
-
-	setInterval( () => {
-		const petals = petalsContainer.querySelectorAll( 'div:not(.firefly):not(.overlay-firefly)' );
-		if ( petals.length < PETAL_COUNT + 8 ) petalsContainer.appendChild( createPetal() );
-		if ( petals.length > PETAL_COUNT + 16 && petals[0] ) petals[0].remove();
-	}, 4000 );
-
-	// ============================================
-	// СВЕТЛЯЧКИ (ОСНОВНОЙ ЭКРАН)
-	// ============================================
-
-	const fireflyStyle = document.createElement( 'style' );
-	fireflyStyle.textContent = `
-		@keyframes fireflyFloat {
-			0%, 100% { 
-				opacity: 0.15; 
-				transform: translate(0, 0) scale(0.8); 
-			}
-			20% { 
-				opacity: 0.9; 
-				transform: translate(12px, -18px) scale(1.6); 
-			}
-			40% { 
-				opacity: 0.25; 
-				transform: translate(-8px, -8px) scale(0.6); 
-			}
-			60% { 
-				opacity: 0.85; 
-				transform: translate(-14px, -22px) scale(1.8); 
-			}
-			80% { 
-				opacity: 0.3; 
-				transform: translate(6px, -12px) scale(0.9); 
-			}
-		}
-	`;
-	document.head.appendChild( fireflyStyle );
-
-	function createFirefly() {
-		const firefly = document.createElement( 'div' );
-
-		const size = Math.random() * 3 + 1.5;
-		const startX = Math.random() * 90;
-		const startY = Math.random() * 80;
-		const duration = Math.random() * 6 + 4;
-		const delay = Math.random() * 5;
-
-		const glowColor = 'rgba(255, 200, 140, 0.7)';
-		const outerGlow = 'rgba(255, 160, 80, 0.35)';
-
-		firefly.className = 'firefly';
-		firefly.style.cssText = `
-			position: absolute;
-			top: ${startY}%;
-			left: ${startX}%;
-			width: ${size}px;
-			height: ${size}px;
-			background: radial-gradient(
-				circle at center,
-				rgba(255, 220, 170, 0.95) 0%,
-				${glowColor} 35%,
-				transparent 70%
-			);
-			border-radius: 50%;
-			box-shadow: 
-				0 0 ${size * 2}px ${glowColor},
-				0 0 ${size * 5}px ${outerGlow},
-				0 0 ${size * 10}px rgba(255, 140, 50, 0.15);
-			animation: fireflyFloat ${duration}s ${delay}s ease-in-out infinite;
-			pointer-events: none;
-			z-index: 4;
-			will-change: transform, opacity;
-		`;
-
-		return firefly;
-	}
-
-	const FIREFLY_COUNT = 10;
-	for ( let i = 0; i < FIREFLY_COUNT; i++ ) {
-		setTimeout( () => {
-			petalsContainer.appendChild( createFirefly() );
-		}, i * 400 );
-	}
-
-	setInterval( () => {
-		const oldFireflies = petalsContainer.querySelectorAll( '.firefly' );
-		oldFireflies.forEach( f => f.remove() );
-
-		for ( let i = 0; i < FIREFLY_COUNT; i++ ) {
-			setTimeout( () => {
-				petalsContainer.appendChild( createFirefly() );
-			}, i * 300 );
-		}
-	}, 10000 );
-
-	// ============================================
-	// СВЕТЛЯЧКИ (ОВЕРЛЕЙ)
-	// ============================================
-
-	function createOverlayFirefly() {
-		const firefly = document.createElement( 'div' );
-
-		const size = Math.random() * 4 + 2;
-		const startX = Math.random() * 90;
-		const startY = Math.random() * 85;
-		const duration = Math.random() * 5 + 3;
-		const delay = Math.random() * 4;
-
-		const glowColor = 'rgba(255, 210, 150, 0.8)';
-		const outerGlow = 'rgba(255, 170, 90, 0.4)';
-
-		firefly.className = 'overlay-firefly';
-		firefly.style.cssText = `
-			position: absolute;
-			top: ${startY}%;
-			left: ${startX}%;
-			width: ${size}px;
-			height: ${size}px;
-			background: radial-gradient(
-				circle at center,
-				rgba(255, 230, 180, 1) 0%,
-				${glowColor} 30%,
-				transparent 70%
-			);
-			border-radius: 50%;
-			box-shadow: 
-				0 0 ${size * 2.5}px ${glowColor},
-				0 0 ${size * 6}px ${outerGlow},
-				0 0 ${size * 12}px rgba(255, 150, 60, 0.2);
-			animation: fireflyFloat ${duration}s ${delay}s ease-in-out infinite;
-			pointer-events: none;
-			z-index: 101;
-			will-change: transform, opacity;
-		`;
-
-		return firefly;
-	}
-
-	function startOverlayFireflies() {
-		const OVERLAY_FIREFLY_COUNT = 8;
-
-		for ( let i = 0; i < OVERLAY_FIREFLY_COUNT; i++ ) {
-			setTimeout( () => {
-				const ff = createOverlayFirefly();
-				overlayFireflies.push( ff );
-				storyOverlay.appendChild( ff );
-			}, i * 250 );
-		}
-
-		overlayFirefliesInterval = setInterval( () => {
-			overlayFireflies.forEach( f => f.remove() );
-			overlayFireflies = [];
-
-			for ( let i = 0; i < OVERLAY_FIREFLY_COUNT; i++ ) {
-				setTimeout( () => {
-					const ff = createOverlayFirefly();
-					overlayFireflies.push( ff );
-					storyOverlay.appendChild( ff );
-				}, i * 250 );
-			}
-		}, 8000 );
-	}
-
-	function stopOverlayFireflies() {
-		if ( overlayFirefliesInterval ) {
-			clearInterval( overlayFirefliesInterval );
-			overlayFirefliesInterval = null;
-		}
-
-		overlayFireflies.forEach( f => f.remove() );
-		overlayFireflies = [];
-	}
-
-	// ============================================
-	// ПЛАВНОЕ ПОЯВЛЕНИЕ
-	// ============================================
 	function entranceAnimation() {
 		const container = document.querySelector( '.cover-container' );
 		if ( container ) {
 			container.style.opacity = '0';
 			container.style.transition = 'opacity 1s ease';
-			requestAnimationFrame( () => container.style.opacity = '1' );
+			requestAnimationFrame( () => {
+				container.style.opacity = '1';
+			} );
 		}
 	}
 
-	// ============================================
-	// ЗАПУСК
-	// ============================================
+	// ============================================================
+	// 7. ЗАПУСК ПРИЛОЖЕНИЯ
+	// Главная функция init — запускает всё.
+	// ============================================================
+
 	function init() {
 		entranceAnimation();
 		init3D();
@@ -469,9 +378,11 @@
 		console.log( '📖 Разделы: Сад | ЗАГС | Дом' );
 	}
 
+	// Ждём загрузки DOM, затем запускаем
 	if ( document.readyState === 'loading' ) {
 		document.addEventListener( 'DOMContentLoaded', init );
 	} else {
+		// DOM уже загружен — запускаем сразу
 		init();
 	}
 
