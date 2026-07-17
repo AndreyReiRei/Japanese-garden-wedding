@@ -671,43 +671,42 @@ function openSlider( config ) {
 	 * 
 	 * Как это работает:
 	 * - Десктоп (мышь/тачпад): используем click.
-	 *   Тачпад на ноутбуке отправляет click при двойном тапе — работает.
 	 * - Мобильные (палец): используем touchend.
-	 *   click на мобильных имеет задержку ~300мс и может не сработать
-	 *   при быстром двойном тапе. touchend срабатывает мгновенно.
-	 * - Оба обработчика ведут к общей функции handleDoubleTapAttempt.
-	 * - Используем флаг touchDeviceDetected чтобы на мобильных
-	 *   не обрабатывать click (иначе будет двойное срабатывание).
+	 * - Оба обработчика ведут к handleDoubleTapAttempt.
+	 * - Флаг isTouchDevice предотвращает двойное срабатывание на мобильных.
+	 * - preventDefault вызывается ТОЛЬКО когда обнаружен двойной тап,
+	 *   чтобы не блокировать кнопки и перелистывание.
 	 */
 
-	// Определяем, является ли устройство тач-устройством
-	// Проверяем один раз при первом касании
 	let isTouchDevice = false;
 
 	/**
-	 * Общая функция проверки на двойной тап.
-	 * Вызывается и из click (десктоп), и из touchend (мобильные).
+	 * Проверяет, был ли это двойной тап и выполняет зум.
+	 * Вызывается из click (десктоп) и touchend (мобильные).
+	 * 
+	 * @param {Event} e - Исходное событие
+	 * @param {number} clientX - X-координата тапа
+	 * @param {number} clientY - Y-координата тапа
+	 * @returns {boolean} true если был обработан двойной тап
 	 */
 	function handleDoubleTapAttempt( e, clientX, clientY ) {
-		// Проверяем, что тап был по изображению
 		const img = e.target.closest( '[data-zoom-img]' );
 		if ( !img ) {
 			zoomState.lastTapTime = 0;
-			return;
+			return false;
 		}
 
 		const now = Date.now();
 		const timeSinceLastTap = now - zoomState.lastTapTime;
 
 		if ( timeSinceLastTap < DOUBLE_TAP_DELAY && timeSinceLastTap > 0 ) {
-			// Это двойной тап — выполняем zoom
+			// ДВОЙНОЙ ТАП — выполняем зум
 			e.preventDefault();
 			e.stopPropagation();
 
 			const wrapper = img.closest( '[data-zoom-wrapper]' );
-			if ( !wrapper ) return;
+			if ( !wrapper ) return true;
 
-			// Координаты тапа относительно изображения
 			const rect = img.getBoundingClientRect();
 			const tapX = clientX - rect.left;
 			const tapY = clientY - rect.top;
@@ -715,14 +714,11 @@ function openSlider( config ) {
 			const centerY = rect.height / 2;
 
 			if ( zoomState.active && zoomState.img === img ) {
-				// Уже увеличено — сбрасываем зум
 				setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
 			} else {
-				// Увеличиваем с центром на точке тапа
 				const targetScale = 2.5;
 				const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
 				const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
-
 				resetAllZooms();
 				setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
 			}
@@ -732,35 +728,36 @@ function openSlider( config ) {
 			if ( window.navigator?.vibrate ) {
 				window.navigator.vibrate( 8 );
 			}
+
+			return true;
 		} else {
-			// Первый тап — запоминаем время
+			// Первый тап — запоминаем время, не блокируем ничего
 			zoomState.lastTapTime = now;
+			return false;
 		}
 	}
 
 	// --- Десктоп: обработчик click ---
 	swiperEl.addEventListener( 'click', function ( e ) {
-		// На тач-устройствах click обрабатывается с задержкой.
-		// Если мы уже обработали двойной тап через touchend —
-		// игнорируем click чтобы не было двойного срабатывания.
 		if ( isTouchDevice ) return;
-
 		handleDoubleTapAttempt( e, e.clientX, e.clientY );
 	} );
 
 	// --- Мобильные: обработчик touchend ---
 	swiperEl.addEventListener( 'touchend', function ( e ) {
-		// Помечаем что это тач-устройство
 		isTouchDevice = true;
 
 		// Игнорируем если пальцев больше одного (пинч)
 		if ( e.changedTouches.length !== 1 ) return;
 
-		// Предотвращаем эмуляцию click после touchend
-		e.preventDefault();
-
 		const touch = e.changedTouches[0];
-		handleDoubleTapAttempt( e, touch.clientX, touch.clientY );
+		const wasDoubleTap = handleDoubleTapAttempt( e, touch.clientX, touch.clientY );
+
+		// preventDefault вызывается только если был двойной тап.
+		// Если не вызван — кнопки и свайпы работают как обычно.
+		if ( !wasDoubleTap ) {
+			// Не блокируем — Swiper и кнопки работают
+		}
 	} );
 
 	/**
