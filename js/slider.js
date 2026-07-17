@@ -110,7 +110,7 @@ function openSlider( config ) {
 			enabled: true,
 			maxRatio: 4,
 			minRatio: 1,
-			toggle: true,
+			toggle: false,
 			containerClass: 'swiper-zoom-container',
 			zoomedSlideClass: 'swiper-slide-zoomed',
 		},
@@ -226,8 +226,114 @@ function openSlider( config ) {
 	}
 
 	// ============================================================
-	// 7. ИНТЕРФЕЙС ЗУМА (подсказка, кнопки +/−)
+	// 7. ЗУМ — ДВОЙНОЙ ТАП И КНОПКИ +/−
 	// ============================================================
+
+	/**
+	 * Ступени зума: 1× → 2× → 4× → 1×
+	 */
+	const ZOOM_STEPS = [1, 2, 4, 8];
+
+	/**
+	 * Вычисляет следующий масштаб по кругу.
+	 * 1 → 2 → 4 → 1 → ...
+	 */
+	function getNextZoomStep( currentScale ) {
+		// Находим текущую ступень или ближайшую
+		let currentStep = 1;
+		for ( let i = ZOOM_STEPS.length - 1; i >= 0; i-- ) {
+			if ( currentScale >= ZOOM_STEPS[i] - 0.1 ) {
+				currentStep = ZOOM_STEPS[i];
+				break;
+			}
+		}
+
+		// Находим индекс текущей ступени
+		const currentIndex = ZOOM_STEPS.indexOf( currentStep );
+
+		// Следующая ступень (по кругу)
+		const nextIndex = ( currentIndex + 1 ) % ZOOM_STEPS.length;
+
+		return ZOOM_STEPS[nextIndex];
+	}
+
+	/**
+	 * Двойной тап — переключение зума по ступеням.
+	 * Swiper сам определяет двойной тап через doubleTapClick.
+	 */
+	swiperInstance.on( 'doubleTap', function ( swiper, event ) {
+		const currentScale = swiper.zoom.scale || 1;
+		const nextScale = getNextZoomStep( currentScale );
+
+		if ( nextScale <= 1 ) {
+			// Сбрасываем зум
+			swiper.zoom.out( 1 );
+		} else {
+			// Увеличиваем до следующей ступени
+			swiper.zoom.in( nextScale );
+		}
+
+		updateZoomUI( nextScale );
+
+		if ( window.navigator?.vibrate ) {
+			window.navigator.vibrate( 8 );
+		}
+	} );
+
+	/**
+	 * Кнопка «+» — следующая ступень зума.
+	 */
+	const zoomInBtn = overlay.querySelector( '#zoomIn' );
+	zoomInBtn.addEventListener( 'click', function ( e ) {
+		e.stopPropagation();
+		if ( !swiperInstance?.zoom ) return;
+
+		const currentScale = swiperInstance.zoom.scale || 1;
+		const nextScale = getNextZoomStep( currentScale );
+
+		if ( nextScale <= 1 ) {
+			swiperInstance.zoom.out( 1 );
+		} else {
+			swiperInstance.zoom.in( nextScale );
+		}
+
+		updateZoomUI( nextScale );
+
+		if ( window.navigator?.vibrate ) window.navigator.vibrate( 5 );
+	} );
+
+	/**
+	 * Кнопка «−» — предыдущая ступень зума.
+	 */
+	const zoomOutBtn = overlay.querySelector( '#zoomOut' );
+	zoomOutBtn.addEventListener( 'click', function ( e ) {
+		e.stopPropagation();
+		if ( !swiperInstance?.zoom ) return;
+
+		const currentScale = swiperInstance.zoom.scale || 1;
+
+		// Находим предыдущую ступень
+		let prevStep = 1;
+		for ( let i = 0; i < ZOOM_STEPS.length; i++ ) {
+			if ( currentScale > ZOOM_STEPS[i] + 0.1 ) {
+				prevStep = ZOOM_STEPS[i];
+			}
+		}
+
+		if ( prevStep <= 1 ) {
+			swiperInstance.zoom.out( 1 );
+		} else {
+			swiperInstance.zoom.in( prevStep );
+		}
+
+		updateZoomUI( prevStep );
+
+		if ( window.navigator?.vibrate ) window.navigator.vibrate( 5 );
+	} );
+
+	/**
+	 * Обновление интерфейса зума.
+	 */
 	function updateZoomUI( currentScale ) {
 		const hint = document.getElementById( 'sliderZoomHint' );
 		const zoomLevel = document.getElementById( 'zoomLevel' );
@@ -253,23 +359,6 @@ function openSlider( config ) {
 			zoomControls.classList.toggle( 'visible', isZoomed );
 		}
 	}
-
-	const zoomInBtn = overlay.querySelector( '#zoomIn' );
-	const zoomOutBtn = overlay.querySelector( '#zoomOut' );
-
-	zoomInBtn.addEventListener( 'click', function ( e ) {
-		e.stopPropagation();
-		if ( !swiperInstance?.zoom ) return;
-		const current = swiperInstance.zoom.scale || 1;
-		swiperInstance.zoom.in( current + 0.5 );
-	} );
-
-	zoomOutBtn.addEventListener( 'click', function ( e ) {
-		e.stopPropagation();
-		if ( !swiperInstance?.zoom ) return;
-		const current = swiperInstance.zoom.scale || 1;
-		swiperInstance.zoom.out( current - 0.5 );
-	} );
 
 	// ============================================================
 	// 8. ЗАКРЫТИЕ
