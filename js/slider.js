@@ -667,107 +667,89 @@ function openSlider( config ) {
 	// ============================================================
 
 	/**
-	 * 10.1. Отслеживание двойного тапа.
+	 * 10.1. Двойной тап для переключения зума.
 	 * 
-	 * ВАЖНО для мобильных:
-	 * - Не используем click (задержка 300мс на мобильных)
-	 * - Используем touchend для тач-устройств
-	 * - Используем click для десктопа
-	 * - Разделяем одиночный и двойной тап через lastTapTime
+	 * Как это работает:
+	 * - Используем стандартное событие click, которое срабатывает
+	 *   и на десктопе (мышь), и на мобильных (палец).
+	 * - Swiper не блокирует click по слайдам, поэтому событие
+	 *   гарантированно доходит до нашего обработчика.
+	 * - Отслеживаем время между двумя последовательными кликами.
+	 *   Если разница меньше DOUBLE_TAP_DELAY (300мс) — это двойной тап.
+	 * - При двойном тапе: увеличиваем фото с центром в точке тапа,
+	 *   либо сбрасываем зум если фото уже увеличено.
+	 * - При одиночном тапе: запоминаем время, ничего не делаем.
 	 */
 
-	// Для десктопа — стандартный click с проверкой на двойной
 	swiperEl.addEventListener( 'click', function ( e ) {
-		// Не обрабатываем, если это был тач (для тач-устройств — свой обработчик)
-		if ( e.pointerType === 'touch' ) return;
-
-		handleTap( e );
-	} );
-
-	// Для мобильных — touchend (без задержки)
-	swiperEl.addEventListener( 'touchend', function ( e ) {
-		// Игнорируем если пальцев больше одного (пинч)
-		if ( e.touches.length > 0 || e.changedTouches.length > 1 ) return;
-
-		handleTap( e );
-	} );
-
-	/**
-	 * Общая логика обработки тапа.
-	 * Определяет: одиночный тап или двойной.
-	 */
-	function handleTap( e ) {
-		const now = Date.now();
-		const timeSinceLastTap = now - zoomState.lastTapTime;
-
-		// Проверяем, что тап был по изображению
+		// Проверяем, что клик был по изображению
 		const img = e.target.closest( '[data-zoom-img]' );
 		if ( !img ) {
-			// Тап мимо фото — сбрасываем таймер
+			// Клик мимо фото — сбрасываем таймер двойного тапа
 			zoomState.lastTapTime = 0;
 			return;
 		}
 
-		// Предотвращаем стандартное поведение
-		e.preventDefault();
-		e.stopPropagation();
+		const now = Date.now();
+		const timeSinceLastTap = now - zoomState.lastTapTime;
 
 		if ( timeSinceLastTap < DOUBLE_TAP_DELAY && timeSinceLastTap > 0 ) {
-			// ЭТО ДВОЙНОЙ ТАП
-			handleDoubleTap( e, img );
-			zoomState.lastTapTime = 0;
-		} else {
-			// Это первый тап — запоминаем время
-			zoomState.lastTapTime = now;
+			// Это двойной тап — выполняем zoom
+			e.preventDefault();
+			e.stopPropagation();
 
-			// Если зум уже активен и тапаем по увеличенному фото —
-			// ничего не делаем (ждём второго тапа или перетаскивания)
+			const wrapper = img.closest( '[data-zoom-wrapper]' );
+			if ( !wrapper ) return;
+
+			// Определяем координаты тапа относительно изображения
+			const rect = img.getBoundingClientRect();
+			const tapX = e.clientX - rect.left;
+			const tapY = e.clientY - rect.top;
+			const centerX = rect.width / 2;
+			const centerY = rect.height / 2;
+
+			if ( zoomState.active && zoomState.img === img ) {
+				// Фото уже увеличено — плавно сбрасываем зум до 1×
+				setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
+			} else {
+				// Фото ещё не увеличено — увеличиваем до 2.5×
+				// Центрируем увеличение на точке тапа
+				const targetScale = 2.5;
+				const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
+				const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
+
+				// Сбрасываем предыдущий зум если был на другом слайде
+				resetAllZooms();
+
+				// Запускаем плавное увеличение
+				setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
+			}
+
+			// Сбрасываем таймер
+			zoomState.lastTapTime = 0;
+
+			// Тактильный отклик на телефоне
+			if ( window.navigator?.vibrate ) {
+				window.navigator.vibrate( 8 );
+			}
+		} else {
+			// Это первый тап — просто запоминаем время
+			zoomState.lastTapTime = now;
 		}
-	}
+	} );
 
 	/**
-	 * 10.2. Логика двойного тапа.
-	 * Переключает зум: увеличивает в точке тапа или сбрасывает.
+	 * 10.2. Кнопки зума +/−.
+	 * 
+	 * Как это работает:
+	 * - Кнопки видны только когда фото увеличено.
+	 * - «+» увеличивает масштаб на ZOOM_STEP (0.5).
+	 * - «−» уменьшает масштаб на ZOOM_STEP.
+	 * - Если после уменьшения масштаб становится ≤ 1× — сбрасываем зум полностью.
+	 * - Каждое нажатие даёт тактильный отклик.
+	 * - stopPropagation предотвращает закрытие слайдера при клике на кнопку.
 	 */
-	function handleDoubleTap( e, img ) {
-		const wrapper = img.closest( '[data-zoom-wrapper]' );
-		if ( !wrapper ) return;
 
-		// Координаты тапа относительно изображения
-		const rect = img.getBoundingClientRect();
-
-		// Для тач-событий используем координаты из changedTouches
-		const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
-		const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
-
-		const tapX = clientX - rect.left;
-		const tapY = clientY - rect.top;
-		const centerX = rect.width / 2;
-		const centerY = rect.height / 2;
-
-		if ( zoomState.active && zoomState.img === img ) {
-			// Уже увеличено — сбрасываем зум (плавно)
-			setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
-		} else {
-			// Не увеличено — увеличиваем с центром на точку тапа
-			const targetScale = 2.5;
-			const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
-			const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
-
-			// Сбрасываем предыдущий зум (если был на другом слайде)
-			resetAllZooms();
-
-			// Увеличиваем с плавной анимацией
-			setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
-		}
-
-		// Виброотклик
-		if ( window.navigator?.vibrate ) {
-			window.navigator.vibrate( 8 );
-		}
-	}
-
-	// 10.3. Кнопки зума +/−
 	const zoomInBtn = overlay.querySelector( '#zoomIn' );
 	const zoomOutBtn = overlay.querySelector( '#zoomOut' );
 
@@ -793,6 +775,7 @@ function openSlider( config ) {
 
 		const newScale = zoomState.currentScale - ZOOM_STEP;
 		if ( newScale <= MIN_SCALE ) {
+			// Масштаб стал 1× или меньше — полностью сбрасываем зум
 			resetAllZooms();
 		} else {
 			setZoom(
@@ -808,30 +791,46 @@ function openSlider( config ) {
 	} );
 
 	// ============================================================
-	// 11. ПИНЧ (ДВА ПАЛЬЦА) — ПЛАВНЫЙ ЗУМ
+	// 11. ПИНЧ (ДВА ПАЛЬЦА)
 	// ============================================================
 
 	/**
-	 * Начало пинча.
+	 * Обработка пинча для плавного зума.
+	 * 
+	 * Как это работает:
+	 * - Отслеживаем касания двух пальцев через touchstart/touchmove/touchend.
+	 * - При начале пинча запоминаем расстояние между пальцами (startDistance)
+	 *   и текущий масштаб (startScale).
+	 * - При движении пальцев вычисляем новый масштаб пропорционально
+	 *   изменению расстояния: newScale = startScale * (currentDistance / startDistance).
+	 * - Масштаб ограничен значениями MIN_SCALE (1) и MAX_SCALE (4).
+	 * - При окончании пинча проверяем: если масштаб < 1.05 — сбрасываем зум.
+	 * - Все изменения применяются мгновенно (без анимации) для точного следования за пальцами.
+	 * - passive: false нужен для возможности вызвать preventDefault.
 	 */
+
 	function handlePinchStart( e ) {
+		// Пинч — только когда два пальца на экране
 		if ( e.touches.length !== 2 ) return;
 
+		// Проверяем что один из пальцев на изображении
 		const img = e.target.closest( '[data-zoom-img]' );
 		if ( !img ) return;
 
 		const wrapper = img.closest( '[data-zoom-wrapper]' );
 
-		// Отменяем анимацию для мгновенного отклика
+		// Отменяем текущую анимацию зума если она идёт
 		if ( zoomState.animFrameId ) {
 			cancelAnimationFrame( zoomState.animFrameId );
 			zoomState.animFrameId = null;
 		}
+		// Убираем transition с изображения для мгновенного отклика
 		if ( zoomState.img ) {
 			zoomState.img.style.transition = 'none';
 		}
 
-		// Если зум не активен для этого изображения — инициализируем
+		// Если зум ещё не активен или активен для другого изображения —
+		// инициализируем зум для текущего
 		if ( !zoomState.active || zoomState.img !== img ) {
 			resetAllZooms();
 			zoomState.img = img;
@@ -843,7 +842,7 @@ function openSlider( config ) {
 			setSwiperLocked( true );
 		}
 
-		// Запоминаем начальное расстояние между пальцами
+		// Вычисляем и запоминаем начальное расстояние между пальцами
 		const dx = e.touches[0].clientX - e.touches[1].clientX;
 		const dy = e.touches[0].clientY - e.touches[1].clientY;
 		zoomState.startDistance = Math.sqrt( dx * dx + dy * dy );
@@ -854,10 +853,8 @@ function openSlider( config ) {
 		e.preventDefault();
 	}
 
-	/**
-	 * Движение пинча.
-	 */
 	function handlePinchMove( e ) {
+		// Продолжаем только если два пальца и зум активен
 		if ( e.touches.length !== 2 ) return;
 		if ( !zoomState.img || zoomState.startDistance === 0 ) return;
 
@@ -866,39 +863,39 @@ function openSlider( config ) {
 		const dy = e.touches[0].clientY - e.touches[1].clientY;
 		const distance = Math.sqrt( dx * dx + dy * dy );
 
-		// Вычисляем новый масштаб
+		// Новый масштаб = начальный масштаб × отношение расстояний
 		const ratio = distance / zoomState.startDistance;
 		const newScale = zoomState.startScale * ratio;
 
-		// Мгновенное применение (без анимации для пинча)
+		// Применяем мгновенно, без анимации
 		setZoom(
 			zoomState.img,
 			zoomState.wrapper,
 			newScale,
 			zoomState.translateX,
 			zoomState.translateY,
-			false  // Без анимации
+			false
 		);
 
 		e.preventDefault();
 	}
 
-	/**
-	 * Окончание пинча.
-	 */
 	function handlePinchEnd() {
 		if ( !zoomState.img ) return;
 
-		// Если масштаб почти 1 — сбрасываем
+		// Если пальцы свели почти до исходного размера — сбрасываем зум
 		if ( zoomState.currentScale < 1.05 ) {
 			resetAllZooms();
 		}
 
+		// Сбрасываем начальное расстояние
 		zoomState.startDistance = 0;
+
+		// Обновляем интерфейс (кнопки +/−, подсказка)
 		updateZoomUI();
 	}
 
-	// Навешиваем обработчики пинча
+	// Навешиваем обработчики пинча на swiper-контейнер
 	swiperEl.addEventListener( 'touchstart', handlePinchStart, { passive: false } );
 	swiperEl.addEventListener( 'touchmove', handlePinchMove, { passive: false } );
 	swiperEl.addEventListener( 'touchend', handlePinchEnd );
@@ -906,25 +903,48 @@ function openSlider( config ) {
 
 	// ============================================================
 	// 12. ПЕРЕТАСКИВАНИЕ УВЕЛИЧЕННОГО ФОТО
-	// Работает ТОЛЬКО при активном зуме
-	// Swiper заблокирован — перелистывания не будет
 	// ============================================================
 
 	/**
-	 * Начало перетаскивания (мышь или один палец).
+	 * Перетаскивание увеличенного изображения.
+	 * 
+	 * Как это работает:
+	 * - Перетаскивание возможно ТОЛЬКО когда фото увеличено (zoomState.active = true).
+	 * - Swiper в этот момент заблокирован через setSwiperLocked(true),
+	 *   поэтому перелистывание слайдов не происходит.
+	 * - Поддерживается два способа ввода:
+	 *   1. Мышь (десктоп): mousedown → mousemove → mouseup
+	 *   2. Один палец (мобильный): touchstart → touchmove → touchend
+	 * - При начале перетаскивания запоминаем позицию курсора/пальца
+	 *   и текущее смещение изображения.
+	 * - При движении вычисляем дельту и применяем новое смещение.
+	 * - Все изменения применяются мгновенно (без анимации)
+	 *   для точного следования за курсором/пальцем.
+	 * - Курсор меняется на 'grabbing' при перетаскивании.
+	 */
+
+	// Переменные для отслеживания перетаскивания мышью
+	// (сам объект dragState объявлен в секции 6)
+
+	/**
+	 * Начало перетаскивания.
+	 * Вызывается при mousedown (десктоп) или touchstart (мобильный, 1 палец).
 	 */
 	function handleDragStart( e ) {
-		// Перетаскивание только при активном зуме
+		// Только при активном зуме
 		if ( !zoomState.active || !zoomState.img ) return;
 
+		// Определяем тип события: тач или мышь
 		const isTouch = !!e.touches;
 
 		// Для тача — только один палец (пинч обрабатывается отдельно)
 		if ( isTouch && e.touches.length !== 1 ) return;
 
+		// Координаты курсора или пальца
 		const clientX = isTouch ? e.touches[0].clientX : e.clientX;
 		const clientY = isTouch ? e.touches[0].clientY : e.clientY;
 
+		// Запоминаем начальные позиции
 		dragState.active = true;
 		dragState.isTouch = isTouch;
 		dragState.startX = clientX;
@@ -932,60 +952,75 @@ function openSlider( config ) {
 		dragState.startTranslateX = zoomState.translateX;
 		dragState.startTranslateY = zoomState.translateY;
 
-		// Отключаем анимацию на время перетаскивания
+		// Отменяем анимацию зума если она идёт
 		if ( zoomState.animFrameId ) {
 			cancelAnimationFrame( zoomState.animFrameId );
 			zoomState.animFrameId = null;
 		}
+
+		// Убираем transition для мгновенного следования
 		zoomState.img.style.transition = 'none';
 		zoomState.img.style.cursor = 'grabbing';
 
-		e.preventDefault();
-		e.stopPropagation();
+		// Предотвращаем стандартное поведение браузера
+		if ( e.preventDefault ) e.preventDefault();
+		if ( e.stopPropagation ) e.stopPropagation();
 	}
 
 	/**
 	 * Движение при перетаскивании.
+	 * Вызывается при mousemove или touchmove.
 	 */
 	function handleDragMove( e ) {
-		if ( !dragState.active || !zoomState.active || !zoomState.img ) return;
+		// Только если перетаскивание активно
+		if ( !dragState.active || !zoomState.img ) return;
 
-		const isTouch = dragState.isTouch;
-		const clientX = isTouch ? e.touches[0].clientX : e.clientX;
-		const clientY = isTouch ? e.touches[0].clientY : e.clientY;
+		// Координаты в зависимости от типа события
+		const clientX = dragState.isTouch ? e.touches[0].clientX : e.clientX;
+		const clientY = dragState.isTouch ? e.touches[0].clientY : e.clientY;
 
+		// Вычисляем смещение от начальной точки
 		const deltaX = clientX - dragState.startX;
 		const deltaY = clientY - dragState.startY;
 
+		// Применяем новое смещение мгновенно
 		setZoom(
 			zoomState.img,
 			zoomState.wrapper,
 			zoomState.currentScale,
 			dragState.startTranslateX + deltaX,
 			dragState.startTranslateY + deltaY,
-			false  // Без анимации — мгновенное следование
+			false
 		);
 	}
 
 	/**
 	 * Окончание перетаскивания.
+	 * Вызывается при mouseup или touchend.
 	 */
 	function handleDragEnd() {
 		if ( !dragState.active ) return;
 
+		// Сбрасываем флаг перетаскивания
 		dragState.active = false;
+
+		// Возвращаем курсор grab (готов к следующему перетаскиванию)
 		if ( zoomState.img ) {
 			zoomState.img.style.cursor = 'grab';
 		}
 	}
 
-	// Мышь: перетаскивание
+	// --- Перетаскивание мышью (десктоп) ---
+
 	swiperEl.addEventListener( 'mousedown', function ( e ) {
+		// Начинаем перетаскивание только если кликнули по увеличенному изображению
 		if ( zoomState.active && e.target.closest( '[data-zoom-img]' ) ) {
 			handleDragStart( e );
 		}
 	} );
 
+	// mousemove и mouseup вешаем на document,
+	// чтобы перетаскивание работало даже если курсор вышел за пределы слайдера
 	document.addEventListener( 'mousemove', function ( e ) {
 		if ( dragState.active && !dragState.isTouch ) {
 			handleDragMove( e );
@@ -998,11 +1033,14 @@ function openSlider( config ) {
 		}
 	} );
 
-	// Тач: перетаскивание одним пальцем (только при зуме)
+	// --- Перетаскивание одним пальцем (мобильные) ---
+
 	swiperEl.addEventListener( 'touchstart', function ( e ) {
-		// Не перехватываем пинч (2 пальца)
-		if ( e.touches.length !== 1 ) return;
-		if ( zoomState.active && e.target.closest( '[data-zoom-img]' ) ) {
+		// Начинаем перетаскивание только если:
+		// - один палец (не пинч)
+		// - зум активен
+		// - палец на увеличенном изображении
+		if ( e.touches.length === 1 && zoomState.active && e.target.closest( '[data-zoom-img]' ) ) {
 			handleDragStart( e );
 		}
 	}, { passive: false } );
