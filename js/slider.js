@@ -344,8 +344,11 @@ function openSlider( config ) {
 	 * Принцип:
 	 * - Изображение ВСЕГДА object-fit: contain
 	 * - Увеличение = transform: scale() на img
-	 * - Слайд получает overflow: visible — не обрезает края
-	 * - Обёртка получает overflow: visible — не обрезает края
+	 * - Слайд получает overflow: visible + z-index: 100
+	 * - Псевдоэлемент слайда затемняет фон
+	 * - Swiper получает класс для скрытия стрелок и пагинации
+	 * - Подпись и затемнение скрываются
+	 * - Фильтры (grayscale, brightness) убираются
 	 * 
 	 * @param {HTMLElement} img - Изображение
 	 * @param {HTMLElement} wrapper - Обёртка изображения
@@ -355,19 +358,21 @@ function openSlider( config ) {
 	 * @param {boolean} [animate=true] - Плавная анимация или мгновенно
 	 */
 	function setZoom( img, wrapper, targetScale, targetX = 0, targetY = 0, animate = true ) {
-		// Отменяем предыдущую анимацию
+
+		// --- 1. Отменяем предыдущую анимацию ---
 		if ( zoomState.animFrameId ) {
 			cancelAnimationFrame( zoomState.animFrameId );
 			zoomState.animFrameId = null;
 		}
 
+		// --- 2. Вычисляем целевой масштаб ---
 		const clampedScale = Math.max( MIN_SCALE, Math.min( MAX_SCALE, targetScale ) );
 		const willBeActive = clampedScale > MIN_SCALE;
 
-		// Находим слайд
+		// --- 3. Находим родительские элементы ---
 		const slide = wrapper ? wrapper.closest( '.swiper-slide' ) : null;
 
-		// Обновляем состояние
+		// --- 4. Обновляем состояние ---
 		zoomState.img = img;
 		zoomState.wrapper = wrapper;
 		zoomState.scale = clampedScale;
@@ -375,67 +380,110 @@ function openSlider( config ) {
 		zoomState.translateY = targetY;
 
 		/**
-		 * Применяет трансформацию и обновляет все классы.
+		 * 4.1. Применяет трансформацию и обновляет все классы.
+		 * Вызывается на каждом кадре анимации или мгновенно.
+		 * 
+		 * @param {number} scale - Текущий масштаб
+		 * @param {number} tx - Смещение по X
+		 * @param {number} ty - Смещение по Y
 		 */
 		function applyTransform( scale, tx, ty ) {
 			if ( !img ) return;
 
-			// Трансформация изображения
+			// --- Изображение ---
 			img.style.transform = `scale(${scale}) translate(${tx / scale}px, ${ty / scale}px)`;
 			img.style.cursor = scale > MIN_SCALE ? 'grab' : '';
 			img.classList.toggle( 'zoomed', scale > MIN_SCALE );
 
-			// Обёртка
+			// --- Обёртка ---
 			if ( wrapper ) {
 				wrapper.classList.toggle( 'zoomed', scale > MIN_SCALE );
 				wrapper.style.overflow = scale > MIN_SCALE ? 'visible' : 'hidden';
 			}
 
-			// СЛАЙД — ключевой момент
+			// --- Слайд ---
 			if ( slide ) {
 				slide.classList.toggle( 'zoomed-slide', scale > MIN_SCALE );
 				slide.style.overflow = scale > MIN_SCALE ? 'visible' : 'hidden';
 			}
 
+			// --- Swiper-контейнер: скрываем стрелки и пагинацию ---
+			if ( swiperEl ) {
+				swiperEl.classList.toggle( 'swiper-has-zoomed-slide', scale > MIN_SCALE );
+			}
+
+			// --- Сохраняем текущий масштаб ---
 			zoomState.currentScale = scale;
 		}
 
-		// Анимация или мгновенно
+		// --- 5. Анимация или мгновенное применение ---
+
 		if ( animate && Math.abs( zoomState.currentScale - clampedScale ) > 0.01 ) {
+
+			// === ПЛАВНАЯ АНИМАЦИЯ ===
+
 			const startScale = zoomState.currentScale;
 			const startX = zoomState.translateX;
 			const startY = zoomState.translateY;
 			const startTime = performance.now();
+
+			// Отключаем CSS-переходы на время JS-анимации
 			img.style.transition = 'none';
 
+			/**
+			 * Один шаг анимации.
+			 * Вызывается рекурсивно через requestAnimationFrame.
+			 * 
+			 * @param {number} now - Время вызова (от performance.now)
+			 */
 			function animateZoom( now ) {
 				const elapsed = now - startTime;
 				const progress = Math.min( elapsed / ZOOM_ANIM_DURATION, 1 );
+
+				// Ease-out кривая (кубическая)
 				const eased = 1 - Math.pow( 1 - progress, 3 );
 
-				applyTransform(
-					startScale + ( clampedScale - startScale ) * eased,
-					startX + ( targetX - startX ) * eased,
-					startY + ( targetY - startY ) * eased
-				);
+				// Промежуточные значения
+				const currentScale = startScale + ( clampedScale - startScale ) * eased;
+				const currentX = startX + ( targetX - startX ) * eased;
+				const currentY = startY + ( targetY - startY ) * eased;
 
+				// Применяем
+				applyTransform( currentScale, currentX, currentY );
+
+				// Продолжаем или заканчиваем
 				if ( progress < 1 ) {
 					zoomState.animFrameId = requestAnimationFrame( animateZoom );
 				} else {
+					// --- Финальное состояние ---
 					applyTransform( clampedScale, targetX, targetY );
 					zoomState.animFrameId = null;
 					zoomState.active = willBeActive;
+
+					// Блокируем или разблокируем Swiper
 					setSwiperLocked( willBeActive );
+
+					// Обновляем интерфейс (подсказка, кнопки +/−, уровень зума)
 					updateZoomUI();
 				}
 			}
 
+			// Запускаем анимацию
 			zoomState.animFrameId = requestAnimationFrame( animateZoom );
+
 		} else {
+
+			// === МГНОВЕННОЕ ПРИМЕНЕНИЕ ===
+			// Используется для: пинча, перетаскивания, сброса зума
+
 			img.style.transition = 'none';
 			applyTransform( clampedScale, targetX, targetY );
 			zoomState.active = willBeActive;
+
+			// Блокируем или разблокируем Swiper
 			setSwiperLocked( willBeActive );
+
+			// Обновляем интерфейс
 			updateZoomUI();
 		}
 	}
@@ -618,32 +666,68 @@ function openSlider( config ) {
 	// 10. ОБРАБОТЧИКИ ЗУМА — ДВОЙНОЙ ТАП И КНОПКИ
 	// ============================================================
 
-	// 10.1. Двойной тап — переключение зума
+	/**
+	 * 10.1. Отслеживание двойного тапа.
+	 * 
+	 * ВАЖНО для мобильных:
+	 * - Не используем click (задержка 300мс на мобильных)
+	 * - Используем touchend для тач-устройств
+	 * - Используем click для десктопа
+	 * - Разделяем одиночный и двойной тап через lastTapTime
+	 */
+
+	// Для десктопа — стандартный click с проверкой на двойной
 	swiperEl.addEventListener( 'click', function ( e ) {
+		// Не обрабатываем, если это был тач (для тач-устройств — свой обработчик)
+		if ( e.pointerType === 'touch' ) return;
+
+		handleTap( e );
+	} );
+
+	// Для мобильных — touchend (без задержки)
+	swiperEl.addEventListener( 'touchend', function ( e ) {
+		// Игнорируем если пальцев больше одного (пинч)
+		if ( e.touches.length > 0 || e.changedTouches.length > 1 ) return;
+
+		handleTap( e );
+	} );
+
+	/**
+	 * Общая логика обработки тапа.
+	 * Определяет: одиночный тап или двойной.
+	 */
+	function handleTap( e ) {
 		const now = Date.now();
 		const timeSinceLastTap = now - zoomState.lastTapTime;
 
 		// Проверяем, что тап был по изображению
 		const img = e.target.closest( '[data-zoom-img]' );
 		if ( !img ) {
-			zoomState.lastTapTime = now;
+			// Тап мимо фото — сбрасываем таймер
+			zoomState.lastTapTime = 0;
 			return;
 		}
 
+		// Предотвращаем стандартное поведение
+		e.preventDefault();
+		e.stopPropagation();
+
 		if ( timeSinceLastTap < DOUBLE_TAP_DELAY && timeSinceLastTap > 0 ) {
-			// Это двойной тап
-			e.preventDefault();
-			e.stopPropagation();
+			// ЭТО ДВОЙНОЙ ТАП
 			handleDoubleTap( e, img );
 			zoomState.lastTapTime = 0;
 		} else {
+			// Это первый тап — запоминаем время
 			zoomState.lastTapTime = now;
+
+			// Если зум уже активен и тапаем по увеличенному фото —
+			// ничего не делаем (ждём второго тапа или перетаскивания)
 		}
-	} );
+	}
 
 	/**
 	 * 10.2. Логика двойного тапа.
-	 * Увеличивает в точке тапа или сбрасывает зум.
+	 * Переключает зум: увеличивает в точке тапа или сбрасывает.
 	 */
 	function handleDoubleTap( e, img ) {
 		const wrapper = img.closest( '[data-zoom-wrapper]' );
@@ -651,21 +735,29 @@ function openSlider( config ) {
 
 		// Координаты тапа относительно изображения
 		const rect = img.getBoundingClientRect();
-		const tapX = e.clientX - rect.left;
-		const tapY = e.clientY - rect.top;
+
+		// Для тач-событий используем координаты из changedTouches
+		const clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+		const clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+
+		const tapX = clientX - rect.left;
+		const tapY = clientY - rect.top;
 		const centerX = rect.width / 2;
 		const centerY = rect.height / 2;
 
 		if ( zoomState.active && zoomState.img === img ) {
-			// Уже увеличено — сбрасываем
+			// Уже увеличено — сбрасываем зум (плавно)
 			setZoom( img, wrapper, MIN_SCALE, 0, 0, true );
 		} else {
-			// Увеличиваем с центром на точку тапа
+			// Не увеличено — увеличиваем с центром на точку тапа
 			const targetScale = 2.5;
 			const offsetX = ( centerX - tapX ) * ( targetScale - 1 );
 			const offsetY = ( centerY - tapY ) * ( targetScale - 1 );
 
+			// Сбрасываем предыдущий зум (если был на другом слайде)
 			resetAllZooms();
+
+			// Увеличиваем с плавной анимацией
 			setZoom( img, wrapper, targetScale, offsetX, offsetY, true );
 		}
 

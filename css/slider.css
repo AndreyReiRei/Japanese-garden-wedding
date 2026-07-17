@@ -434,11 +434,11 @@
  * - Изображение всегда object-fit: contain
  * - Увеличение достигается через transform: scale() на самом img
  * - При активном зуме:
- *   - img получает класс .zoomed → scale увеличивается
+ *   - img получает класс .zoomed → scale увеличивается, фильтры убираются
  *   - .image-wrapper получает overflow: visible
- *   - .swiper-slide получает overflow: visible
+ *   - .swiper-slide получает overflow: visible + z-index выше всего
  *   - Подпись и затемнение скрываются
- *   - Все фильтры (grayscale, brightness) убираются
+ *   - Позади слайда появляется фон, перекрывающий соседние слайды
  */
 
 /* Без зума — плавные переходы */
@@ -447,10 +447,9 @@
 	will-change: transform;
 }
 
-/* При зуме — быстрое следование */
+/* При зуме — быстрое следование + убираем фильтры */
 [data-zoom-img].zoomed {
 	transition: transform 0.1s linear;
-	/* Убираем все фильтры — фото всегда цветное и яркое при зуме */
 	filter: none !important;
 }
 
@@ -463,10 +462,33 @@
 	overflow: visible !important;
 }
 
-/* Слайд: при зуме тоже visible */
+/* 
+ * СЛАЙД при зуме:
+ * - overflow: visible — не обрезает увеличенное изображение
+ * - z-index: 100 — выше стрелок (z-index по умолчанию ~10)
+ * - фон перекрывает соседние слайды и пагинацию
+ */
 .swiper-slide.zoomed-slide {
 	overflow: visible !important;
-	z-index: 10 !important;
+	z-index: 100 !important;
+}
+
+/* 
+ * Фон позади увеличенного слайда.
+ * Перекрывает соседние слайды и элементы интерфейса.
+ * Создаётся через псевдоэлемент с высоким z-index.
+ */
+.swiper-slide.zoomed-slide::before {
+	content: '';
+	position: fixed;
+	/* Фиксирован относительно экрана */
+	inset: 0;
+	z-index: -1;
+	/* Позади слайда, но внутри него */
+	background: rgba(0, 0, 0, 0.85);
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+	pointer-events: none;
 }
 
 /* Скрываем подпись при зуме */
@@ -480,6 +502,45 @@
 .swiper-slide.zoomed-slide::after {
 	opacity: 0 !important;
 	transition: opacity 0.2s ease;
+}
+
+/* Скрываем пагинацию при зуме */
+.swiper-has-zoomed-slide .swiper-pagination {
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+}
+
+/* Скрываем стрелки при зуме */
+.swiper-has-zoomed-slide .swiper-button-prev,
+.swiper-has-zoomed-slide .swiper-button-next {
+	opacity: 0;
+	transition: opacity 0.3s ease;
+	pointer-events: none;
+}
+
+/* Скрываем полосу прокрутки (скроллбар) страницы при зуме */
+html:has(.swiper-has-zoomed-slide),
+body:has(.swiper-has-zoomed-slide) {
+	overflow: hidden;
+}
+
+/* 
+ * Скрываем скроллбар страницы при открытом слайдере.
+ * Слайдер всегда открыт = скролл всегда скрыт.
+ * Дополнительная страховка на случай зума.
+ */
+.slider-overlay.open~body,
+.slider-overlay.open {
+	/* Уже применяется в JS, но дублируем для надёжности */
+}
+
+/* При зуме — 100% гарантия что скролла нет */
+.swiper-has-zoomed-slide {
+	/* Свайпер занимает весь экран — скролла быть не должно */
+	overflow: hidden;
+	touch-action: none;
+	/* Запрещаем все жесты браузера */
 }
 
 /* ============================================================
