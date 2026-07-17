@@ -1,11 +1,28 @@
 /* ============================================================
    SLIDER.CSS — Полноэкранный слайдер на Swiper
-   Современная японская эстетика
-   Все фото: contain (без обрезки) → zoom: cover
+   Современная японская эстетика с микро-взаимодействиями
+   ============================================================
+   
+   СОДЕРЖАНИЕ:
+   1.  Сброс стилей и CSS-переменные
+   2.  Контейнер слайдера (фон, оверлей)
+   3.  Swiper-контейнер
+   4.  Слайд
+   5.  Обёртка и изображение
+   6.  Подпись
+   7.  Навигационные стрелки
+   8.  Пагинация (точки)
+   9.  Кнопка закрытия
+   10. Счётчик фото
+   11. Подсказка о зуме
+   12. Кнопки зума +/−
+   13. Зум (состояния и эффекты)
+   14. Скрытие скроллбара при зуме
+   15. Адаптивность
    ============================================================ */
 
 /* ============================================================
-   1. СБРОС И ПЕРЕМЕННЫЕ
+   1. СБРОС И CSS-ПЕРЕМЕННЫЕ
    ============================================================ */
 
 * {
@@ -15,33 +32,87 @@
 }
 
 :root {
-	--slider-bg: #0a0a0a;
-	--slider-text: rgba(240, 255, 255, 0.9);
-	--slider-text-muted: rgba(240, 255, 255, 0.35);
-	--accent-color: #E84040;
-	--accent-glow: rgba(232, 64, 64, 0.3);
+	/* 
+     * ЦВЕТОВАЯ ПАЛИТРА
+     * Меняйте значения здесь — весь слайдер перекрасится.
+     */
 
+	/* Фон слайдера */
+	--slider-bg: #0a0a0a;
+	/* Глубокий чёрный */
+
+	/* Цвета текста */
+	--slider-text: rgba(240, 255, 255, 0.95);
+	/* Почти белый */
+	--slider-text-muted: rgba(240, 255, 255, 0.4);
+	/* Приглушённый */
+
+	/* 
+     * АКЦЕНТНЫЙ ЦВЕТ (по умолчанию — красный для ЗАГС)
+     * Переопределяется в data-theme ниже.
+     * Формат: #HEX для цвета, rgba() для свечений.
+     */
+	--accent-color: #E84040;
+	/* Основной акцентный */
+	--accent-glow: rgba(232, 64, 64, 0.4);
+	/* Ближнее свечение */
+	--accent-glow-strong: rgba(232, 64, 64, 0.6);
+	/* Дальнее свечение */
+
+	/* 
+     * АНИМАЦИИ
+     * Кривые для разных типов движения.
+     */
 	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+	/* Плавное торможение */
+	--ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+	/* Пружинистый эффект */
+	--ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+	/* Симметричный плавный */
+
+	/* Длительности переходов */
+	--transition-fast: 0.2s ease;
+	/* Быстрые реакции (нажатия) */
+	--transition-normal: 0.35s var(--ease-out-expo);
+	/* Обычные hover */
 	--transition-slow: 0.6s var(--ease-out-expo);
+	/* Медленные (смена слайдов) */
+	--transition-spring: 0.5s var(--ease-out-back);
+	/* Пружинистые появления */
 }
 
+/*
+ * ТЕМЫ РАЗДЕЛОВ
+ * Применяются через data-theme на body.
+ * Меняют акцентный цвет в зависимости от раздела свадьбы.
+ */
+
+/* Сад — холодный тёмно-алый */
 [data-theme="garden"] {
 	--accent-color: #C0392B;
-	--accent-glow: rgba(192, 57, 43, 0.3);
+	--accent-glow: rgba(192, 57, 43, 0.4);
+	--accent-glow-strong: rgba(192, 57, 43, 0.6);
 }
 
+/* ЗАГС — яркая киноварь */
 [data-theme="zags"] {
 	--accent-color: #E84040;
-	--accent-glow: rgba(232, 64, 64, 0.35);
+	--accent-glow: rgba(232, 64, 64, 0.45);
+	--accent-glow-strong: rgba(232, 64, 64, 0.65);
 }
 
+/* Дом — тёплый янтарь/золото */
 [data-theme="home"] {
 	--accent-color: #D4A24E;
-	--accent-glow: rgba(212, 162, 78, 0.3);
+	--accent-glow: rgba(212, 162, 78, 0.4);
+	--accent-glow-strong: rgba(212, 162, 78, 0.6);
 }
 
 /* ============================================================
-   2. КОНТЕЙНЕР СЛАЙДЕРА (фоновый слой)
+   2. КОНТЕЙНЕР СЛАЙДЕРА (ФОН)
+   ============================================================
+   Полупрозрачный оверлей с шумом и градиентами.
+   Появляется плавно при открытии.
    ============================================================ */
 
 .slider-overlay {
@@ -49,33 +120,38 @@
 	inset: 0;
 	z-index: 1000;
 	background: var(--slider-bg);
+
+	/* Скрыт по умолчанию */
 	opacity: 0;
 	pointer-events: none;
-	transition: opacity 0.4s ease;
+	transition: opacity 0.5s var(--ease-out-expo);
 }
 
+
+/* Открытое состояние */
 .slider-overlay.open {
 	opacity: 1;
 	pointer-events: all;
+	overflow: hidden;
 }
 
+/* Дополнительно — запрещаем скролл на body */
+body:has(.slider-overlay.open) {
+	overflow: hidden;
+}
+
+/* Фоновые эффекты: шум + акцентное свечение */
 .slider-overlay::before {
 	content: '';
 	position: absolute;
 	inset: 0;
 	z-index: 0;
 	pointer-events: none;
-	background-image: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
-	opacity: 0.4;
-}
-
-.slider-overlay::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	z-index: 0;
-	pointer-events: none;
-	background: radial-gradient(ellipse at center, rgba(60, 60, 65, 0.15) 0%, transparent 70%);
+	background:
+		/* Лёгкое свечение сверху */
+		radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
+		/* Акцентное свечение снизу */
+		radial-gradient(ellipse at 50% 70%, var(--accent-glow) 0%, transparent 50%);
 }
 
 /* ============================================================
@@ -97,10 +173,12 @@
 	height: 85vh;
 	max-height: 900px;
 	overflow: hidden;
+	/* Обрезает слайды за пределами */
 }
 
 .swiper-wrapper {
 	align-items: center;
+	/* Вертикальное центрирование слайдов */
 }
 
 /* ============================================================
@@ -111,20 +189,25 @@
 	position: relative;
 	height: 100%;
 	overflow: hidden;
+	/* Обрезаем содержимое (кроме зума) */
 	border-radius: 24px;
 	background: #080808;
-	transition: box-shadow 0.6s var(--ease-out-expo);
+	transition:
+		box-shadow 0.6s var(--ease-out-expo),
+		transform 0.6s var(--ease-out-expo);
+}
+
+/* Активный слайд — чуть выше остальных */
+.swiper-slide-active {
+	z-index: 2;
 }
 
 /* ============================================================
    5. ОБЁРТКА И ИЗОБРАЖЕНИЕ
+   ============================================================
+   Контейнер для Swiper Zoom.
+   Масштабируется для неактивных слайдов.
    ============================================================ */
-
-/*
- * Swiper Zoom увеличивает изображение внутри контейнера.
- * Чтобы края не обрезались, контейнер должен быть
- * overflow: visible при зуме.
- */
 
 .swiper-zoom-container {
 	width: 100%;
@@ -134,42 +217,51 @@
 	justify-content: center;
 	background: #080808;
 	overflow: hidden;
+	/* Без зума — обрезаем */
 	border-radius: 24px;
+	transition: transform 0.8s var(--ease-out-expo);
 }
 
-/* При активном зуме — показываем содержимое полностью */
+/* При зуме — показываем содержимое полностью */
 .swiper-slide-zoomed .swiper-zoom-container {
 	overflow: visible;
 }
 
-/* Масштаб неактивных слайдов */
+/* Неактивные слайды — слегка увеличены для эффекта глубины */
 .swiper-slide:not(.swiper-slide-active) .swiper-zoom-container {
 	transform: scale(1.15);
-	transition: transform 0.8s var(--ease-out-expo);
 }
 
+/* Активный слайд — нормальный размер */
 .swiper-slide-active .swiper-zoom-container {
 	transform: scale(1);
-	transition: transform 0.8s var(--ease-out-expo);
 }
 
+/* Изображение */
 .swiper-slide img {
 	width: 100%;
 	height: 100%;
 	object-fit: contain;
+	/* Все фото видны целиком */
 	background: #080808;
 	user-select: none;
 	-webkit-user-drag: none;
-	filter: grayscale(1) brightness(0.7);
+
+	/* Неактивные — ч/б и затемнены */
+	filter: grayscale(1) brightness(0.6);
 	transition: filter 0.6s var(--ease-out-expo);
 }
 
+/* Активный слайд — цветной */
 .swiper-slide-active img {
 	filter: grayscale(0) brightness(0.95);
 }
 
 /* ============================================================
    6. ПОДПИСЬ
+   ============================================================
+   Текст снизу слева.
+   Появляется только у активного слайда.
    ============================================================ */
 
 .swiper-slide .slide-caption {
@@ -177,28 +269,41 @@
 	left: 28px;
 	bottom: 28px;
 	z-index: 2;
+
+	/* Шрифт: Cormorant Garamond (основной) */
 	font-family: 'Cormorant Garamond', serif;
 	font-size: 22px;
 	font-weight: 400;
 	letter-spacing: 0.04em;
 	color: var(--slider-text-muted);
 	user-select: none;
+
+	/* По умолчанию скрыта */
+	transform: translateY(12px);
+	opacity: 0;
 	transition: all 0.6s var(--ease-out-expo);
-	transform: translateY(8px);
 }
 
+/* Активный слайд — подпись видна */
 .swiper-slide-active .slide-caption {
 	color: var(--slider-text);
 	transform: translateY(0);
-	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 0, 0, 0.3);
+	opacity: 1;
+	text-shadow:
+		0 2px 12px rgba(0, 0, 0, 0.6),
+		/* Ближняя тень */
+		0 0 40px rgba(0, 0, 0, 0.3);
+	/* Дальнее размытие */
 }
 
-/* Затемнение под подписью */
+/* Затемнение под подписью (для читаемости) */
 .swiper-slide::after {
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.5) 0%, transparent 35%);
+	background: linear-gradient(to top,
+			rgba(0, 0, 0, 0.55) 0%,
+			transparent 40%);
 	pointer-events: none;
 	z-index: 1;
 	opacity: 0;
@@ -211,74 +316,117 @@
 
 /* ============================================================
    7. НАВИГАЦИОННЫЕ СТРЕЛКИ
+   ============================================================
+   Стеклянные кнопки по бокам.
+   При hover: свечение, увеличение, стрелка сдвигается.
    ============================================================ */
 
 .swiper-button-prev,
 .swiper-button-next {
-	width: 48px;
-	height: 48px;
+	width: 52px;
+	height: 52px;
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.05);
+
+	/* Стеклянный фон */
+	background: rgba(0, 0, 0, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	color: rgba(255, 255, 255, 0.7);
-	transition: all 0.3s ease;
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+
+	color: rgba(255, 255, 255, 0.6);
+	transition: all 0.4s var(--ease-out-expo);
 	top: 50%;
 	transform: translateY(-50%);
 }
 
+/* Размер иконки стрелки */
 .swiper-button-prev::after,
 .swiper-button-next::after {
-	font-size: 18px;
-	font-weight: 300;
+	font-size: 16px;
+	font-weight: 200;
+	transition: transform 0.3s var(--ease-out-expo);
 }
 
+/* Hover: подсветка, увеличение, тень */
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
-	background: rgba(255, 255, 255, 0.1);
+	background: rgba(0, 0, 0, 0.6);
+	border-color: rgba(255, 255, 255, 0.25);
 	color: #fff;
-	border-color: rgba(255, 255, 255, 0.2);
-	transform: translateY(-50%) scale(1.05);
+	box-shadow:
+		0 0 30px rgba(0, 0, 0, 0.4),
+		0 0 0 1px rgba(255, 255, 255, 0.05);
+	transform: translateY(-50%) scale(1.08);
 }
 
+/* Стрелка сдвигается при hover */
+.swiper-button-prev:hover::after {
+	transform: translateX(-3px);
+}
+
+.swiper-button-next:hover::after {
+	transform: translateX(3px);
+}
+
+/* Нажатие */
 .swiper-button-prev:active,
 .swiper-button-next:active {
-	transform: translateY(-50%) scale(0.93);
-	transition: transform 0.12s ease;
+	transform: translateY(-50%) scale(0.94);
+	transition: transform 0.15s ease;
 }
 
+/* Неактивная стрелка (когда нельзя листать) */
 .swiper-button-disabled {
-	opacity: 0.2 !important;
+	opacity: 0.15 !important;
 	pointer-events: none;
+	filter: blur(2px);
 }
 
 /* ============================================================
    8. ПАГИНАЦИЯ (ТОЧКИ)
+   ============================================================
+   Активная точка — вытянутая капсула с двойным свечением.
+   Неактивные — маленькие кружки.
    ============================================================ */
 
 .swiper-pagination {
-	bottom: 16px !important;
+	bottom: 24px !important;
 }
 
 .swiper-pagination-bullet {
-	width: 8px;
-	height: 8px;
-	background: rgba(255, 255, 255, 0.3);
+	width: 6px;
+	height: 6px;
+	background: rgba(255, 255, 255, 0.25);
 	opacity: 1;
-	transition: all 0.35s ease;
-	margin: 0 6px !important;
+	border-radius: 3px;
+	transition: all 0.4s var(--ease-out-expo);
+	margin: 0 5px !important;
 }
 
+/* Hover: подсветка и приподнимание */
+.swiper-pagination-bullet:hover {
+	background: rgba(255, 255, 255, 0.5);
+	transform: translateY(-2px);
+}
+
+/* Активная точка */
 .swiper-pagination-bullet-active {
 	background: var(--accent-color);
-	box-shadow: 0 0 12px var(--accent-glow);
-	width: 24px;
-	border-radius: 4px;
+	width: 28px;
+	/* Вытянутая форма */
+	border-radius: 3px;
+	box-shadow:
+		0 0 10px var(--accent-glow),
+		/* Ближнее свечение */
+		0 0 20px var(--accent-glow);
+	/* Дальнее свечение */
 }
 
 /* ============================================================
-   9. КНОПКА ЗАКРЫТИЯ И СЧЁТЧИК
+   9. КНОПКА ЗАКРЫТИЯ (КРЕСТИК)
+   ============================================================
+   Правый верхний угол.
+   При hover: поворот на 90°, красное свечение.
    ============================================================ */
 
 .slider-close {
@@ -289,29 +437,46 @@
 	width: 44px;
 	height: 44px;
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.05);
+
+	/* Стеклянный фон */
+	background: rgba(0, 0, 0, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	color: rgba(255, 255, 255, 0.7);
-	font-size: 20px;
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+
+	color: rgba(255, 255, 255, 0.6);
+	font-size: 18px;
+	font-weight: 200;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.3s ease;
+	transition: all 0.4s var(--ease-out-expo);
 }
 
+/* Hover: красная подсветка + поворот */
 .slider-close:hover {
-	background: rgba(255, 255, 255, 0.1);
+	background: rgba(232, 64, 64, 0.2);
+	border-color: rgba(232, 64, 64, 0.4);
 	color: #fff;
-	transform: scale(1.05);
+	box-shadow:
+		0 0 30px rgba(232, 64, 64, 0.15),
+		0 0 0 1px rgba(232, 64, 64, 0.1);
+	transform: rotate(90deg) scale(1.08);
 }
 
+/* Нажатие */
 .slider-close:active {
-	transform: scale(0.92);
+	transform: rotate(90deg) scale(0.9);
 	transition: transform 0.12s ease;
 }
+
+/* ============================================================
+   10. СЧЁТЧИК ФОТО
+   ============================================================
+   По центру внизу.
+   «3 / 12»
+   ============================================================ */
 
 .slider-counter {
 	position: absolute;
@@ -319,173 +484,277 @@
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 10;
+
 	font-family: 'Inter', sans-serif;
-	font-size: 13px;
-	font-weight: 400;
-	letter-spacing: 0.1em;
-	color: rgba(255, 255, 255, 0.35);
+	font-size: 12px;
+	font-weight: 500;
+	letter-spacing: 0.15em;
+	color: rgba(255, 255, 255, 0.3);
 	pointer-events: none;
 }
 
 /* ============================================================
-   10. ПОДСКАЗКА О ЗУМЕ
+   11. ПОДСКАЗКА О ЗУМЕ
+   ============================================================
+   Всплывает сверху при открытии.
+   «Двойной тап — увеличить»
    ============================================================ */
 
 .slider-zoom-hint {
 	position: absolute;
 	top: 24px;
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translateX(-50%) translateY(-10px);
 	z-index: 10;
+
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
-	font-weight: 400;
-	letter-spacing: 0.06em;
-	color: rgba(255, 255, 255, 0.5);
+	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	color: rgba(255, 255, 255, 0.4);
+
+	/* Стеклянная капсула */
 	background: rgba(0, 0, 0, 0.5);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.06);
 	border-radius: 100px;
-	padding: 6px 14px;
+	padding: 7px 16px;
+
+	/* Скрыта по умолчанию */
 	opacity: 0;
 	pointer-events: none;
-	transition: opacity 0.3s ease;
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
+	transition: all 0.4s var(--ease-out-expo);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
 }
 
+/* Видима */
 .slider-zoom-hint.visible {
 	opacity: 1;
+	transform: translateX(-50%) translateY(0);
 }
 
 /* ============================================================
-   11. КНОПКИ ЗУМА
+   12. КНОПКИ ЗУМА +/−
+   ============================================================
+   Появляются снизу при активном зуме.
+   Выезжают с пружинной анимацией.
    ============================================================ */
 
 .slider-zoom-controls {
 	position: absolute;
 	bottom: 60px;
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translateX(-50%) translateY(10px) scale(0.9);
 	z-index: 10;
+
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 2px;
+
+	/* Стеклянный фон */
 	background: rgba(0, 0, 0, 0.55);
-	border: 1px solid rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.08);
 	border-radius: 100px;
-	padding: 6px 8px;
+	padding: 5px;
+
+	/* Скрыты по умолчанию */
 	opacity: 0;
 	pointer-events: none;
-	transition: opacity 0.3s ease;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
+	transition: all 0.5s var(--ease-out-expo);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
+/* Видимы — выезжают с пружиной */
 .slider-zoom-controls.visible {
 	opacity: 1;
 	pointer-events: all;
+	transform: translateX(-50%) translateY(0) scale(1);
 }
 
+/* Кнопка + или − */
 .zoom-btn {
-	width: 34px;
-	height: 34px;
+	width: 36px;
+	height: 36px;
 	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.06);
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	color: rgba(255, 255, 255, 0.8);
+	background: transparent;
+	border: none;
+	color: rgba(255, 255, 255, 0.6);
 	font-size: 18px;
 	font-weight: 300;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.2s ease;
+	transition: all 0.3s var(--ease-out-expo);
 	font-family: 'Inter', sans-serif;
 	line-height: 1;
+	position: relative;
+}
+
+/* Круглая подсветка при hover */
+.zoom-btn::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0);
+	transition: all 0.3s var(--ease-out-expo);
+	z-index: -1;
 }
 
 .zoom-btn:hover {
-	background: rgba(255, 255, 255, 0.12);
 	color: #fff;
 }
 
-.zoom-btn:active {
-	transform: scale(0.9);
-	background: rgba(255, 255, 255, 0.18);
+.zoom-btn:hover::before {
+	background: rgba(255, 255, 255, 0.08);
+	box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
 }
 
+/* Нажатие */
+.zoom-btn:active {
+	transform: scale(0.85);
+	transition: transform 0.12s ease;
+}
+
+/* Уровень зума «2×» */
 .zoom-level {
 	font-family: 'Inter', sans-serif;
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: 500;
-	letter-spacing: 0.04em;
+	letter-spacing: 0.06em;
 	color: rgba(255, 255, 255, 0.7);
-	min-width: 32px;
+	min-width: 36px;
 	text-align: center;
 	user-select: none;
 }
 
 /* ============================================================
-   12. ЗУМ — ВСТРОЕННЫЙ SWIPER ZOOM
+   13. ЗУМ (СОСТОЯНИЯ И ЭФФЕКТЫ)
+   ============================================================
+   При активном зуме:
+   - Фон затемняется с blur
+   - Подпись скрывается
+   - Фильтры убираются
+   - Слайд и контейнер — overflow: visible
+   - Стрелки и пагинация скрываются
    ============================================================ */
 
-/* При активном зуме — убираем фильтры */
+/* При зуме — убираем ч/б фильтр */
 .swiper-slide-zoomed img {
 	filter: none !important;
 }
 
-/* При активном зуме — слайд visible */
+/* Слайд при зуме: visible + выше всего */
 .swiper-slide-zoomed {
 	overflow: visible !important;
 	z-index: 100 !important;
 }
 
-/* Фон позади увеличенного слайда */
+/* Затемнённый фон позади увеличенного изображения */
 .swiper-slide-zoomed::before {
 	content: '';
 	position: fixed;
 	inset: 0;
 	z-index: -1;
-	background: rgba(0, 0, 0, 0.85);
-	backdrop-filter: blur(4px);
-	-webkit-backdrop-filter: blur(4px);
+	background: rgba(0, 0, 0, 0.88);
+	backdrop-filter: blur(6px);
+	-webkit-backdrop-filter: blur(6px);
 	pointer-events: none;
+	animation: fadeIn 0.3s ease;
 }
 
-/* При активном зуме — скрываем подпись */
+/* Анимация появления фона */
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+/* Скрываем подпись при зуме */
 .swiper-slide-zoomed .slide-caption {
 	opacity: 0 !important;
 	pointer-events: none;
 	transition: opacity 0.2s ease;
 }
 
-/* При активном зуме — скрываем затемнение */
+/* Скрываем затемнение под подписью */
 .swiper-slide-zoomed::after {
 	opacity: 0 !important;
 }
 
-/* Скрываем стрелки и пагинацию при зуме */
+/* Скрываем стрелки при зуме */
 .swiper:has(.swiper-slide-zoomed) .swiper-button-prev,
-.swiper:has(.swiper-slide-zoomed) .swiper-button-next,
+.swiper:has(.swiper-slide-zoomed) .swiper-button-next {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+}
+
+/* Скрываем пагинацию при зуме */
 .swiper:has(.swiper-slide-zoomed) .swiper-pagination {
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.3s ease;
 }
 
-/* Скрываем скроллбар страницы при зуме */
+/* Запрещаем жесты браузера при зуме */
 .swiper-slide-zoomed {
 	touch-action: none;
 }
 
-/* Скрываем полосу прокрутки (скроллбар) страницы при зуме */
-html:has(.swiper-has-zoomed-slide),
-body:has(.swiper-has-zoomed-slide) {
-	overflow: hidden;
+/* ============================================================
+   14. СКРЫТИЕ СКРОЛЛБАРА СТРАНИЦЫ
+   ============================================================
+   Скроллбар скрыт всегда когда слайдер открыт.
+   Применяется и к html, и к body.
+   ============================================================ */
+
+/* Когда слайдер открыт — скролла нет */
+html:has(.slider-overlay.open),
+body:has(.slider-overlay.open) {
+	overflow: hidden !important;
+	scrollbar-width: none;
+	/* Firefox */
+	-ms-overflow-style: none;
+	/* IE/Edge */
 }
 
+/* Скрываем сам скроллбар в Webkit (Chrome, Safari) */
+html:has(.slider-overlay.open)::-webkit-scrollbar,
+body:has(.slider-overlay.open)::-webkit-scrollbar {
+	display: none;
+	width: 0;
+	height: 0;
+}
+
+/* При зуме — дополнительная гарантия */
+html:has(.swiper-slide-zoomed),
+body:has(.swiper-slide-zoomed) {
+	overflow: hidden !important;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+html:has(.swiper-slide-zoomed)::-webkit-scrollbar,
+body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
+	display: none;
+	width: 0;
+	height: 0;
+}
+
+
 /* ============================================================
-   13. АДАПТИВНОСТЬ
+   15. АДАПТИВНОСТЬ
+   ============================================================
+   Уменьшаем размеры элементов на маленьких экранах.
+   Плавно увеличиваем с ростом ширины.
    ============================================================ */
 
 /* Мобильные (< 481px) */
@@ -498,8 +767,8 @@ body:has(.swiper-has-zoomed-slide) {
 		border-radius: 12px;
 	}
 
-	.swiper-slide .image-wrapper {
-		transform: scale(1.1);
+	.swiper-zoom-container {
+		border-radius: 12px;
 	}
 
 	.swiper-slide .slide-caption {
@@ -510,53 +779,52 @@ body:has(.swiper-has-zoomed-slide) {
 
 	.swiper-button-prev,
 	.swiper-button-next {
-		width: 36px;
-		height: 36px;
+		width: 40px;
+		height: 40px;
 	}
 
 	.swiper-button-prev::after,
 	.swiper-button-next::after {
-		font-size: 14px;
+		font-size: 13px;
 	}
 
 	.slider-close {
 		top: 12px;
 		right: 12px;
-		width: 36px;
-		height: 36px;
+		width: 38px;
+		height: 38px;
 		font-size: 16px;
 	}
 
 	.slider-counter {
 		bottom: 18px;
-		font-size: 11px;
+		font-size: 10px;
 	}
 
 	.slider-zoom-hint {
 		font-size: 10px;
-		padding: 4px 10px;
+		padding: 5px 12px;
 		top: 14px;
 	}
 
 	.slider-zoom-controls {
 		bottom: 44px;
-		gap: 6px;
-		padding: 4px 6px;
+		padding: 4px;
 	}
 
 	.zoom-btn {
-		width: 28px;
-		height: 28px;
-		font-size: 15px;
+		width: 32px;
+		height: 32px;
+		font-size: 16px;
 	}
 
 	.zoom-level {
 		font-size: 11px;
-		min-width: 24px;
+		min-width: 28px;
 	}
 
 	.swiper-pagination {
-		bottom: 10px !important;
+		bottom: 14px !important;
 	}
 }
 
@@ -567,6 +835,10 @@ body:has(.swiper-has-zoomed-slide) {
 	}
 
 	.swiper-slide {
+		border-radius: 16px;
+	}
+
+	.swiper-zoom-container {
 		border-radius: 16px;
 	}
 
@@ -587,6 +859,10 @@ body:has(.swiper-has-zoomed-slide) {
 		border-radius: 20px;
 	}
 
+	.swiper-zoom-container {
+		border-radius: 20px;
+	}
+
 	.swiper-slide .slide-caption {
 		font-size: 19px;
 		left: 22px;
@@ -597,6 +873,10 @@ body:has(.swiper-has-zoomed-slide) {
 /* Планшеты (769px – 992px) */
 @media (769px <=width < 993px) {
 	.swiper-slide {
+		border-radius: 28px;
+	}
+
+	.swiper-zoom-container {
 		border-radius: 28px;
 	}
 

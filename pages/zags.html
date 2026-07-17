@@ -4,13 +4,20 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>Бракосочетание — Александр & Екатерина</title>
-	<link rel="stylesheet" href="../css/gallery.css">
+	<title>Бракосочетание — Андрей & Татьяна</title>
 
+	<!-- Галерея -->
+	<link rel="stylesheet" href="../css/gallery.css">
+	<!-- Swiper -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+	<!-- Наш слайдер -->
+	<link rel="stylesheet" href="../css/slider.css">
+
+	<!-- Гугл шрифты -->
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link
-		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Inter:wght@300;400;500&display=swap"
+		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Noto+Serif+JP:wght@200;300;400;500;600&family=Zen+Old+Mincho:wght@400;500;600;700&display=swap"
 		rel="stylesheet">
 </head>
 
@@ -18,7 +25,6 @@
 
 	<div class="bg-noise"></div>
 
-	<!-- Шапка -->
 	<header class="gallery-header">
 		<div class="header-inner">
 			<a href="../index.html" class="back-btn">
@@ -46,12 +52,10 @@
 		</div>
 	</header>
 
-	<!-- Галерея -->
 	<main class="gallery-container">
 		<div class="gallery-grid" id="galleryGrid"></div>
 	</main>
 
-	<!-- Нижняя навигация -->
 	<nav class="section-bottom-nav">
 		<a href="garden.html" class="bottom-nav-btn">
 			<span class="arrow arrow-left">←</span>
@@ -75,29 +79,22 @@
 		</a>
 	</nav>
 
-	<!-- Подвал -->
 	<footer class="section-footer">
 		<div class="footer-accent"></div>
 		<p class="footer-text">Кольца, подписи, клятвы. Момент, когда две жизни становятся одной.</p>
 	</footer>
 
-	<!-- Лайтбокс -->
-	<div class="lightbox" id="lightbox">
-		<button class="lightbox-close" id="lightboxClose">✕</button>
-		<button class="lightbox-nav prev" id="lightboxPrev">←</button>
-		<img src="" alt="" id="lightboxImg">
-		<button class="lightbox-nav next" id="lightboxNext">→</button>
-		<span class="lightbox-counter" id="lightboxCounter"></span>
-		<span class="lightbox-swipe-hint">← свайп →</span>
-	</div>
-
+	<!-- Swiper JS -->
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<!-- Наш слайдер -->
+	<script src="../js/slider.js"></script>
+	<!-- Галерея -->
 	<script src="../js/gallery.js"></script>
+
 	<script>
-		// Инициализация галереи для раздела ЗАГС
 		initGallery( {
 			section: 'zags',
 			photos: [
-				// Замени на свои фото
 				{ src: '../photos/zags/01.jpeg', alt: 'Здание ЗАГСа', span: '2-cols' },
 				{ src: '../photos/zags/02.jpeg', alt: 'Ожидание', span: '2-rows' },
 				{ src: '../photos/zags/03.jpeg', alt: 'Роспись в книге', span: '' },
