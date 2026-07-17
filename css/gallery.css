@@ -522,22 +522,6 @@ body::before {
 	display: block;
 	transition: transform 0.8s var(--ease-out-expo), filter 0.8s var(--ease-out-expo);
 	filter: brightness(0.85);
-	/* Размытие пока не загрузилось */
-	filter: brightness(0.85) blur(10px);
-	transition:
-		transform 0.8s var(--ease-out-expo),
-		filter 0.8s var(--ease-out-expo);
-}
-
-.gallery-item img[loading="lazy"] {
-	/* Начальное состояние до загрузки */
-	background: rgba(255, 255, 255, 0.02);
-}
-
-/* Когда загрузилось — убираем размытие */
-.gallery-item img:not([src=""]),
-.gallery-item img[src] {
-	/* Сработает после установки src */
 }
 
 .gallery-item:hover img {
