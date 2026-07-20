@@ -1,0 +1,373 @@
+/* ============================================================
+   SCROLL.CSS — Блок свитка на всю ширину
+   Плавное разворачивание | Японская эстетика
+   ============================================================ */
+
+/* ============================================================
+   1. БЛОК СВИТКА
+   ============================================================ */
+
+.scroll-block {
+	position: relative;
+	z-index: 10;
+	width: 100%;
+	overflow: hidden;
+}
+
+/* ============================================================
+   2. СВЁРНУТЫЙ СВИТОК (КНОПКА)
+   ============================================================ */
+
+.scroll-trigger {
+	cursor: pointer;
+	padding: 12px var(--grid-padding, 20px) 0;
+	transition:
+		opacity 0.5s ease,
+		max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+		margin 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+		padding 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+	max-height: 80px;
+	opacity: 1;
+}
+
+/* Обёртка внутри кнопки */
+.scroll-trigger-inner {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 16px 28px;
+	background: rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 14px;
+	transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+}
+
+/* Иконка */
+.scroll-trigger-icon {
+	color: var(--accent-color, #E84040);
+	opacity: 0.7;
+	transition: all 0.4s ease;
+	flex-shrink: 0;
+}
+
+/* Текст */
+.scroll-trigger-text {
+	font-family: 'Cormorant Garamond', 'Zen Old Mincho', serif;
+	font-size: 24px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	color: var(--text-secondary, rgba(255, 255, 255, 0.55));
+	transition: color 0.4s ease;
+}
+
+/* Hover */
+.scroll-trigger:hover .scroll-trigger-inner {
+	background: rgba(255, 255, 255, 0.05);
+	border-color: rgba(var(--accent-rgb, 232, 64, 64), 0.3);
+	transform: translateY(-2px);
+	box-shadow:
+		0 6px 24px rgba(0, 0, 0, 0.3),
+		0 0 0 1px rgba(var(--accent-rgb, 232, 64, 64), 0.1);
+}
+
+.scroll-trigger:hover .scroll-trigger-icon {
+	opacity: 1;
+	transform: rotate(-5deg);
+}
+
+.scroll-trigger:hover .scroll-trigger-text {
+	color: #fff;
+}
+
+/* Нажатие */
+.scroll-trigger:active .scroll-trigger-inner {
+	transform: scale(0.97);
+	transition: transform 0.12s ease;
+}
+
+/* ============================================================
+   3. КОГДА СВИТОК РАЗВЁРНУТ — кнопка исчезает
+   ============================================================ */
+
+.scroll-block.expanded .scroll-trigger {
+	max-height: 0;
+	opacity: 0;
+	margin: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	pointer-events: none;
+}
+
+/* ============================================================
+   4. РАЗВЁРНУТЫЙ СВИТОК
+   ============================================================ */
+
+.scroll-expanded {
+	max-height: 0;
+	opacity: 0;
+	overflow: hidden;
+	transition:
+		max-height 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 0.5s ease;
+}
+
+.scroll-block.expanded .scroll-expanded {
+	max-height: 3000px;
+	/* Достаточно для любого текста */
+	opacity: 1;
+}
+
+/* ============================================================
+   5. БУМАГА СВИТКА — НА ВСЮ ШИРИНУ
+   ============================================================ */
+
+.scroll-paper {
+	width: 100%;
+	background: linear-gradient(180deg,
+			#F7F1E8 0%,
+			#EFE6D6 18%,
+			#F4EDE0 50%,
+			#EFE6D6 82%,
+			#EADFCC 100%);
+	padding: 48px 10% 40px;
+	position: relative;
+	color: #2a2520;
+	font-family: 'Cormorant Garamond', 'Zen Old Mincho', 'Noto Serif JP', serif;
+
+	/* Тени для объёма */
+	box-shadow:
+		0 2px 6px rgba(0, 0, 0, 0.08),
+		0 8px 30px rgba(0, 0, 0, 0.3),
+		inset 0 0 100px rgba(0, 0, 0, 0.015);
+
+	/* Анимация появления */
+	transform: translateY(-30px);
+	transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.15s;
+}
+
+.scroll-block.expanded .scroll-paper {
+	transform: translateY(0);
+}
+
+/* Декоративные полосы по краям */
+.scroll-paper::before,
+.scroll-paper::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 4px;
+	background: repeating-linear-gradient(180deg,
+			rgba(0, 0, 0, 0.04) 0px,
+			rgba(0, 0, 0, 0.04) 1px,
+			transparent 1px,
+			transparent 5px);
+}
+
+.scroll-paper::before {
+	left: 0;
+}
+
+.scroll-paper::after {
+	right: 0;
+}
+
+/* ============================================================
+   6. ПЕЧАТИ
+   ============================================================ */
+
+.scroll-seal-top,
+.scroll-seal-bottom {
+	display: flex;
+	justify-content: center;
+	transition: all 0.6s ease 0.3s;
+}
+
+.scroll-seal-top {
+	margin-bottom: 20px;
+}
+
+.scroll-seal-bottom {
+	margin-top: 28px;
+	opacity: 0.6;
+}
+
+/* ============================================================
+   7. ЗАГОЛОВОК
+   ============================================================ */
+
+.scroll-title {
+	text-align: center;
+	font-size: 28px;
+	font-weight: 500;
+	letter-spacing: 0.07em;
+	color: #1a1510;
+	margin-bottom: 14px;
+	line-height: 1.2;
+}
+
+/* ============================================================
+   8. РАЗДЕЛИТЕЛЬ
+   ============================================================ */
+
+.scroll-divider {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	margin-bottom: 28px;
+}
+
+.scroll-divider-line {
+	width: 48px;
+	height: 1px;
+	background: rgba(0, 0, 0, 0.1);
+}
+
+.scroll-divider-diamond {
+	font-size: 7px;
+	color: var(--accent-color, #E84040);
+	opacity: 0.6;
+}
+
+/* ============================================================
+   9. ТЕКСТ — широкий, в две колонки на десктопе
+   ============================================================ */
+
+.scroll-text {
+	font-size: 17px;
+	font-weight: 400;
+	line-height: 1.8;
+	letter-spacing: 0.03em;
+	color: #3a3530;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+/* ============================================================
+   10. КНОПКА «СВЕРНУТЬ»
+   ============================================================ */
+
+.scroll-collapse-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin: 32px auto 0;
+	padding: 12px 28px;
+	background: rgba(0, 0, 0, 0.03);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 100px;
+	color: #5a5040;
+	font-family: 'Cormorant Garamond', serif;
+	font-size: 15px;
+	font-weight: 500;
+	letter-spacing: 0.05em;
+	cursor: pointer;
+	transition: all 0.35s ease;
+}
+
+.scroll-collapse-btn:hover {
+	background: rgba(0, 0, 0, 0.07);
+	border-color: rgba(0, 0, 0, 0.18);
+	color: #2a2520;
+	transform: translateY(-2px);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.scroll-collapse-btn:active {
+	transform: scale(0.96);
+	transition: transform 0.12s ease;
+}
+
+.scroll-collapse-btn svg {
+	transition: transform 0.3s ease;
+}
+
+.scroll-collapse-btn:hover svg {
+	transform: translateY(-2px);
+}
+
+/* ============================================================
+   11. АДАПТИВНОСТЬ
+   ============================================================ */
+
+/* Мобильные */
+@media (width < 481px) {
+	.scroll-trigger {
+		padding: 8px var(--grid-padding, 8px) 0;
+	}
+
+	.scroll-trigger-inner {
+		padding: 14px 20px;
+		gap: 8px;
+		border-radius: 12px;
+	}
+
+	.scroll-trigger-text {
+		font-size: 16px;
+	}
+
+	.scroll-paper {
+		padding: 32px 6% 28px;
+	}
+
+	.scroll-title {
+		font-size: 22px;
+	}
+
+	.scroll-text {
+		font-size: 15px;
+		line-height: 1.7;
+	}
+
+	.scroll-collapse-btn {
+		padding: 10px 22px;
+		font-size: 14px;
+	}
+}
+
+/* Мобильные L */
+@media (481px <=width < 769px) {
+	.scroll-trigger-text {
+		font-size: 17px;
+	}
+
+	.scroll-paper {
+		padding: 40px 8% 34px;
+	}
+
+	.scroll-title {
+		font-size: 25px;
+	}
+
+	.scroll-text {
+		font-size: 16px;
+	}
+}
+
+/* Планшеты */
+@media (769px <=width < 993px) {
+	.scroll-paper {
+		padding: 44px 10% 38px;
+	}
+
+	.scroll-title {
+		font-size: 27px;
+	}
+
+	.scroll-text {
+		font-size: 17px;
+	}
+}
+
+/* Десктоп */
+@media (width >=993px) {
+	.scroll-text {
+		column-count: 2;
+		column-gap: 40px;
+	}
+}
