@@ -480,6 +480,8 @@ body::before {
 	gap: clamp(10px, 2vw, 16px);
 	margin-bottom: 6px;
 	flex-wrap: wrap;
+	/* Отражение имён как от воды */
+	-webkit-box-reflect: below 2px linear-gradient(transparent 40%, rgba(0, 0, 0, 0.5));
 }
 
 /* Имя */
@@ -508,9 +510,9 @@ body::before {
 	font-family: var(--font-body);
 	font-size: var(--location-size);
 	font-weight: 500;
+	font-style: italic;
 	letter-spacing: 0.15em;
-	color: var(--text-muted);
-	text-transform: uppercase;
+	color: rgb(230, 57, 57);
 	margin-bottom: clamp(14px, 3vh, 20px);
 	text-shadow: var(--text-shadow-light);
 }

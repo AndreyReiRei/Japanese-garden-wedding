@@ -1,7 +1,8 @@
 /* ============================================================
    GALLERY.CSS — Современная японская эстетика
    Базовые стили в :root | Переопределение в data-theme
-   Единый дизайн кнопок | Крупный текст | Воздух | Свечения
+   Анимированные кнопки с бегущей обводкой | Крупный текст
+   Отражения как от воды | Воздух | Свечения
    ============================================================ */
 
 /* ============================================================
@@ -19,8 +20,8 @@
 
 :root {
 	/* 
-     * БАЗОВЫЕ ЦВЕТА (не меняются)
-     */
+	 * БАЗОВЫЕ ЦВЕТА (не меняются)
+	 */
 	--bg-primary: #060606;
 	--bg-surface: #0c0c0c;
 	--white: #F5F1EC;
@@ -29,16 +30,16 @@
 	--text-tertiary: rgba(255, 255, 255, 0.3);
 
 	/*
-     * ТЕНИ (не меняются)
-     */
+	 * ТЕНИ (не меняются)
+	 */
 	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
 	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
 	--shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
 	--shadow-button: 0 8px 30px rgba(0, 0, 0, 0.4);
 
 	/*
-     * СКРУГЛЕНИЯ (не меняются)
-     */
+	 * СКРУГЛЕНИЯ (не меняются)
+	 */
 	--radius-xs: 6px;
 	--radius-sm: 10px;
 	--radius-md: 14px;
@@ -47,8 +48,8 @@
 	--radius-pill: 100px;
 
 	/*
-     * АНИМАЦИЯ (не меняется)
-     */
+	 * АНИМАЦИЯ (не меняется)
+	 */
 	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 	--ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
 	--transition-fast: 0.2s ease;
@@ -57,9 +58,9 @@
 	--transition-spring: 0.5s var(--ease-out-back);
 
 	/*
-     * АКЦЕНТНЫЕ ЦВЕТА (переопределяются в [data-theme])
-     * Значения по умолчанию — красный (ЗАГС)
-     */
+	 * АКЦЕНТНЫЕ ЦВЕТА (переопределяются в [data-theme])
+	 * Значения по умолчанию — красный (ЗАГС)
+	 */
 	--accent-color: #E84040;
 	--accent-color-light: #FF6B6B;
 	--accent-glow: rgba(232, 64, 64, 0.4);
@@ -69,22 +70,32 @@
 	--accent-surface-hover: rgba(232, 64, 64, 0.12);
 
 	/*
-     * ФОНОВЫЙ ГРАДИЕНТ (переопределяется в [data-theme])
-     */
+	 * ФОНОВЫЙ ГРАДИЕНТ (переопределяется в [data-theme])
+	 */
 	--bg-glow-from: rgba(232, 64, 64, 0.2);
 	--bg-glow-via: rgba(200, 40, 40, 0.08);
 	--bg-glow-to: transparent;
 
 	/*
-     * СЕТКА (не меняется)
-     */
+	 * ЦВЕТА ДЛЯ АНИМИРОВАННЫХ КНОПОК (переопределяются в [data-theme])
+	 */
+	--btn-bg: #3d0b0b;
+	--btn-bg-dark: #2b0808;
+	--btn-text: #f7d4d4;
+	--btn-line-color: #E84040;
+	--btn-glow: rgba(232, 64, 64, 0.35);
+	--btn-hover-overlay: rgba(232, 64, 64, 0.12);
+
+	/*
+	 * СЕТКА (не меняется)
+	 */
 	--grid-gap: 12px;
 	--grid-padding: 20px;
 	--photo-min-width: 150px;
 
 	/*
-     * ТИПОГРАФИКА (не меняется)
-     */
+	 * ТИПОГРАФИКА (не меняется)
+	 */
 	--font-display: 'Cormorant Garamond', 'Zen Old Mincho', 'Noto Serif JP', serif;
 	--font-japanese: 'Zen Old Mincho', 'Noto Serif JP', serif;
 	--font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -92,8 +103,8 @@
 
 /* ============================================================
    ТЕМЫ РАЗДЕЛОВ
-   Переопределяют ТОЛЬКО акцентные цвета и фоновый градиент.
-   Вся остальная структура едина.
+   Переопределяют ТОЛЬКО акцентные цвета, фоновый градиент
+   и цвета кнопок. Вся остальная структура едина.
    ============================================================ */
 
 /*
@@ -112,6 +123,14 @@
 	--bg-glow-from: rgba(232, 160, 180, 0.22);
 	--bg-glow-via: rgba(200, 100, 120, 0.1);
 	--bg-glow-to: transparent;
+
+	/* Кнопки для Сада */
+	--btn-bg: #3d1520;
+	--btn-bg-dark: #2b0e16;
+	--btn-text: #f7d4e0;
+	--btn-line-color: #E8A0B4;
+	--btn-glow: rgba(232, 160, 180, 0.35);
+	--btn-hover-overlay: rgba(232, 160, 180, 0.12);
 }
 
 /*
@@ -130,6 +149,14 @@
 	--bg-glow-from: rgba(232, 64, 64, 0.22);
 	--bg-glow-via: rgba(200, 40, 40, 0.1);
 	--bg-glow-to: transparent;
+
+	/* Кнопки для ЗАГСа */
+	--btn-bg: #3d0b0b;
+	--btn-bg-dark: #2b0808;
+	--btn-text: #f7d4d4;
+	--btn-line-color: #E84040;
+	--btn-glow: rgba(232, 64, 64, 0.35);
+	--btn-hover-overlay: rgba(232, 64, 64, 0.12);
 }
 
 /*
@@ -148,6 +175,14 @@
 	--bg-glow-from: rgba(212, 162, 78, 0.2);
 	--bg-glow-via: rgba(180, 130, 50, 0.08);
 	--bg-glow-to: transparent;
+
+	/* Кнопки для Дома */
+	--btn-bg: #3d2a0b;
+	--btn-bg-dark: #2b1e08;
+	--btn-text: #f7ecd4;
+	--btn-line-color: #D4A24E;
+	--btn-glow: rgba(212, 162, 78, 0.35);
+	--btn-hover-overlay: rgba(212, 162, 78, 0.12);
 }
 
 /* ============================================================
@@ -222,62 +257,55 @@ body::before {
 
 /* ============================================================
    3.1. КНОПКА «НАЗАД»
-   Единый стеклянный стиль для всех разделов
+   Анимированная кнопка с бегущей обводкой
+   Единый стиль со всей нижней навигацией
    ============================================================ */
 
 .back-btn {
-	display: flex;
+	position: relative;
+	display: inline-flex;
 	align-items: center;
 	gap: 8px;
-	background: rgba(255, 255, 255, 0.025);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	border-radius: var(--radius-pill);
-	padding: 10px 20px;
-	color: var(--text-secondary);
+	padding: 10px 22px;
+	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
+	color: var(--btn-text);
 	font-family: var(--font-body);
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 500;
-	letter-spacing: 0.03em;
-	cursor: pointer;
+	letter-spacing: 0.04em;
 	text-decoration: none;
-	transition: all var(--transition-normal);
-	white-space: nowrap;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	position: relative;
+	border: none;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
 	overflow: hidden;
+	white-space: nowrap;
+	box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+	transition: all 0.4s var(--ease-out-expo);
 }
 
 /*
- * Светящаяся точка при hover — следует за мышью
+ * Затемнение при hover
  */
-.back-btn::before {
+.back-btn::after {
 	content: '';
 	position: absolute;
-	width: 60px;
-	height: 60px;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(var(--accent-rgb), 0.15) 0%, transparent 70%);
-	top: var(--mouse-y, 50%);
-	left: var(--mouse-x, 50%);
-	transform: translate(-50%, -50%);
+	inset: 0;
+	background: var(--btn-hover-overlay);
 	opacity: 0;
+	border-radius: var(--radius-pill);
 	transition: opacity 0.3s ease;
-	pointer-events: none;
 }
 
 .back-btn:hover {
-	background: rgba(255, 255, 255, 0.06);
-	border-color: rgba(255, 255, 255, 0.18);
-	color: var(--white);
-	transform: translateX(-3px);
+	transform: translateY(-2px);
+	color: var(--btn-text);
 	box-shadow:
-		var(--shadow-md),
-		0 0 0 1px rgba(255, 255, 255, 0.03);
+		0 10px 34px rgba(0, 0, 0, 0.5),
+		0 0 24px var(--btn-glow);
 }
 
-.back-btn:hover::before {
-	opacity: 1;
+.back-btn:hover::after {
+	opacity: 0.2;
 }
 
 .back-btn:active {
@@ -285,10 +313,61 @@ body::before {
 	transition: transform 0.12s ease;
 }
 
+/*
+ * БЕГУЩАЯ ОБВОДКА — 4 линии
+ */
+.back-btn .btn-line {
+	position: absolute;
+	border-radius: 2px;
+}
+
+/* Верхняя */
+.back-btn .btn-line:nth-child(1) {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: linear-gradient(to left, transparent, var(--btn-line-color));
+	animation: btnLineX 2s linear infinite;
+}
+
+/* Правая */
+.back-btn .btn-line:nth-child(2) {
+	top: 0;
+	right: 0;
+	width: 2px;
+	height: 100%;
+	background: linear-gradient(to top, transparent, var(--btn-line-color));
+	animation: btnLineY 2s linear -0.5s infinite;
+}
+
+/* Нижняя */
+.back-btn .btn-line:nth-child(3) {
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: linear-gradient(to right, transparent, var(--btn-line-color));
+	animation: btnLineX 2s linear -1s infinite reverse;
+}
+
+/* Левая */
+.back-btn .btn-line:nth-child(4) {
+	top: 0;
+	left: 0;
+	width: 2px;
+	height: 100%;
+	background: linear-gradient(to bottom, transparent, var(--btn-line-color));
+	animation: btnLineY 2s linear -1.5s infinite reverse;
+}
+
+/*
+ * Стрелка
+ */
 .back-arrow {
-	font-size: 16px;
+	font-size: 15px;
 	line-height: 1;
-	transition: transform var(--transition-normal);
+	transition: transform 0.3s ease;
 }
 
 .back-btn:hover .back-arrow {
@@ -296,12 +375,19 @@ body::before {
 }
 
 /* ============================================================
-   3.2. ЗАГОЛОВОК РАЗДЕЛА
+   3.2. ЗАГОЛОВОК РАЗДЕЛА — с отражением как от воды
    ============================================================ */
 
 .title-block {
 	text-align: center;
 	flex: 1;
+	/*
+	 * Увеличенный нижний отступ для отражения
+	 * -webkit-box-reflect создаёт зеркальное отражение,
+	 * которое выходит за границы элемента.
+	 * padding-bottom даёт отражению место.
+	 */
+	padding-bottom: 14px;
 }
 
 .section-title {
@@ -309,118 +395,24 @@ body::before {
 	font-weight: 500;
 	letter-spacing: 0.06em;
 	color: var(--white);
-	margin-bottom: 10px;
-	line-height: 1.1;
+	margin-bottom: 4px;
+	line-height: 1.15;
 	text-shadow:
 		0 2px 12px rgba(0, 0, 0, 0.4),
 		0 0 40px rgba(0, 0, 0, 0.2);
+
+	/*
+	 * ОТРАЖЕНИЕ КАК ОТ ВОДЫ
+	 * -webkit-box-reflect создаёт зеркальное отражение снизу
+	 * linear-gradient делает отражение затухающим
+	 * Работает в Chrome, Safari, Edge
+	 * В Firefox отражения не будет — текст останется читаемым
+	 */
+	-webkit-box-reflect: below 2px linear-gradient(transparent 30%, rgba(0, 0, 0, 0.5));
 }
 
 /* ============================================================
-   3.3. НАВИГАЦИЯ МЕЖДУ РАЗДЕЛАМИ
-   Единый стеклянный стиль стрелок
-   ============================================================ */
-
-.section-nav {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 18px;
-}
-
-.nav-arrow {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 38px;
-	height: 38px;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.025);
-	border: 1px solid rgba(255, 255, 255, 0.08);
-	color: var(--text-tertiary);
-	font-size: 16px;
-	cursor: pointer;
-	text-decoration: none;
-	transition: all var(--transition-normal);
-	flex-shrink: 0;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	position: relative;
-	overflow: hidden;
-}
-
-/*
- * Акцентное кольцо при hover
- */
-.nav-arrow::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border-radius: 50%;
-	border: 1px solid rgba(var(--accent-rgb), 0);
-	transition: all var(--transition-normal);
-}
-
-.nav-arrow:hover {
-	background: rgba(255, 255, 255, 0.08);
-	color: var(--white);
-	transform: scale(1.08);
-	box-shadow:
-		var(--shadow-md),
-		0 0 0 1px rgba(var(--accent-rgb), 0.1);
-}
-
-.nav-arrow:hover::before {
-	border-color: rgba(var(--accent-rgb), 0.5);
-}
-
-.nav-arrow:active {
-	transform: scale(0.9);
-	transition: transform 0.12s ease;
-}
-
-.nav-arrow.disabled {
-	display: none;
-}
-
-/* ============================================================
-   3.4. ТОЧКИ-ИНДИКАТОРЫ РАЗДЕЛОВ
-   ============================================================ */
-
-.section-dots {
-	display: flex;
-	gap: 8px;
-	align-items: center;
-}
-
-.section-dot {
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	background: rgba(255, 255, 255, 0.12);
-	transition: all var(--transition-normal);
-	cursor: pointer;
-	text-decoration: none;
-	display: block;
-}
-
-.section-dot.active {
-	background: var(--accent-color);
-	box-shadow:
-		0 0 8px var(--accent-glow),
-		0 0 20px var(--accent-glow);
-	width: 26px;
-	border-radius: 4px;
-}
-
-.section-dot:hover:not(.active) {
-	background: rgba(255, 255, 255, 0.3);
-	transform: scale(1.3);
-	box-shadow: 0 0 10px rgba(255, 255, 255, 0.08);
-}
-
-/* ============================================================
-   3.5. СЧЁТЧИК ФОТО
+   3.3. СЧЁТЧИК ФОТО
    ============================================================ */
 
 .photo-counter {
@@ -573,148 +565,216 @@ body::before {
 }
 
 /* ============================================================
-   5. НИЖНЯЯ НАВИГАЦИЯ
-   Единый дизайн всех кнопок, включая «Обложку»
+   5. АНИМИРОВАННЫЕ КНОПКИ — БЕГУЩАЯ ОБВОДКА
+   Цвета задаются через CSS-переменные в data-theme
+   ============================================================ */
+
+/*
+ * БАЗОВЫЙ СТИЛЬ АНИМИРОВАННОЙ КНОПКИ
+ * Используется для всех кнопок нижней навигации
+ */
+.animated-btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	padding: 16px 28px;
+	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
+	color: var(--btn-text);
+	font-family: var(--font-display);
+	font-size: 16px;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	text-decoration: none;
+	border: none;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	overflow: hidden;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+	transition: all 0.4s var(--ease-out-expo);
+}
+
+/*
+ * Затемнение при hover
+ */
+.animated-btn::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--btn-hover-overlay);
+	opacity: 0;
+	border-radius: var(--radius-pill);
+	transition: opacity 0.3s ease;
+}
+
+.animated-btn:hover::after {
+	opacity: 0.2;
+}
+
+.animated-btn:hover {
+	transform: translateY(-3px);
+	box-shadow:
+		0 12px 40px rgba(0, 0, 0, 0.5),
+		0 0 30px var(--btn-glow);
+	/*
+	 * Отражение при hover — как от водной глади
+	 */
+	-webkit-box-reflect: below 2px linear-gradient(transparent 40%, rgba(0, 0, 0, 0.4));
+}
+
+.animated-btn:active {
+	transform: scale(0.96);
+	transition: transform 0.12s ease;
+}
+
+/*
+ * БЕГУЩАЯ ОБВОДКА — 4 линии
+ * span:nth-child(1): верхняя (слева направо)
+ * span:nth-child(2): правая  (сверху вниз)
+ * span:nth-child(3): нижняя  (справа налево)
+ * span:nth-child(4): левая   (снизу вверх)
+ */
+.animated-btn .btn-line {
+	position: absolute;
+	border-radius: 2px;
+}
+
+/* Верхняя линия */
+.animated-btn .btn-line:nth-child(1) {
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: linear-gradient(to left, transparent, var(--btn-line-color));
+	animation: btnLineX 2s linear infinite;
+}
+
+/* Правая линия */
+.animated-btn .btn-line:nth-child(2) {
+	top: 0;
+	right: 0;
+	width: 2px;
+	height: 100%;
+	background: linear-gradient(to top, transparent, var(--btn-line-color));
+	animation: btnLineY 2s linear -0.5s infinite;
+}
+
+/* Нижняя линия */
+.animated-btn .btn-line:nth-child(3) {
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: linear-gradient(to right, transparent, var(--btn-line-color));
+	animation: btnLineX 2s linear -1s infinite reverse;
+}
+
+/* Левая линия */
+.animated-btn .btn-line:nth-child(4) {
+	top: 0;
+	left: 0;
+	width: 2px;
+	height: 100%;
+	background: linear-gradient(to bottom, transparent, var(--btn-line-color));
+	animation: btnLineY 2s linear -1.5s infinite reverse;
+}
+
+/*
+ * КЛЮЧЕВЫЕ КАДРЫ ДЛЯ БЕГУЩЕЙ ОБВОДКИ
+ */
+@keyframes btnLineX {
+	0% {
+		transform: translateX(100%);
+	}
+
+	100% {
+		transform: translateX(-100%);
+	}
+}
+
+@keyframes btnLineY {
+	0% {
+		transform: translateY(100%);
+	}
+
+	100% {
+		transform: translateY(-100%);
+	}
+}
+
+/* ============================================================
+   5.1. НИЖНЯЯ НАВИГАЦИЯ — контейнер
    ============================================================ */
 
 .section-bottom-nav {
 	display: flex;
 	justify-content: center;
-	align-items: stretch;
+	align-items: center;
 	gap: 14px;
 	padding: 48px 20px 24px;
 	position: relative;
 	z-index: 1;
 	max-width: 720px;
 	margin: 0 auto;
+	flex-wrap: wrap;
 }
 
 /*
- * БАЗОВАЯ КНОПКА НАВИГАЦИИ
- * Общий стиль для «Предыдущий», «Следующий» и «Обложка».
- * Различаются только размерами и акцентами.
+ * Кнопка «Обложка» — компактная, квадратная
  */
-.bottom-nav-btn,
-.bottom-nav-home {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 10px;
-	border-radius: var(--radius-lg);
-	background: rgba(255, 255, 255, 0.02);
-	border: 1px solid rgba(255, 255, 255, 0.06);
-	color: var(--white);
-	font-family: var(--font-display);
-	cursor: pointer;
-	text-decoration: none;
-	transition: all var(--transition-normal);
-	position: relative;
-	overflow: hidden;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
+.bottom-nav-home-btn {
+	flex-shrink: 0;
+	padding: 16px 24px;
+	gap: 6px;
+}
+
+.bottom-nav-home-btn .bottom-nav-home-icon {
+	font-size: 24px;
+	line-height: 1;
+	transition: transform 0.5s var(--ease-out-back);
+}
+
+.bottom-nav-home-btn:hover .bottom-nav-home-icon {
+	transform: scale(1.25);
 }
 
 /*
- * Акцентная полоска сверху при hover
+ * Кнопка «Следующий» / «Предыдущий» — широкая, с текстом
  */
-.bottom-nav-btn::before,
-.bottom-nav-home::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 20%;
-	right: 20%;
-	height: 2px;
-	background: var(--accent-color);
-	border-radius: 2px;
-	opacity: 0;
-	transform: scaleX(0);
-	transition: all var(--transition-normal);
-}
-
-/*
- * Радиальная подсветка изнутри при hover
- */
-.bottom-nav-btn::after,
-.bottom-nav-home::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	background: radial-gradient(ellipse at center,
-			rgba(var(--accent-rgb), 0.08) 0%,
-			transparent 70%);
-	opacity: 0;
-	transition: opacity 0.5s ease;
-}
-
-/*
- * HOVER — единый для всех кнопок
- */
-.bottom-nav-btn:hover,
-.bottom-nav-home:hover {
-	background: rgba(255, 255, 255, 0.04);
-	border-color: rgba(var(--accent-rgb), 0.35);
-	transform: translateY(-3px);
-	box-shadow:
-		var(--shadow-button),
-		0 0 0 1px rgba(var(--accent-rgb), 0.12),
-		0 0 50px rgba(var(--accent-rgb), 0.05);
-}
-
-.bottom-nav-btn:hover::before,
-.bottom-nav-home:hover::before {
-	opacity: 1;
-	transform: scaleX(1);
-}
-
-.bottom-nav-btn:hover::after,
-.bottom-nav-home:hover::after {
-	opacity: 1;
-}
-
-.bottom-nav-btn:active,
-.bottom-nav-home:active {
-	transform: scale(0.96);
-	transition: transform 0.15s ease;
-}
-
-/*
- * КНОПКА «ПРЕДЫДУЩИЙ» / «СЛЕДУЮЩИЙ»
- * Широкая, с текстом и стрелкой
- */
-.bottom-nav-btn {
+.bottom-nav-next-btn,
+.bottom-nav-prev-btn {
 	flex: 1;
 	min-width: 0;
-	padding: 20px 28px;
+	padding: 18px 28px;
 	gap: 14px;
 }
 
-/* Стрелка */
-.bottom-nav-btn .arrow {
-	font-size: 22px;
-	color: var(--accent-color);
-	transition: all var(--transition-normal);
+/* Стрелка в кнопке */
+.animated-btn .arrow {
+	font-size: 20px;
+	transition: transform 0.3s ease;
 	flex-shrink: 0;
 	opacity: 0.7;
 }
 
-.bottom-nav-btn:hover .arrow {
+.animated-btn:hover .arrow {
 	opacity: 1;
 }
 
-.bottom-nav-btn:hover .arrow-right {
-	transform: translateX(6px);
+.animated-btn:hover .arrow-right {
+	transform: translateX(5px);
 }
 
-.bottom-nav-btn:hover .arrow-left {
-	transform: translateX(-6px);
+.animated-btn:hover .arrow-left {
+	transform: translateX(-5px);
 }
 
 /* Текст внутри кнопки */
 .bottom-nav-content {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 3px;
 	min-width: 0;
 }
 
@@ -722,67 +782,22 @@ body::before {
 	font-family: var(--font-body);
 	font-size: 10px;
 	font-weight: 600;
-	letter-spacing: 0.16em;
-	color: var(--accent-color);
+	letter-spacing: 0.14em;
 	text-transform: uppercase;
-	opacity: 0.7;
+	opacity: 0.6;
 }
 
-.bottom-nav-btn:hover .bottom-nav-label {
+.animated-btn:hover .bottom-nav-label {
 	opacity: 1;
 }
 
 .bottom-nav-title {
-	font-size: 23px;
+	font-size: 20px;
 	font-weight: 500;
-	letter-spacing: 0.05em;
-	color: var(--white);
+	letter-spacing: 0.04em;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-/*
- * КНОПКА «ОБЛОЖКА»
- * Квадратная, с иконкой, акцентный фон
- */
-.bottom-nav-home {
-	flex-direction: column;
-	padding: 20px 24px;
-	gap: 6px;
-	flex-shrink: 0;
-	min-width: 72px;
-	background: var(--accent-surface);
-	border-color: rgba(var(--accent-rgb), 0.25);
-}
-
-.bottom-nav-home:hover {
-	background: var(--accent-surface-hover);
-	border-color: rgba(var(--accent-rgb), 0.5);
-	box-shadow:
-		0 8px 30px var(--accent-glow),
-		0 0 50px rgba(var(--accent-rgb), 0.1);
-}
-
-/* Иконка */
-.bottom-nav-home-icon {
-	font-size: 28px;
-	line-height: 1;
-	transition: transform var(--transition-spring);
-}
-
-.bottom-nav-home:hover .bottom-nav-home-icon {
-	transform: scale(1.2);
-}
-
-/* Текст */
-.bottom-nav-home .bottom-nav-label {
-	font-family: var(--font-body);
-	font-size: 11px;
-	font-weight: 600;
-	letter-spacing: 0.1em;
-	color: var(--accent-color);
-	text-transform: none;
 }
 
 /* ============================================================
@@ -834,6 +849,11 @@ body::before {
 	margin: 0 auto;
 	line-height: 1.6;
 	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+	/*
+	 * Лёгкое отражение текста в подвале
+	 */
+	-webkit-box-reflect: below 1px linear-gradient(transparent 50%, rgba(0, 0, 0, 0.3));
 }
 
 /* ============================================================
@@ -858,7 +878,10 @@ body::before {
 
 	.section-title {
 		font-size: 20px;
-		margin-bottom: 6px;
+	}
+
+	.title-block {
+		padding-bottom: 10px;
 	}
 
 	.back-btn {
@@ -871,48 +894,28 @@ body::before {
 		font-size: 10px;
 	}
 
-	.section-dots {
-		gap: 5px;
-	}
-
-	.section-dot {
-		width: 5px;
-		height: 5px;
-	}
-
-	.section-dot.active {
-		width: 18px;
-	}
-
-	.nav-arrow {
-		width: 30px;
-		height: 30px;
-		font-size: 13px;
-	}
-
 	.section-bottom-nav {
 		flex-direction: column;
-		gap: 8px;
+		gap: 10px;
 		padding: 28px 14px 14px;
 	}
 
-	.bottom-nav-btn {
-		padding: 16px 20px;
-		gap: 10px;
+	.animated-btn {
+		width: 100%;
+		padding: 14px 20px;
+		font-size: 15px;
+	}
+
+	.bottom-nav-home-btn {
+		flex-direction: row;
 	}
 
 	.bottom-nav-title {
-		font-size: 18px;
-	}
-
-	.bottom-nav-home {
-		flex-direction: row;
-		padding: 14px 20px;
-		gap: 8px;
+		font-size: 17px;
 	}
 
 	.bottom-nav-home-icon {
-		font-size: 22px;
+		font-size: 20px;
 	}
 
 	.footer-text {
@@ -943,7 +946,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 20px;
+		font-size: 18px;
 	}
 
 	.footer-text {
@@ -968,7 +971,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 22px;
+		font-size: 20px;
 	}
 
 	.footer-text {
@@ -993,7 +996,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 24px;
+		font-size: 22px;
 	}
 
 	.footer-text {
@@ -1018,7 +1021,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 26px;
+		font-size: 24px;
 	}
 
 	.footer-text {
@@ -1043,7 +1046,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 28px;
+		font-size: 26px;
 	}
 
 	.footer-text {
@@ -1068,7 +1071,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 30px;
+		font-size: 28px;
 	}
 
 	.footer-text {
@@ -1097,7 +1100,7 @@ body::before {
 	}
 
 	.bottom-nav-title {
-		font-size: 34px;
+		font-size: 32px;
 	}
 
 	.footer-text {
