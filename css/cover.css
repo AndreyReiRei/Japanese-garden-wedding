@@ -374,6 +374,7 @@ body::before {
 /* ============================================================
    6. ВЕРХНЯЯ НАВИГАЦИЯ
    Стеклянные кнопки с blur-эффектом
+   Пульсация иконок | Свечение при hover | Акцентная обводка
    ============================================================ */
 
 .top-nav {
@@ -391,7 +392,9 @@ body::before {
 	-webkit-backdrop-filter: blur(20px);
 }
 
-/* Кнопка навигации */
+/*
+ * КНОПКА НАВИГАЦИИ
+ */
 .nav-item {
 	flex: 1;
 	display: flex;
@@ -413,14 +416,102 @@ body::before {
 	position: relative;
 }
 
-/* Иконка */
+/*
+ * СВЕТЯЩАЯСЯ ПОДЛОЖКА ПРИ HOVER
+ * Радиальный градиент, следующий за мышью.
+ */
+.nav-item::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: var(--radius-sm);
+	background: radial-gradient(circle at center, rgba(var(--accent-rgb, 232, 64, 64), 0.2) 0%, transparent 70%);
+	opacity: 0;
+	transition: opacity 0.4s ease;
+}
+
+.nav-item:hover::before {
+	opacity: 1;
+}
+
+/*
+ * HOVER — ПРИПОДНЯТИЕ И СВЕЧЕНИЕ
+ */
+.nav-item:hover {
+	color: #fff;
+	transform: translateY(-2px);
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/*
+ * АКЦЕНТНАЯ ОБВОДКА ПРИ HOVER
+ */
+.nav-item::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: var(--radius-sm);
+	border: 1px solid rgba(var(--accent-rgb, 232, 64, 64), 0);
+	transition: border-color 0.4s ease;
+	pointer-events: none;
+}
+
+.nav-item:hover::after {
+	border-color: rgba(var(--accent-rgb, 232, 64, 64), 0.4);
+}
+
+/*
+ * ИКОНКА — ПУЛЬСАЦИЯ + ЦВЕТ ПРИ HOVER
+ */
 .nav-item .nav-icon {
 	font-size: var(--nav-icon-size);
 	filter: grayscale(0.3);
 	transition: all var(--transition-normal);
+	/*
+     * Мягкая пульсация иконки
+     */
+	animation: navIconPulse 3s ease-in-out infinite;
 }
 
-/* Японский подзаголовок — скрыт на малых экранах */
+.nav-item:nth-child(2) .nav-icon {
+	animation-delay: 0.5s;
+	/* Разная задержка для каждой иконки */
+}
+
+.nav-item:nth-child(3) .nav-icon {
+	animation-delay: 1s;
+}
+
+.nav-item:hover .nav-icon {
+	filter: grayscale(0);
+	animation: none;
+	/* Останавливаем пульсацию при hover */
+	transform: scale(1.2);
+}
+
+/*
+ * ТЕКСТ — ПУЛЬСАЦИЯ ПРОЗРАЧНОСТИ
+ */
+.nav-item .nav-label {
+	animation: navTextPulse 3s ease-in-out infinite;
+}
+
+.nav-item:nth-child(2) .nav-label {
+	animation-delay: 0.5s;
+}
+
+.nav-item:nth-child(3) .nav-label {
+	animation-delay: 1s;
+}
+
+.nav-item:hover .nav-label {
+	animation: none;
+	opacity: 1;
+}
+
+/*
+ * Японский подзаголовок — скрыт на малых экранах
+ */
 .nav-item .nav-subtitle {
 	display: none;
 	font-family: var(--font-japanese);
@@ -430,22 +521,50 @@ body::before {
 	letter-spacing: 0.05em;
 }
 
-/* Активная кнопка */
-.nav-item.active {
-	background: rgba(232, 64, 64, 0.18);
-	color: #fff;
-	box-shadow: 0 0 20px rgba(232, 64, 64, 0.08);
+/*
+ * АКТИВНАЯ КНОПКА
+ */
+
+.nav-item.active .nav-label {
+	animation: none;
+	opacity: 1;
 }
 
-.nav-item.active .nav-icon {
-	filter: grayscale(0);
-	transform: scale(1.1);
-}
-
-/* Эффект нажатия */
+/*
+ * ЭФФЕКТ НАЖАТИЯ
+ */
 .nav-item:active {
 	transform: scale(0.94);
 	transition: transform var(--transition-fast);
+}
+
+/*
+ * АНИМАЦИИ ПУЛЬСАЦИИ
+ */
+@keyframes navIconPulse {
+
+	0%,
+	100% {
+		transform: scale(1);
+		filter: grayscale(0.3);
+	}
+
+	50% {
+		transform: scale(1.12);
+		filter: grayscale(0);
+	}
+}
+
+@keyframes navTextPulse {
+
+	0%,
+	100% {
+		opacity: 0.6;
+	}
+
+	50% {
+		opacity: 1;
+	}
 }
 
 /* ============================================================
@@ -560,6 +679,89 @@ body::before {
 	border-color: rgba(201, 169, 110, 0.6);
 	transform: scale(0.96);
 	transition: transform 0.12s ease;
+}
+
+/* ============================================================
+   7.5. ОБРАТНЫЙ ОТСЧЁТ
+   ============================================================ */
+
+.countdown-block {
+	text-align: center;
+	margin-bottom: clamp(14px, 3vh, 20px);
+}
+
+.countdown-label {
+	font-family: var(--font-body);
+	font-size: 11px;
+	font-weight: 400;
+	letter-spacing: 0.2em;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	margin-bottom: 8px;
+	text-shadow: var(--text-shadow-light);
+}
+
+.countdown-timer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+}
+
+.countdown-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 48px;
+}
+
+.countdown-number {
+	font-family: var(--font-display);
+	font-size: 28px;
+	font-weight: 400;
+	color: var(--white);
+	line-height: 1;
+	text-shadow: var(--text-shadow-medium);
+	/*
+     * Лёгкое отражение цифр
+     */
+	-webkit-box-reflect: below 1px linear-gradient(transparent 40%, rgba(0, 0, 0, 0.4));
+}
+
+.countdown-unit {
+	font-family: var(--font-body);
+	font-size: 9px;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	margin-top: 4px;
+}
+
+.countdown-separator {
+	font-family: var(--font-display);
+	font-size: 24px;
+	font-weight: 300;
+	color: var(--red-accent);
+	margin-top: -14px;
+	/* Поднимаем к цифрам */
+	text-shadow: 0 0 10px var(--red-glow);
+	animation: separatorBlink 2s ease-in-out infinite;
+}
+
+/*
+ * Мигание разделителя
+ */
+@keyframes separatorBlink {
+
+	0%,
+	100% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0.3;
+	}
 }
 
 /* ============================================================
@@ -843,6 +1045,15 @@ body::before {
 
 	.story-content {
 		max-width: 100%;
+	}
+
+	.countdown-number {
+		font-size: 22px;
+	}
+
+	.countdown-separator {
+		font-size: 18px;
+		margin-top: -10px;
 	}
 }
 

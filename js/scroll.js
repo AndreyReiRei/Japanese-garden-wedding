@@ -1,7 +1,8 @@
 /**
  * ============================================================
- * scroll.js — Блок свитка
- * Свёрнутый → разворачивается при клике
+ * scroll.js — Блок свитка с историей дня
+ * Плавное разворачивание как на главной странице
+ * + светлячки внутри развёрнутого свитка
  * ============================================================
  * 
  * ИСПОЛЬЗОВАНИЕ:
@@ -13,6 +14,10 @@
  *       },
  *       section: 'garden'
  *   } );
+ * 
+ * ЗАВИСИМОСТИ:
+ *   - effects.js (для светлячков: startOverlayFireflies / stopOverlayFireflies)
+ *   - scroll.css
  * ============================================================
  */
 
@@ -42,7 +47,6 @@ function initScroll( config ) {
 
 	const scrollBlock = document.getElementById( 'scrollBlock' );
 	const scrollTrigger = document.getElementById( 'scrollTrigger' );
-	const scrollExpanded = document.getElementById( 'scrollExpanded' );
 	const collapseBtn = document.getElementById( 'scrollCollapseBtn' );
 
 	if ( !scrollBlock ) {
@@ -53,6 +57,7 @@ function initScroll( config ) {
 	// Элементы внутри развёрнутого свитка
 	const titleEl = scrollBlock.querySelector( '.scroll-title' );
 	const textEl = scrollBlock.querySelector( '.scroll-text' );
+	const paperEl = scrollBlock.querySelector( '.scroll-paper' );
 
 	// ============================================================
 	// 3. ЗАПОЛНЕНИЕ КОНТЕНТА
@@ -62,20 +67,43 @@ function initScroll( config ) {
 	if ( textEl ) textEl.textContent = story.text;
 
 	// ============================================================
-	// 4. ФУНКЦИИ РАЗВОРАЧИВАНИЯ / СВОРАЧИВАНИЯ
+	// 4. ХРАНИЛИЩЕ ДЛЯ КОНТРОЛЛЕРА СВЕТЛЯЧКОВ
+	// ============================================================
+
+	let firefliesController = null;
+
+	// ============================================================
+	// 5. ФУНКЦИИ РАЗВОРАЧИВАНИЯ / СВОРАЧИВАНИЯ
 	// ============================================================
 
 	/**
-	 * Разворачивает свиток.
+	 * 5.1. РАЗВОРАЧИВАЕТ СВИТОК
+	 * 
+	 * Анимация:
+	 * 1. Добавляем класс .expanded — запускается CSS-переход
+	 *    max-height: 0 → 3000px и opacity: 0 → 1.
+	 * 2. Бумага выезжает снизу вверх через transform.
+	 * 3. После раскрытия запускаем светлячков внутри бумаги.
+	 * 4. Прокручиваем страницу к началу свитка.
 	 */
 	function expand() {
+		// Запускаем CSS-анимацию разворачивания
 		scrollBlock.classList.add( 'expanded' );
 
-		// Плавный скролл к началу свитка
+		// Даём анимации начаться, затем прокручиваем
 		setTimeout( () => {
 			scrollBlock.scrollIntoView( { behavior: 'smooth', block: 'start' } );
-		}, 100 );
+		}, 250 );
 
+		// Запускаем светлячков внутри развёрнутой бумаги
+		if ( typeof window.startOverlayFireflies === 'function' && paperEl ) {
+			// Небольшая задержка — чтобы бумага уже была видна
+			setTimeout( () => {
+				firefliesController = window.startOverlayFireflies( paperEl );
+			}, 400 );
+		}
+
+		// Тактильный отклик
 		if ( window.navigator?.vibrate ) {
 			window.navigator.vibrate( 10 );
 		}
@@ -84,16 +112,31 @@ function initScroll( config ) {
 	}
 
 	/**
-	 * Сворачивает свиток.
+	 * 5.2. СВОРАЧИВАЕТ СВИТОК
+	 * 
+	 * Анимация:
+	 * 1. Останавливаем и удаляем светлячков.
+	 * 2. Убираем класс .expanded — запускается обратный CSS-переход.
+	 * 3. Прокручиваем страницу обратно к кнопке.
 	 */
 	function collapse() {
+		// Останавливаем светлячков
+		if ( firefliesController ) {
+			window.stopOverlayFireflies( firefliesController );
+			firefliesController = null;
+		}
+
+		// Запускаем CSS-анимацию сворачивания
 		scrollBlock.classList.remove( 'expanded' );
 
-		// Возвращаемся к кнопке
+		// Прокручиваем обратно к кнопке
 		setTimeout( () => {
-			scrollTrigger.scrollIntoView( { behavior: 'smooth', block: 'center' } );
-		}, 100 );
+			if ( scrollTrigger ) {
+				scrollTrigger.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+			}
+		}, 150 );
 
+		// Тактильный отклик
 		if ( window.navigator?.vibrate ) {
 			window.navigator.vibrate( 8 );
 		}
@@ -101,22 +144,11 @@ function initScroll( config ) {
 		console.log( '📜 Свиток свёрнут' );
 	}
 
-	/**
-	 * Переключает состояние свитка.
-	 */
-	function toggle() {
-		if ( scrollBlock.classList.contains( 'expanded' ) ) {
-			collapse();
-		} else {
-			expand();
-		}
-	}
-
 	// ============================================================
-	// 5. ОБРАБОТЧИКИ СОБЫТИЙ
+	// 6. ОБРАБОТЧИКИ СОБЫТИЙ
 	// ============================================================
 
-	// 5.1. Клик по свёрнутому свитку
+	// 6.1. Клик по свёрнутой кнопке — разворачиваем
 	if ( scrollTrigger ) {
 		scrollTrigger.addEventListener( 'click', function ( e ) {
 			e.stopPropagation();
@@ -124,7 +156,7 @@ function initScroll( config ) {
 		} );
 	}
 
-	// 5.2. Клик по кнопке «Свернуть»
+	// 6.2. Клик по кнопке «Свернуть» — сворачиваем
 	if ( collapseBtn ) {
 		collapseBtn.addEventListener( 'click', function ( e ) {
 			e.stopPropagation();
@@ -133,14 +165,13 @@ function initScroll( config ) {
 	}
 
 	// ============================================================
-	// 6. ВОЗВРАЩАЕМ МЕТОДЫ ДЛЯ ВНЕШНЕГО УПРАВЛЕНИЯ
+	// 7. ВОЗВРАЩАЕМ МЕТОДЫ ДЛЯ ВНЕШНЕГО УПРАВЛЕНИЯ
 	// ============================================================
 
 	console.log( `📜 Свиток готов: «${story.title}»` );
 
 	return {
 		expand: expand,
-		collapse: collapse,
-		toggle: toggle
+		collapse: collapse
 	};
 }
