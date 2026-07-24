@@ -216,12 +216,9 @@ body {
 	background-repeat: no-repeat;
 
 	/*
-     * Оптимизация скролла:
-     * translateZ(0) создаёт отдельный композитный слой для body.
-     * Это предотвращает конфликты с position: fixed у body::after
-     * и убирает рывки на мобильных.
+     * УБРАН translateZ(0) — он ломает position: fixed у слайдера.
+     * Плавность достигается через will-change на конкретных элементах.
      */
-	transform: translateZ(0);
 }
 
 /* ============================================================
@@ -242,6 +239,7 @@ body {
  * ЗАГС → красное свечение снизу
  * Дом  → янтарное свечение снизу
  */
+
 body::after {
 	content: '';
 	position: fixed;
@@ -250,22 +248,15 @@ body::after {
 	pointer-events: none;
 
 	/*
-     * Аппаратное ускорение:
-     * translateZ(0) выносит слой на GPU.
-     * will-change предупреждает браузер о том что слой не меняется.
-     * Вместе они убирают рывки при скролле.
+     * translateZ(0) здесь безопасен — это отдельный слой.
      */
 	transform: translateZ(0);
 	will-change: transform;
 
 	background:
-		/* Верх страницы — едва заметное свечение */
 		radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
-		/* Низ страницы — акцентное свечение раздела */
 		radial-gradient(ellipse at 50% 100%, rgba(var(--accent-rgb), 0.07) 0%, rgba(var(--accent-rgb), 0.04) 35%, transparent 65%),
-		/* Центр — лёгкий оттенок */
 		radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.02) 0%, transparent 60%),
-		/* Тёмная подложка для глубины */
 		rgba(8, 8, 8, 0.8);
 }
 
@@ -284,12 +275,11 @@ body::after {
 	padding: 16px 20px;
 
 	/*
-     * Оптимизация sticky для мобильных:
-     * translateZ(0) + will-change убирают подёргивания.
+     * УБРАН translateZ(0) — sticky тоже может конфликтовать.
+     * Плавность достигается через внутренние элементы.
      */
-	transform: translateZ(0);
-	will-change: transform;
 }
+
 
 .header-inner {
 	display: flex;
@@ -715,6 +705,7 @@ body::after {
  * 9.1. КАРТОЧКА ФОТО
  * translateZ(0) + will-change для плавности.
  */
+
 .gallery-item {
 	position: relative;
 	overflow: hidden;
@@ -726,16 +717,12 @@ body::after {
 	break-inside: avoid;
 
 	/*
-     * Аппаратное ускорение:
-     * translateZ(0) выносит карточку на отдельный слой GPU.
-     * will-change предупреждает браузер о трансформациях.
-     * Это убирает рывки при появлении и hover.
+     * Аппаратное ускорение.
      */
-	transform: translateZ(0);
+	transform: translateY(30px) translateZ(0);
 	will-change: transform, opacity;
 
 	opacity: 0;
-	transform: translateY(30px) translateZ(0);
 	transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
 }
 
