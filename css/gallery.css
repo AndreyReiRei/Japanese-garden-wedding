@@ -270,13 +270,13 @@ body::after {
 
 	background:
 		/* Верх страницы — едва заметное свечение */
-		radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
-		/* Низ страницы — акцентное свечение раздела */
-		radial-gradient(ellipse at 50% 100%, var(--accent-glow) 0%, rgba(var(--accent-rgb), 0.15) 35%, transparent 65%),
-		/* Центр — лёгкий оттенок */
-		radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.04) 0%, transparent 60%),
+		radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
+		/* Низ страницы — акцентное свечение раздела (уменьшено в 2 раза) */
+		radial-gradient(ellipse at 50% 100%, rgba(var(--accent-rgb), 0.07) 0%, rgba(var(--accent-rgb), 0.04) 35%, transparent 65%),
+		/* Центр — лёгкий оттенок (уменьшено в 2 раза) */
+		radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.02) 0%, transparent 60%),
 		/* Тёмная подложка для глубины */
-		rgba(8, 8, 8, 0.6);
+		rgba(8, 8, 8, 0.8);
 }
 
 /* ============================================================
@@ -660,13 +660,14 @@ body::after {
 
 /* ============================================================
    7. ЗАГОЛОВОК РАЗДЕЛА
-   С отражением как от водной глади.
+   С анимированным отражением как от водной глади.
+   Отражение плавно появляется и исчезает.
    ============================================================ */
 
 .title-block {
 	text-align: center;
 	flex: 1;
-	padding-bottom: 14px;
+	padding-bottom: 24px;
 	/* Место для отражения */
 }
 
@@ -678,12 +679,57 @@ body::after {
 	margin-bottom: 4px;
 	line-height: 1.15;
 	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 0, 0, 0.2);
+	position: relative;
+}
+
+/*
+ * ОТРАЖЕНИЕ ЧЕРЕЗ ПСЕВДОЭЛЕМЕНТ
+ * Дублирует текст заголовка, переворачивает и затемняет.
+ * Плавно появляется и исчезает через animation.
+ */
+.section-title::after {
+	content: attr(data-text);
+	/* Берёт текст из data-text в HTML */
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	transform: scaleY(-1);
+	/* Переворачиваем */
+	color: var(--white);
+	font-size: inherit;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	line-height: 1;
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 0, 0, 0.2);
+	pointer-events: none;
+
 	/*
-     * ОТРАЖЕНИЕ КАК ОТ ВОДЫ
-     * Работает в Chrome, Safari, Edge.
-     * В Firefox отражения не будет — текст останется читаемым.
+     * Маска для затухания отражения книзу
      */
-	-webkit-box-reflect: below 2px linear-gradient(transparent 30%, rgba(0, 0, 0, 0.3));
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+
+	/*
+     * АНИМАЦИЯ ПОЯВЛЕНИЯ И ИСЧЕЗНОВЕНИЯ
+     * Отражение мягко пульсирует
+     */
+	animation: reflectionPulse 4s ease-in-out infinite;
+}
+
+/*
+ * АНИМАЦИЯ ПУЛЬСАЦИИ ОТРАЖЕНИЯ
+ */
+@keyframes reflectionPulse {
+
+	0%,
+	100% {
+		opacity: 0.15;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
 }
 
 /* ============================================================
@@ -744,7 +790,6 @@ body::after {
 	box-shadow: var(--shadow-card);
 	margin-bottom: var(--masonry-gap);
 	break-inside: avoid;
-	/* Не разрывать между колонками */
 
 	/* Анимация появления */
 	opacity: 0;
@@ -759,13 +804,13 @@ body::after {
 
 /*
  * 9.3. РАМКА ФОТО
- * Тонкая линия по периметру.
+ * Тонкая тёмная линия по периметру — едва заметная.
  */
 .gallery-item::after {
 	content: '';
 	position: absolute;
 	inset: 0;
-	border: 1px solid rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(0, 0, 0, 0.12);
 	border-radius: var(--radius-md);
 	pointer-events: none;
 	z-index: 2;
@@ -774,7 +819,7 @@ body::after {
 
 /*
  * 9.4. УГОЛКИ В ЯПОНСКОМ СТИЛЕ
- * Четыре уголка создаются через box-shadow на псевдоэлементе.
+ * Тёмные, едва заметные — проявляются при hover.
  */
 .gallery-item::before {
 	content: '';
@@ -785,17 +830,17 @@ body::after {
 	opacity: 0;
 	transition: opacity 0.5s var(--ease-out-expo);
 	/*
-     * Четыре уголка через box-shadow:
-     * каждый уголок — это тень с разным смещением.
+     * Четыре уголка через box-shadow.
+     * Тёмные и приглушённые.
      */
 	box-shadow:
-		-1px -1px 0 rgba(var(--accent-rgb), 0.4),
+		-1px -1px 0 rgba(0, 0, 0, 0.25),
 		/*左上*/
-		1px -1px 0 rgba(var(--accent-rgb), 0.4),
+		1px -1px 0 rgba(0, 0, 0, 0.25),
 		/*右上*/
-		-1px 1px 0 rgba(var(--accent-rgb), 0.4),
+		-1px 1px 0 rgba(0, 0, 0, 0.25),
 		/*左下*/
-		1px 1px 0 rgba(var(--accent-rgb), 0.4);
+		1px 1px 0 rgba(0, 0, 0, 0.25);
 	/*右下*/
 	border-radius: var(--radius-md);
 }
@@ -805,18 +850,30 @@ body::after {
 }
 
 /*
- * 9.5. HOVER — АКЦЕНТНОЕ СВЕЧЕНИЕ
+ * 9.5. HOVER — ТЁМНАЯ РАМКА С БЛЮРОМ
+ * При наведении появляется тёмная рамка с размытием,
+ * создающая эффект глубины и фокуса.
  */
 @media (hover: hover) {
 	.gallery-item:hover {
-		box-shadow: 0 20px 56px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(var(--accent-rgb), 0.3), 0 0 48px rgba(var(--accent-rgb), 0.1);
+		/*
+         * Тёмная рамка с блюром
+         */
+		outline: 3px solid rgba(0, 0, 0, 0.5);
+		outline-offset: 4px;
+		filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.4));
+
 		transform: translateY(-4px);
 		z-index: 5;
+		transition: all 0.4s var(--ease-out-expo);
 	}
 
 	.gallery-item:hover::after {
-		border-color: rgba(var(--accent-rgb), 0.5);
-		box-shadow: inset 0 0 40px rgba(var(--accent-rgb), 0.04);
+		/*
+         * Внутренняя рамка — тёмная
+         */
+		border-color: rgba(0, 0, 0, 0.2);
+		box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.25);
 	}
 }
 
@@ -829,7 +886,6 @@ body::after {
  * 9.6. ИЗОБРАЖЕНИЕ С ПАРАЛЛАКС-ЭФФЕКТОМ
  * Изображение масштабировано (scale: 1.1) и смещается при hover.
  * overflow: hidden на карточке скрывает края.
- * Создаётся эффект глубины — фото «оживает» при наведении.
  */
 .gallery-item img {
 	width: 100%;
@@ -837,12 +893,6 @@ body::after {
 	display: block;
 	border-radius: var(--radius-md);
 
-	/*
-     * Параллакс:
-     * - Изображение чуть увеличено (1.1)
-     * - object-position смещается при hover
-     * - transform добавляет плавное масштабирование
-     */
 	transform: scale(1.1);
 	object-fit: cover;
 	object-position: center;
@@ -850,14 +900,9 @@ body::after {
 	filter: brightness(0.85);
 }
 
-/*
- * При наведении — изображение «приближается» и светлеет.
- * object-position слегка смещается для параллакс-эффекта.
- */
 .gallery-item:hover img {
 	transform: scale(1.18);
 	object-position: center 45%;
-	/* Лёгкий сдвиг вверх */
 	filter: brightness(1.02);
 }
 
@@ -992,8 +1037,10 @@ body::after {
 
 
 /*
- * 11.2. ТЕКСТ ПОДВАЛА С ОТРАЖЕНИЕМ
+ * 11.2. ТЕКСТ ПОДВАЛА С АНИМИРОВАННЫМ ОТРАЖЕНИЕМ
+ * Отражение плавно пульсирует — как вода.
  */
+
 .footer-text {
 	font-size: 23px;
 	font-weight: 300;
@@ -1003,18 +1050,68 @@ body::after {
 	margin: 0 auto;
 	line-height: 1.6;
 	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-	-webkit-box-reflect: below 1px linear-gradient(transparent 20%, rgba(0, 0, 0, 0.3));
+	position: relative;
+}
+
+/*
+ * ОТРАЖЕНИЕ ЧЕРЕЗ ПСЕВДОЭЛЕМЕНТ
+ * Дублирует текст, переворачивает, затемняет книзу.
+ * Пульсирует с периодом 5 секунд.
+ */
+.footer-text::after {
+	content: attr(data-text);
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	transform: scaleY(-1);
+	color: white;
+	font-size: inherit;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	line-height: 1;
+	text-align: center;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+	pointer-events: none;
+
+	/*
+     * Маска для затухания книзу
+     */
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+
+	/*
+     * АНИМАЦИЯ ПУЛЬСАЦИИ ОТРАЖЕНИЯ
+     * Чуть медленнее чем у заголовка — 5 секунд
+     */
+	animation: footerReflectionPulse 5s ease-in-out infinite;
+}
+
+/*
+ * АНИМАЦИЯ ПУЛЬСАЦИИ
+ */
+@keyframes footerReflectionPulse {
+
+	0%,
+	100% {
+		opacity: 0.1;
+	}
+
+	50% {
+		opacity: 0.45;
+	}
 }
 
 /* ============================================================
    12. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
    Все @media собраны здесь.
    Каждый брейкпоинт масштабирует сетку, текст, кнопки и отступы.
+   Особое внимание: шапка, заголовок, кнопки на мобильных.
    ============================================================ */
 
 /*
  * МОБИЛЬНЫЕ (< 481px)
- * 2 колонки, компактные отступы, кнопки в столбик.
+ * 2 колонки, шапка в 2 строки, кнопки без фикс. ширины.
  */
 @media (width < 481px) {
 	:root {
@@ -1023,23 +1120,62 @@ body::after {
 		--grid-padding: 8px;
 	}
 
+	/*
+     * ШАПКА — компактная
+     */
 	.gallery-header {
-		padding: 10px 12px;
+		padding: 8px 10px;
 	}
 
-	.section-title {
-		font-size: 26px;
+	/*
+     * ВНУТРЕННИЙ КОНТЕЙНЕР ШАПКИ
+     * На мобильных — кнопка и счётчик меньше, заголовок по центру.
+     */
+	.header-inner {
+		gap: 8px;
 	}
 
-	.title-block {
-		padding-bottom: 10px;
+	/*
+     * КНОПКА «НАЗАД» — без фиксированной ширины
+     */
+	.back-btn {
+		width: auto;
+		min-width: 0;
+		padding: 8px 12px;
+		font-size: 12px;
+		gap: 4px;
 	}
 
+	/*
+     * ТЕКСТ «Обложка» на кнопке назад — скрываем, оставляем только стрелку
+     */
+	.back-btn span:not(.back-arrow):not(.btn-line) {
+		display: none;
+	}
+
+	/*
+     * СЧЁТЧИК ФОТО — без фиксированной ширины
+     */
 	.photo-counter {
+		width: auto;
+		min-width: 0;
 		font-size: 10px;
 	}
 
-	.back-btn,
+	/*
+     * ЗАГОЛОВОК
+     */
+	.section-title {
+		font-size: 20px;
+	}
+
+	.title-block {
+		padding-bottom: 8px;
+	}
+
+	/*
+     * НИЖНИЕ КНОПКИ
+     */
 	.animated-btn {
 		min-width: 0;
 		width: 100%;
@@ -1073,11 +1209,45 @@ body::after {
 		font-size: 12px;
 		padding: 16px 12px 12px;
 	}
+
+	/*
+     * РАЗДЕЛИТЕЛЬ ШАПКИ — меньше на мобильных
+     */
+	.gallery-header::after {
+		width: 120px;
+		max-width: 50%;
+	}
+
+	@keyframes headerDot {
+
+		0%,
+		100% {
+			left: calc(50% - 50px);
+			opacity: 0.2;
+			transform: translateX(-50%) scale(0.7);
+		}
+
+		25% {
+			opacity: 1;
+			transform: translateX(-50%) scale(1.4);
+		}
+
+		50% {
+			left: calc(50% + 50px);
+			opacity: 0.2;
+			transform: translateX(-50%) scale(0.7);
+		}
+
+		75% {
+			opacity: 1;
+			transform: translateX(-50%) scale(1.4);
+		}
+	}
 }
 
 /*
  * МОБИЛЬНЫЕ L (481px – 576px)
- * 2 колонки, чуть больше отступы.
+ * 2 колонки, кнопка назад с текстом.
  */
 @media (481px <=width < 577px) {
 	:root {
@@ -1087,10 +1257,22 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 29px;
+		font-size: 24px;
 	}
 
-	.back-btn,
+	.back-btn {
+		width: auto;
+		min-width: 0;
+		padding: 9px 14px;
+		font-size: 12px;
+	}
+
+	.photo-counter {
+		width: auto;
+		min-width: 0;
+		font-size: 11px;
+	}
+
 	.animated-btn {
 		padding: 11px 20px;
 		font-size: 13px;
@@ -1107,7 +1289,7 @@ body::after {
 
 /*
  * БОЛЬШИЕ МОБИЛЬНЫЕ (577px – 768px)
- * 2 колонки.
+ * 2 колонки, возвращаем фиксированную ширину.
  */
 @media (577px <=width < 769px) {
 	:root {
@@ -1117,7 +1299,15 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 33px;
+		font-size: 28px;
+	}
+
+	.back-btn {
+		width: 120px;
+	}
+
+	.photo-counter {
+		width: 120px;
 	}
 
 	.bottom-nav-title {
@@ -1141,7 +1331,15 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 36px;
+		font-size: 32px;
+	}
+
+	.back-btn {
+		width: 130px;
+	}
+
+	.photo-counter {
+		width: 130px;
 	}
 
 	.bottom-nav-title {
@@ -1165,7 +1363,15 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 40px;
+		font-size: 36px;
+	}
+
+	.back-btn {
+		width: 140px;
+	}
+
+	.photo-counter {
+		width: 140px;
 	}
 
 	.bottom-nav-title {
@@ -1189,7 +1395,7 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 44px;
+		font-size: 40px;
 	}
 
 	.bottom-nav-title {
@@ -1213,7 +1419,7 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 48px;
+		font-size: 44px;
 	}
 
 	.bottom-nav-title {
@@ -1241,7 +1447,7 @@ body::after {
 	}
 
 	.section-title {
-		font-size: 55px;
+		font-size: 48px;
 	}
 
 	.bottom-nav-title {

@@ -61,11 +61,11 @@
 	/* Молочно-белый */
 	--text-primary: rgba(255, 255, 255, 0.9);
 	/* Основной текст */
-	--text-secondary: rgba(255, 255, 255, 0.6);
+	--text-secondary: rgba(255, 255, 255, 0.8);
 	/* Второстепенный */
-	--text-muted: rgba(255, 255, 255, 0.45);
+	--text-muted: rgba(255, 255, 255, 0.7);
 	/* Приглушённый */
-	--text-dim: rgba(255, 255, 255, 0.3);
+	--text-dim: rgba(255, 255, 255, 0.7);
 	/* Едва заметный */
 
 	/* 
@@ -569,7 +569,8 @@ body::before {
 
 /* ============================================================
    7. НИЖНИЙ ИНФОРМАЦИОННЫЙ БЛОК
-   Имена, дата, кнопка истории
+   Имена, дата, кнопка истории.
+   Отражение только у псевдоэлементов — оригинал статичен.
    ============================================================ */
 
 .info-block {
@@ -589,9 +590,56 @@ body::before {
 	text-transform: uppercase;
 	margin-bottom: 10px;
 	text-shadow: var(--text-shadow-medium);
+	position: relative;
 }
 
-/* Строка с именами */
+/*
+ * ОТРАЖЕНИЕ ДАТЫ
+ * Только псевдоэлемент пульсирует.
+ * Оригинал остаётся неподвижным.
+ */
+.date-top::after {
+	content: attr(data-text);
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	transform: scaleY(-1);
+	color: var(--gold-light);
+	font-size: inherit;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	text-shadow: var(--text-shadow-medium);
+	pointer-events: none;
+
+	/*
+     * Маска для затухания книзу
+     */
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
+
+	/*
+     * АНИМАЦИЯ ПУЛЬСАЦИИ — 4 секунды
+     */
+	animation: dateReflectionPulse 4s ease-in-out infinite;
+}
+
+@keyframes dateReflectionPulse {
+
+	0%,
+	100% {
+		opacity: 0.1;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
+}
+
+/*
+ * СТРОКА С ИМЕНАМИ
+ */
 .names-line {
 	display: flex;
 	align-items: center;
@@ -599,8 +647,51 @@ body::before {
 	gap: clamp(10px, 2vw, 16px);
 	margin-bottom: 6px;
 	flex-wrap: wrap;
-	/* Отражение имён как от воды */
-	-webkit-box-reflect: below 2px linear-gradient(transparent 40%, rgba(0, 0, 0, 0.5));
+	position: relative;
+}
+
+/*
+ * ОТРАЖЕНИЕ ИМЁН
+ * Только псевдоэлемент пульсирует.
+ */
+.names-line::after {
+	content: attr(data-text);
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	transform: scaleY(-1);
+	color: var(--white);
+	font-size: var(--name-size);
+	font-weight: 400;
+	letter-spacing: 0.06em;
+	text-align: center;
+	text-shadow: var(--text-shadow-strong);
+	white-space: nowrap;
+	pointer-events: none;
+
+	/*
+     * Маска для затухания книзу
+     */
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, transparent 100%);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0%, transparent 100%);
+
+	/*
+     * АНИМАЦИЯ ПУЛЬСАЦИИ — 5 секунд
+     */
+	animation: namesReflectionPulse 5s ease-in-out infinite;
+}
+
+@keyframes namesReflectionPulse {
+
+	0%,
+	100% {
+		opacity: 0.1;
+	}
+
+	50% {
+		opacity: 0.5;
+	}
 }
 
 /* Имя */
@@ -634,11 +725,54 @@ body::before {
 	color: rgb(230, 57, 57);
 	margin-bottom: clamp(14px, 3vh, 20px);
 	text-shadow: var(--text-shadow-light);
+	position: relative;
+}
+
+/*
+ * ОТРАЖЕНИЕ ЛОКАЦИИ
+ */
+.location::after {
+	content: attr(data-text);
+	position: absolute;
+	top: 100%;
+	left: 0;
+	right: 0;
+	transform: scaleY(-1);
+	color: rgb(230, 57, 57);
+	font-size: inherit;
+	font-weight: inherit;
+	font-style: inherit;
+	letter-spacing: inherit;
+	text-align: center;
+	text-shadow: var(--text-shadow-light);
+	pointer-events: none;
+
+	/*
+     * Маска для затухания книзу
+     */
+	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
+
+	/*
+     * АНИМАЦИЯ ПУЛЬСАЦИИ — 6 секунд
+     */
+	animation: locationReflectionPulse 6s ease-in-out infinite;
+}
+
+@keyframes locationReflectionPulse {
+
+	0%,
+	100% {
+		opacity: 0.08;
+	}
+
+	50% {
+		opacity: 0.4;
+	}
 }
 
 /* 
  * КНОПКА «История одного дня...»
- * Стеклянная, с золотой окантовкой
  */
 .story-toggle {
 	display: inline-flex;
