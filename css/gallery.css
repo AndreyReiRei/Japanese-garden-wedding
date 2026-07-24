@@ -5,7 +5,7 @@
    1.  Сброс и базовые переменные
    2.  Темы разделов (garden / zags / home)
    3.  Базовые стили (html, body)
-   4.  Фоновые слои (изображение, фильтр, шум)
+   4.  Фоновые слои (изображение, фильтр)
    5.  Шапка
    6.  Кнопки — единый стиль (назад + нижняя навигация)
    7.  Заголовок раздела
@@ -34,17 +34,11 @@
      * БАЗОВЫЕ ЦВЕТА
      */
 	--bg-fallback: #0a0a0a;
-	/* Резервный фон если фото нет */
 	--bg-surface: #0c0c0c;
-	/* Поверхность карточек */
 	--white: #F5F1EC;
-	/* Молочно-белый */
 	--text-primary: rgba(255, 255, 255, 0.88);
-	/* Основной текст */
 	--text-secondary: rgba(255, 255, 255, 0.55);
-	/* Второстепенный текст */
 	--text-tertiary: rgba(255, 255, 255, 0.8);
-	/* Третичный текст */
 
 	/*
      * ТЕНИ
@@ -112,11 +106,8 @@
      * СЕТКА MASONRY
      */
 	--masonry-columns: 3;
-	/* Кол-во колонок по умолчанию */
 	--masonry-gap: 12px;
-	/* Отступ между фото */
 	--grid-padding: 20px;
-	/* Отступ контейнера галереи */
 
 	/*
      * ТИПОГРАФИКА
@@ -136,7 +127,6 @@
  * ЯПОНСКИЙ САД — розовый сакуры + тёмно-красный
  */
 [data-theme="garden"] {
-	/* Акцент */
 	--accent-color: #E8A0B4;
 	--accent-color-light: #F0C4D3;
 	--accent-glow: rgba(232, 160, 180, 0.45);
@@ -145,7 +135,6 @@
 	--accent-surface: rgba(232, 160, 180, 0.06);
 	--accent-surface-hover: rgba(232, 160, 180, 0.12);
 
-	/* Кнопки */
 	--btn-bg: #ab6a7d13;
 	--btn-bg-dark: #0a0204a2;
 	--btn-text: #f7d4e0;
@@ -153,7 +142,6 @@
 	--btn-glow: rgba(232, 160, 180, 0.35);
 	--btn-hover-overlay: rgba(232, 160, 180, 0.12);
 
-	/* Фон */
 	--bg-filter-color: rgba(200, 100, 130, 0.22);
 	--bg-image: url('../photos/garden/bg-garden.jpg');
 }
@@ -162,7 +150,6 @@
  * ЗАГС — киноварь
  */
 [data-theme="zags"] {
-	/* Акцент */
 	--accent-color: #E84040;
 	--accent-color-light: #FF6B6B;
 	--accent-glow: rgba(232, 64, 64, 0.45);
@@ -171,7 +158,6 @@
 	--accent-surface: rgba(232, 64, 64, 0.06);
 	--accent-surface-hover: rgba(232, 64, 64, 0.12);
 
-	/* Кнопки */
 	--btn-bg: #3d0b0b43;
 	--btn-bg-dark: #2b0808ab;
 	--btn-text: #f7d4d4;
@@ -179,7 +165,6 @@
 	--btn-glow: rgba(232, 64, 64, 0.35);
 	--btn-hover-overlay: rgba(232, 64, 64, 0.12);
 
-	/* Фон */
 	--bg-filter-color: rgba(200, 40, 40, 0.22);
 	--bg-image: url('../photos/zags/bg-zags.jpg');
 }
@@ -188,7 +173,6 @@
  * КУПЕЧЕСКИЙ ДОМ — тёплый янтарь
  */
 [data-theme="home"] {
-	/* Акцент */
 	--accent-color: #D4A24E;
 	--accent-color-light: #E8C880;
 	--accent-glow: rgba(212, 162, 78, 0.4);
@@ -197,7 +181,6 @@
 	--accent-surface: rgba(212, 162, 78, 0.06);
 	--accent-surface-hover: rgba(212, 162, 78, 0.12);
 
-	/* Кнопки */
 	--btn-bg: #3d2a0b76;
 	--btn-bg-dark: #2b1e089c;
 	--btn-text: #f7ecd4;
@@ -205,7 +188,6 @@
 	--btn-glow: rgba(212, 162, 78, 0.35);
 	--btn-hover-overlay: rgba(212, 162, 78, 0.12);
 
-	/* Фон */
 	--bg-filter-color: rgba(180, 130, 50, 0.20);
 	--bg-image: url('../photos/home/bg-home.jpg');
 }
@@ -213,9 +195,8 @@
 /* ============================================================
    3. БАЗОВЫЕ СТИЛИ
    Фоновое изображение задаётся прямо на body.
-   Это гарантирует что фото видно всегда, на всей странице.
-   Параллакс отключён — фон скроллится вместе с контентом,
-   чтобы избежать рывков на мобильных устройствах.
+   Никакого background-attachment: fixed — плавный скролл.
+   translateZ(0) для аппаратного ускорения.
    ============================================================ */
 
 html,
@@ -229,17 +210,18 @@ body {
 	overflow-y: auto;
 	overflow-x: hidden;
 
-	/*
-     * ФОНОВОЕ ИЗОБРАЖЕНИЕ
-     * Задано прямо на body через CSS-переменную --bg-image.
-     * background-size: cover — заполняет весь экран.
-     * background-attachment не задан — фон скроллится естественно.
-     * Никакого параллакса, никаких рывков на мобильных.
-     */
 	background-image: var(--bg-image);
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
+
+	/*
+     * Оптимизация скролла:
+     * translateZ(0) создаёт отдельный композитный слой для body.
+     * Это предотвращает конфликты с position: fixed у body::after
+     * и убирает рывки на мобильных.
+     */
+	transform: translateZ(0);
 }
 
 /* ============================================================
@@ -253,15 +235,12 @@ body {
 /*
  * 4.1. АКЦЕНТНОЕ СВЕЧЕНИЕ РАЗДЕЛА
  * Градиент поверх фонового фото.
- * Снизу — более насыщенный цвет раздела.
- * Сверху — почти прозрачный.
- * Тёмная подложка rgba(8,8,8,0.6) для глубины.
+ * position: fixed — всегда покрывает экран.
+ * translateZ(0) + will-change — плавный рендеринг без рывков.
  *
  * Сад  → розовое свечение снизу
  * ЗАГС → красное свечение снизу
  * Дом  → янтарное свечение снизу
- *
- * Одинаковый оттенок в шапке и теле страницы.
  */
 body::after {
 	content: '';
@@ -270,12 +249,21 @@ body::after {
 	z-index: -1;
 	pointer-events: none;
 
+	/*
+     * Аппаратное ускорение:
+     * translateZ(0) выносит слой на GPU.
+     * will-change предупреждает браузер о том что слой не меняется.
+     * Вместе они убирают рывки при скролле.
+     */
+	transform: translateZ(0);
+	will-change: transform;
+
 	background:
 		/* Верх страницы — едва заметное свечение */
 		radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
-		/* Низ страницы — акцентное свечение раздела (уменьшено в 2 раза) */
+		/* Низ страницы — акцентное свечение раздела */
 		radial-gradient(ellipse at 50% 100%, rgba(var(--accent-rgb), 0.07) 0%, rgba(var(--accent-rgb), 0.04) 35%, transparent 65%),
-		/* Центр — лёгкий оттенок (уменьшено в 2 раза) */
+		/* Центр — лёгкий оттенок */
 		radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.02) 0%, transparent 60%),
 		/* Тёмная подложка для глубины */
 		rgba(8, 8, 8, 0.8);
@@ -284,6 +272,7 @@ body::after {
 /* ============================================================
    5. ШАПКА
    Полупрозрачная — фото и фильтр видны сквозь неё.
+   Оптимизирована для плавного sticky на мобильных.
    ============================================================ */
 
 .gallery-header {
@@ -293,6 +282,13 @@ body::after {
 	background: rgba(8, 8, 8, 0.2);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	padding: 16px 20px;
+
+	/*
+     * Оптимизация sticky для мобильных:
+     * translateZ(0) + will-change убирают подёргивания.
+     */
+	transform: translateZ(0);
+	will-change: transform;
 }
 
 .header-inner {
@@ -308,7 +304,6 @@ body::after {
 /*
  * 5.1. РАЗДЕЛИТЕЛЬ МЕЖДУ ШАПКОЙ И ТЕЛОМ
  * Тонкая линия с бегущей акцентной точкой.
- * Создаёт плавный переход от шапки к контенту.
  */
 .gallery-header::after {
 	content: '';
@@ -330,7 +325,6 @@ body::after {
 
 /*
  * Бегущая точка на разделителе.
- * Движется слева направо и обратно с пульсацией.
  */
 .gallery-header::before {
 	content: '';
@@ -348,10 +342,6 @@ body::after {
 	animation: headerDot 4s ease-in-out infinite;
 }
 
-/*
- * АНИМАЦИЯ ТОЧКИ НА РАЗДЕЛИТЕЛЕ ШАПКИ
- * Движется по линии + пульсирует.
- */
 @keyframes headerDot {
 
 	0%,
@@ -378,22 +368,16 @@ body::after {
 	}
 }
 
-
 /* ============================================================
    6. КНОПКИ — ЕДИНЫЙ СТИЛЬ
    Все кнопки на странице (назад, предыдущий, следующий, обложка)
    имеют одинаковый стиль: бегущая обводка, градиентный фон,
    скруглённые края, отражение при hover.
-   Размеры и отступы одинаковые для всех кнопок.
    ============================================================ */
 
 /*
- * 6.1. БАЗОВАЯ КНОПКА
- * Используется для всех кнопок навигации.
- * min-width гарантирует одинаковый размер независимо от контента.
+ * 6.1. ВЕРХНЯЯ КНОПКА «НАЗАД»
  */
-
-/* Верхняя кнопка */
 .back-btn {
 	position: relative;
 	display: inline-flex;
@@ -401,34 +385,6 @@ body::after {
 	justify-content: center;
 	gap: 10px;
 	width: 140px;
-	/* Фиксированная ширина что бы заголовок не полз */
-	padding: 12px 24px;
-	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
-	color: var(--btn-text);
-	font-family: var(--font-body);
-	font-size: 14px;
-	font-weight: 500;
-	letter-spacing: 0.04em;
-	text-decoration: none;
-	border: none;
-	border-radius: var(--radius-sm);
-	cursor: pointer;
-	overflow: hidden;
-	white-space: nowrap;
-	box-shadow: var(--shadow-card);
-	transition: all 0.4s var(--ease-out-expo);
-	flex-shrink: 0;
-}
-
-/* Нижние кнопки */
-.animated-btn {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 10px;
-	min-width: 200px;
-	/* Минимальная ширина */
 	padding: 12px 24px;
 	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
 	color: var(--btn-text);
@@ -448,7 +404,35 @@ body::after {
 }
 
 /*
- * 6.2. ЗАТЕМНЕНИЕ ПРИ HOVER
+ * 6.2. НИЖНИЕ КНОПКИ
+ */
+.animated-btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-width: 200px;
+	padding: 12px 24px;
+	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
+	color: var(--btn-text);
+	font-family: var(--font-body);
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	text-decoration: none;
+	border: none;
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	overflow: hidden;
+	white-space: nowrap;
+	box-shadow: var(--shadow-card);
+	transition: all 0.4s var(--ease-out-expo);
+	flex-shrink: 0;
+}
+
+/*
+ * 6.3. ЗАТЕМНЕНИЕ ПРИ HOVER
  */
 .back-btn::after,
 .animated-btn::after {
@@ -470,10 +454,6 @@ body::after {
 .animated-btn:hover {
 	transform: translateY(-2px);
 	box-shadow: var(--shadow-card-hover), 0 0 24px var(--btn-glow);
-	/*
-     * Отражение при hover — как от водной глади.
-     * Работает в Chrome, Safari, Edge.
-     */
 	-webkit-box-reflect: below 2px linear-gradient(transparent 40%, rgba(0, 0, 0, 0.4));
 }
 
@@ -484,15 +464,7 @@ body::after {
 }
 
 /*
- * 6.3. БЕГУЩАЯ ОБВОДКА — 4 линии
- * Общие стили для всех кнопок.
- * span:nth-child(1): верхняя (слева направо)
- * span:nth-child(2): правая  (сверху вниз)
- * span:nth-child(3): нижняя  (справа налево)
- * span:nth-child(4): левая   (снизу вверх)
- * 
- * Скорость анимации: 4s 
- * Задержки пропорционально увеличены.
+ * 6.4. БЕГУЩАЯ ОБВОДКА — 4 линии
  */
 .back-btn .btn-line,
 .animated-btn .btn-line {
@@ -541,7 +513,7 @@ body::after {
 }
 
 /*
- * 6.4. СТРЕЛКА В КНОПКЕ
+ * 6.5. СТРЕЛКА В КНОПКЕ
  */
 .back-arrow,
 .animated-btn .arrow {
@@ -569,7 +541,7 @@ body::after {
 }
 
 /*
- * 6.5. ТЕКСТ ВНУТРИ КНОПКИ
+ * 6.6. ТЕКСТ ВНУТРИ КНОПКИ
  */
 .bottom-nav-content {
 	display: flex;
@@ -600,29 +572,20 @@ body::after {
 }
 
 /*
- * 6.6. ИКОНКА «ОБЛОЖКА» — с пульсацией
+ * 6.7. ИКОНКА «ОБЛОЖКА» — с пульсацией
  */
 .bottom-nav-home-icon {
 	font-size: 24px;
 	line-height: 1;
 	transition: transform 0.5s var(--ease-out-back);
-	/*
-     * Мягкая пульсация:
-     * иконка постоянно дышит, привлекая внимание.
-     */
 	animation: iconPulse 3s ease-in-out infinite;
 }
 
 .animated-btn:hover .bottom-nav-home-icon {
 	transform: scale(1.25);
 	animation: none;
-	/* Останавливаем пульсацию при hover */
 }
 
-/*
- * АНИМАЦИЯ ПУЛЬСАЦИИ
- * Иконка мягко увеличивается и уменьшается.
- */
 @keyframes iconPulse {
 
 	0%,
@@ -638,7 +601,7 @@ body::after {
 }
 
 /*
- * 6.7. АНИМАЦИИ ОБВОДКИ
+ * 6.8. АНИМАЦИИ ОБВОДКИ
  */
 @keyframes btnLineX {
 	0% {
@@ -663,14 +626,12 @@ body::after {
 /* ============================================================
    7. ЗАГОЛОВОК РАЗДЕЛА
    С анимированным отражением как от водной глади.
-   Отражение плавно появляется и исчезает.
    ============================================================ */
 
 .title-block {
 	text-align: center;
 	flex: 1;
 	padding-bottom: 24px;
-	/* Место для отражения */
 }
 
 .section-title {
@@ -684,20 +645,13 @@ body::after {
 	position: relative;
 }
 
-/*
- * ОТРАЖЕНИЕ ЧЕРЕЗ ПСЕВДОЭЛЕМЕНТ
- * Дублирует текст заголовка, переворачивает и затемняет.
- * Плавно появляется и исчезает через animation.
- */
 .section-title::after {
 	content: attr(data-text);
-	/* Берёт текст из data-text в HTML */
 	position: absolute;
 	top: 100%;
 	left: 0;
 	right: 0;
 	transform: scaleY(-1);
-	/* Переворачиваем */
 	color: var(--white);
 	font-size: inherit;
 	font-weight: inherit;
@@ -705,23 +659,11 @@ body::after {
 	line-height: 1;
 	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 0, 0, 0.2);
 	pointer-events: none;
-
-	/*
-     * Маска для затухания отражения книзу
-     */
 	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
 	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
-
-	/*
-     * АНИМАЦИЯ ПОЯВЛЕНИЯ И ИСЧЕЗНОВЕНИЯ
-     * Отражение мягко пульсирует
-     */
 	animation: reflectionPulse 4s ease-in-out infinite;
 }
 
-/*
- * АНИМАЦИЯ ПУЛЬСАЦИИ ОТРАЖЕНИЯ
- */
 @keyframes reflectionPulse {
 
 	0%,
@@ -752,10 +694,7 @@ body::after {
 
 /* ============================================================
    9. ГАЛЕРЕЯ — MASONRY-СЕТКА + ПАРАЛЛАКС
-   Masonry через CSS columns — фото разной высоты
-   укладываются плотно без пустот, как в Pinterest.
-   Параллакс внутри карточки — изображение смещается
-   при наведении, создавая эффект глубины.
+   Оптимизировано для плавного рендеринга.
    ============================================================ */
 
 .gallery-container {
@@ -766,12 +705,6 @@ body::after {
 	padding: var(--grid-padding);
 }
 
-/*
- * 9.1. MASONRY-СЕТКА ЧЕРЕЗ CSS COLUMNS
- * columns распределяет фото по колонкам как журнальная вёрстка.
- * column-gap — отступ между колонками.
- * Количество колонок задаётся в адаптивности (секция 12).
- */
 .gallery-grid {
 	column-count: var(--masonry-columns);
 	column-gap: var(--masonry-gap);
@@ -779,9 +712,8 @@ body::after {
 }
 
 /*
- * 9.2. КАРТОЧКА ФОТО
- * break-inside: avoid — не разрывает карточку между колонками.
- * margin-bottom — отступ снизу (column-gap не работает для строк).
+ * 9.1. КАРТОЧКА ФОТО
+ * translateZ(0) + will-change для плавности.
  */
 .gallery-item {
 	position: relative;
@@ -793,20 +725,27 @@ body::after {
 	margin-bottom: var(--masonry-gap);
 	break-inside: avoid;
 
-	/* Анимация появления */
+	/*
+     * Аппаратное ускорение:
+     * translateZ(0) выносит карточку на отдельный слой GPU.
+     * will-change предупреждает браузер о трансформациях.
+     * Это убирает рывки при появлении и hover.
+     */
+	transform: translateZ(0);
+	will-change: transform, opacity;
+
 	opacity: 0;
-	transform: translateY(30px);
-	transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo);
+	transform: translateY(30px) translateZ(0);
+	transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
 }
 
 .gallery-item.visible {
 	opacity: 1;
-	transform: translateY(0);
+	transform: translateY(0) translateZ(0);
 }
 
 /*
- * 9.3. РАМКА ФОТО
- * Тонкая тёмная линия по периметру — едва заметная.
+ * 9.2. РАМКА ФОТО
  */
 .gallery-item::after {
 	content: '';
@@ -820,8 +759,7 @@ body::after {
 }
 
 /*
- * 9.4. УГОЛКИ В ЯПОНСКОМ СТИЛЕ
- * Тёмные, едва заметные — проявляются при hover.
+ * 9.3. УГОЛКИ В ЯПОНСКОМ СТИЛЕ
  */
 .gallery-item::before {
 	content: '';
@@ -831,19 +769,11 @@ body::after {
 	pointer-events: none;
 	opacity: 0;
 	transition: opacity 0.5s var(--ease-out-expo);
-	/*
-     * Четыре уголка через box-shadow.
-     * Тёмные и приглушённые.
-     */
 	box-shadow:
 		-1px -1px 0 rgba(0, 0, 0, 0.25),
-		/*左上*/
 		1px -1px 0 rgba(0, 0, 0, 0.25),
-		/*右上*/
 		-1px 1px 0 rgba(0, 0, 0, 0.25),
-		/*左下*/
 		1px 1px 0 rgba(0, 0, 0, 0.25);
-	/*右下*/
 	border-radius: var(--radius-md);
 }
 
@@ -852,42 +782,33 @@ body::after {
 }
 
 /*
- * 9.5. HOVER — ТЁМНАЯ РАМКА С БЛЮРОМ
- * При наведении появляется тёмная рамка с размытием,
- * создающая эффект глубины и фокуса.
+ * 9.4. HOVER — BOX-SHADOW ВМЕСТО FILTER
+ * box-shadow не вызывает перерисовку всего элемента.
  */
 @media (hover: hover) {
 	.gallery-item:hover {
-		/*
-         * Тёмная рамка с блюром
-         */
-		outline: 3px solid rgba(0, 0, 0, 0.5);
-		outline-offset: 4px;
-		filter: drop-shadow(0 0 12px rgba(0, 0, 0, 0.4));
-
-		transform: translateY(-4px);
+		box-shadow:
+			0 0 0 3px rgba(0, 0, 0, 0.5),
+			0 4px 20px rgba(0, 0, 0, 0.5),
+			0 0 0 8px rgba(0, 0, 0, 0.15);
+		transform: translateY(-4px) translateZ(0);
 		z-index: 5;
 		transition: all 0.4s var(--ease-out-expo);
 	}
 
 	.gallery-item:hover::after {
-		/*
-         * Внутренняя рамка — тёмная
-         */
 		border-color: rgba(0, 0, 0, 0.2);
 		box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.25);
 	}
 }
 
 .gallery-item:active {
-	transform: scale(0.97);
+	transform: scale(0.97) translateZ(0);
 	transition: transform 0.15s ease;
 }
 
 /*
- * 9.6. ИЗОБРАЖЕНИЕ С ПАРАЛЛАКС-ЭФФЕКТОМ
- * Изображение масштабировано (scale: 1.1) и смещается при hover.
- * overflow: hidden на карточке скрывает края.
+ * 9.5. ИЗОБРАЖЕНИЕ С ПАРАЛЛАКС-ЭФФЕКТОМ
  */
 .gallery-item img {
 	width: 100%;
@@ -895,22 +816,22 @@ body::after {
 	display: block;
 	border-radius: var(--radius-md);
 
-	transform: scale(1.1);
+	transform: scale(1.1) translateZ(0);
+	will-change: transform;
 	object-fit: cover;
 	object-position: center;
-	transition: transform 0.6s var(--ease-out-expo), filter 0.6s var(--ease-out-expo);
+	transition: transform 0.5s var(--ease-out-expo), filter 0.5s var(--ease-out-expo);
 	filter: brightness(0.85);
 }
 
 .gallery-item:hover img {
-	transform: scale(1.18);
+	transform: scale(1.18) translateZ(0);
 	object-position: center 45%;
 	filter: brightness(1.02);
 }
 
 /*
- * 9.7. ПОДПИСЬ НА ФОТО
- * Появляется снизу при hover.
+ * 9.6. ПОДПИСЬ НА ФОТО
  */
 .gallery-caption {
 	position: absolute;
@@ -939,14 +860,12 @@ body::after {
 
 /* ============================================================
    10. НИЖНЯЯ НАВИГАЦИЯ — КОНТЕЙНЕР
-   Все кнопки одного размера, по центру, на одной линии.
    ============================================================ */
 
 .section-bottom-nav {
 	display: flex;
 	justify-content: center;
 	align-items: stretch;
-	/* Все кнопки одной высоты */
 	gap: 16px;
 	padding: 48px 20px 24px;
 	position: relative;
@@ -971,9 +890,7 @@ body::after {
 
 /*
  * 11.1. ДЕКОРАТИВНАЯ ЛИНИЯ С БЕГУЩЕЙ ТОЧКОЙ
- * Линия с акцентной точкой, которая пульсирует и движется.
  */
-
 .footer-accent {
 	display: inline-block;
 	width: 80px;
@@ -986,10 +903,6 @@ body::after {
 	overflow: visible;
 }
 
-/*
- * Светящаяся точка на линии.
- * Движется слева направо и обратно + пульсирует.
- */
 .footer-accent::after {
 	content: '';
 	position: absolute;
@@ -1007,10 +920,6 @@ body::after {
 	animation: footerDot 3s ease-in-out infinite;
 }
 
-/*
- * АНИМАЦИЯ ТОЧКИ
- * Движется по линии + пульсирует яркостью.
- */
 @keyframes footerDot {
 
 	0%,
@@ -1037,12 +946,9 @@ body::after {
 	}
 }
 
-
 /*
  * 11.2. ТЕКСТ ПОДВАЛА С АНИМИРОВАННЫМ ОТРАЖЕНИЕМ
- * Отражение плавно пульсирует — как вода.
  */
-
 .footer-text {
 	font-size: 23px;
 	font-weight: 300;
@@ -1055,11 +961,6 @@ body::after {
 	position: relative;
 }
 
-/*
- * ОТРАЖЕНИЕ ЧЕРЕЗ ПСЕВДОЭЛЕМЕНТ
- * Дублирует текст, переворачивает, затемняет книзу.
- * Пульсирует с периодом 5 секунд.
- */
 .footer-text::after {
 	content: attr(data-text);
 	position: absolute;
@@ -1075,23 +976,11 @@ body::after {
 	text-align: center;
 	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	pointer-events: none;
-
-	/*
-     * Маска для затухания книзу
-     */
 	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
 	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
-
-	/*
-     * АНИМАЦИЯ ПУЛЬСАЦИИ ОТРАЖЕНИЯ
-     * Чуть медленнее чем у заголовка — 5 секунд
-     */
 	animation: footerReflectionPulse 5s ease-in-out infinite;
 }
 
-/*
- * АНИМАЦИЯ ПУЛЬСАЦИИ
- */
 @keyframes footerReflectionPulse {
 
 	0%,
@@ -1107,13 +996,10 @@ body::after {
 /* ============================================================
    12. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
    Все @media собраны здесь.
-   Каждый брейкпоинт масштабирует сетку, текст, кнопки и отступы.
-   Особое внимание: шапка, заголовок, кнопки на мобильных.
    ============================================================ */
 
 /*
  * МОБИЛЬНЫЕ (< 481px)
- * 2 колонки, шапка в 2 строки, кнопки без фикс. ширины.
  */
 @media (width < 481px) {
 	:root {
@@ -1122,24 +1008,14 @@ body::after {
 		--grid-padding: 8px;
 	}
 
-	/*
-     * ШАПКА — компактная
-     */
 	.gallery-header {
 		padding: 8px 10px;
 	}
 
-	/*
-     * ВНУТРЕННИЙ КОНТЕЙНЕР ШАПКИ
-     * На мобильных — кнопка и счётчик меньше, заголовок по центру.
-     */
 	.header-inner {
 		gap: 8px;
 	}
 
-	/*
-     * КНОПКА «НАЗАД» — без фиксированной ширины
-     */
 	.back-btn {
 		width: auto;
 		min-width: 0;
@@ -1148,25 +1024,16 @@ body::after {
 		gap: 4px;
 	}
 
-	/*
-     * ТЕКСТ «Обложка» на кнопке назад — скрываем, оставляем только стрелку
-     */
 	.back-btn span:not(.back-arrow):not(.btn-line) {
 		display: none;
 	}
 
-	/*
-     * СЧЁТЧИК ФОТО — без фиксированной ширины
-     */
 	.photo-counter {
 		width: auto;
 		min-width: 0;
 		font-size: 10px;
 	}
 
-	/*
-     * ЗАГОЛОВОК
-     */
 	.section-title {
 		font-size: 20px;
 	}
@@ -1175,9 +1042,6 @@ body::after {
 		padding-bottom: 8px;
 	}
 
-	/*
-     * НИЖНИЕ КНОПКИ
-     */
 	.animated-btn {
 		min-width: 0;
 		width: 100%;
@@ -1212,9 +1076,6 @@ body::after {
 		padding: 16px 12px 12px;
 	}
 
-	/*
-     * РАЗДЕЛИТЕЛЬ ШАПКИ — меньше на мобильных
-     */
 	.gallery-header::after {
 		width: 120px;
 		max-width: 50%;
@@ -1249,7 +1110,6 @@ body::after {
 
 /*
  * МОБИЛЬНЫЕ L (481px – 576px)
- * 2 колонки, кнопка назад с текстом.
  */
 @media (481px <=width < 577px) {
 	:root {
@@ -1291,7 +1151,6 @@ body::after {
 
 /*
  * БОЛЬШИЕ МОБИЛЬНЫЕ (577px – 768px)
- * 2 колонки, возвращаем фиксированную ширину.
  */
 @media (577px <=width < 769px) {
 	:root {
@@ -1323,7 +1182,6 @@ body::after {
 
 /*
  * ПЛАНШЕТЫ (769px – 992px)
- * 3 колонки.
  */
 @media (769px <=width < 993px) {
 	:root {
@@ -1355,7 +1213,6 @@ body::after {
 
 /*
  * ДЕСКТОП (993px – 1200px)
- * 3 колонки.
  */
 @media (993px <=width < 1201px) {
 	:root {
@@ -1387,7 +1244,6 @@ body::after {
 
 /*
  * БОЛЬШОЙ ДЕСКТОП (1201px – 1440px)
- * 4 колонки.
  */
 @media (1201px <=width < 1441px) {
 	:root {
@@ -1411,7 +1267,6 @@ body::after {
 
 /*
  * ОЧЕНЬ БОЛЬШОЙ ДЕСКТОП (1441px – 1920px)
- * 4 колонки.
  */
 @media (1441px <=width < 1921px) {
 	:root {
@@ -1435,7 +1290,6 @@ body::after {
 
 /*
  * УЛЬТРАШИРОКИЕ (≥ 1921px)
- * 4 колонки, крупнее.
  */
 @media (width >=1921px) {
 	:root {
