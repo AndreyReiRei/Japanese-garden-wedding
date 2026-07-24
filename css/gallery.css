@@ -181,7 +181,7 @@
 
 	/* Фон */
 	--bg-filter-color: rgba(200, 40, 40, 0.22);
-	--bg-image: url('../photos/zags/bg-zags.jpg.jpg');
+	--bg-image: url('../photos/zags/bg-zags.jpg');
 }
 
 /*
@@ -207,14 +207,15 @@
 
 	/* Фон */
 	--bg-filter-color: rgba(180, 130, 50, 0.20);
-	--bg-image: url('../photos/home/bg-home.jpg.jpg');
+	--bg-image: url('../photos/home/bg-home.jpg');
 }
 
 /* ============================================================
    3. БАЗОВЫЕ СТИЛИ
    Фоновое изображение задаётся прямо на body.
    Это гарантирует что фото видно всегда, на всей странице.
-   На мобильных background-attachment: scroll (fixed не работает).
+   Параллакс отключён — фон скроллится вместе с контентом,
+   чтобы избежать рывков на мобильных устройствах.
    ============================================================ */
 
 html,
@@ -232,26 +233,13 @@ body {
      * ФОНОВОЕ ИЗОБРАЖЕНИЕ
      * Задано прямо на body через CSS-переменную --bg-image.
      * background-size: cover — заполняет весь экран.
-     * background-attachment: scroll — плавный скролл на мобильных.
+     * background-attachment не задан — фон скроллится естественно.
+     * Никакого параллакса, никаких рывков на мобильных.
      */
 	background-image: var(--bg-image);
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	background-attachment: scroll;
-	/* ← Было fixed — дёргалось */
-}
-
-/*
- * На десктопе — возвращаем fixed для параллакс-эффекта.
- * @media (hover: hover) — только для устройств с мышью.
- */
-@media (hover: hover) {
-
-	html,
-	body {
-		background-attachment: fixed;
-	}
 }
 
 /* ============================================================
