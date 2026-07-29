@@ -8,9 +8,9 @@
  * ИСПОЛЬЗОВАНИЕ:
  *   initScroll( {
  *       stories: {
- *           garden: { title: '...', text: '...' },
- *           zags:   { title: '...', text: '...' },
- *           home:   { title: '...', text: '...' }
+ *           garden: { title: '...' },
+ *           zags:   { title: '...' },
+ *           home:   { title: '...' }
  *       },
  *       section: 'garden'
  *   } );
@@ -18,6 +18,11 @@
  * ЗАВИСИМОСТИ:
  *   - effects.js (для светлячков: startOverlayFireflies / stopOverlayFireflies)
  *   - scroll.css
+ * 
+ * ПРИМЕЧАНИЕ:
+ *   Текст истории теперь хранится прямо в HTML внутри .scroll-text.
+ *   JS заполняет только заголовок (.scroll-title).
+ *   Это разделяет контент и логику.
  * ============================================================
  */
 
@@ -56,15 +61,17 @@ function initScroll( config ) {
 
 	// Элементы внутри развёрнутого свитка
 	const titleEl = scrollBlock.querySelector( '.scroll-title' );
-	const textEl = scrollBlock.querySelector( '.scroll-text' );
 	const paperEl = scrollBlock.querySelector( '.scroll-paper' );
 
 	// ============================================================
 	// 3. ЗАПОЛНЕНИЕ КОНТЕНТА
+	// Заполняем ТОЛЬКО заголовок.
+	// Текст уже находится в HTML внутри .scroll-text.
 	// ============================================================
 
-	if ( titleEl ) titleEl.textContent = story.title;
-	if ( textEl ) textEl.textContent = story.text;
+	if ( titleEl ) {
+		titleEl.textContent = story.title;
+	}
 
 	// ============================================================
 	// 4. ХРАНИЛИЩЕ ДЛЯ КОНТРОЛЛЕРА СВЕТЛЯЧКОВ
