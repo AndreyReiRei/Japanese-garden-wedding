@@ -43,7 +43,7 @@
 				<h1 class="section-title" data-text="Японский сад">Японский сад</h1>
 			</div>
 
-			<span class="photo-counter" id="photoCounter"></span>
+			<span class="photo-counter"></span>
 		</div>
 	</header>
 
@@ -53,11 +53,24 @@
 		<div class="scroll-trigger" id="scrollTrigger">
 			<div class="scroll-trigger-inner">
 				<span class="scroll-trigger-text">История этого дня</span>
+				<svg class="scroll-trigger-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="6 9 12 15 18 9"></polyline>
+				</svg>
 			</div>
 		</div>
 
 		<div class="scroll-expanded" id="scrollExpanded">
 			<div class="scroll-paper">
+
+				<!-- Кнопка закрытия -->
+				<button class="scroll-close-btn" id="scrollCloseBtnTop" aria-label="Закрыть">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+						stroke-linecap="round">
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
+				</button>
 
 				<div class="scroll-seal-top">
 					<svg width="36" height="36" viewBox="0 0 36 36" fill="none">
@@ -228,10 +241,65 @@
 
 	</div>
 
-	<!-- Галерея -->
-	<main class="gallery-container">
-		<div class="gallery-grid" id="galleryGrid"></div>
-	</main>
+	<!-- ========================================== -->
+	<!-- БЛОК 1: «А и Т»                            -->
+	<!-- ========================================== -->
+	<section class="gallery-section" data-theme="garden">
+		<header class="gallery-header">
+			<div class="header-inner">
+				<div class="title-block" style="flex: 1; text-align: center;">
+					<h2 class="section-title" data-text="А и Т">А & Т</h2>
+				</div>
+				<!-- <span class="photo-counter" id="photoCounterA">0 фото</span> -->
+			</div>
+		</header>
+
+		<div class="gallery-container">
+			<div class="gallery-grid" id="galleryGridA"></div>
+
+			<!-- Кнопка "Показать все" для блока «А и Т» -->
+			<div class="gallery-load-more-wrapper">
+				<button class="animated-btn gallery-load-more" data-target="galleryGridA" style="display:none;">
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="bottom-nav-content">
+						<span class="bottom-nav-label">Галерея</span>
+						<span class="bottom-nav-title">Показать все фото</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	</section>
+
+	<!-- ========================================== -->
+	<!-- БЛОК 2: «За кадром»                        -->
+	<!-- ========================================== -->
+	<section class="gallery-section" data-theme="zags">
+		<header class="gallery-header">
+			<div class="header-inner">
+				<div class="title-block" style="flex: 1; text-align: center;">
+					<h2 class="section-title" data-text="За кадром">За кадром</h2>
+				</div>
+				<!-- <span class="photo-counter" id="photoCounterB">0 фото</span> -->
+			</div>
+		</header>
+
+		<div class="gallery-container">
+			<div class="gallery-grid" id="galleryGridB"></div>
+
+			<!-- Кнопка "Показать все" для блока «За кадром» -->
+			<div class="gallery-load-more-wrapper">
+				<button class="animated-btn gallery-load-more" data-target="galleryGridB" style="display:none;">
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="bottom-nav-content">
+						<span class="bottom-nav-label">Галерея</span>
+						<span class="bottom-nav-title">Показать все фото</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	</section>
 
 	<!-- Нижняя навигация -->
 	<nav class="section-bottom-nav">
@@ -301,22 +369,225 @@
 			section: 'garden'
 		} );
 
-		// Инициализация галереи
+		// ==========================================
+		// 1. Блок «А и Т»
+		// ==========================================
 		initGallery( {
 			section: 'garden',
+			gridId: 'galleryGridA',
+			counterId: 'photoCounterA',
+			initialCount: 15, // Показываем первые 15 фото
 			photos: [
-				{ src: '../photos/garden/01.jpeg', alt: 'Вход в сад' },
-				{ src: '../photos/garden/02.jpeg', alt: 'Каменная дорожка' },
-				{ src: '../photos/garden/03.jpg', alt: 'Мостик' },
-				{ src: '../photos/garden/04.jpeg', alt: 'Пара у пруда' },
-				{ src: '../photos/garden/05.jpeg', alt: 'Детали' },
-				{ src: '../photos/garden/06.jpg', alt: 'Ветка сакуры' },
-				{ src: '../photos/garden/07.jpeg', alt: 'Камни' },
-				{ src: '../photos/garden/08.jpg', alt: 'Фонарь' },
-				{ src: '../photos/garden/09.jpg', alt: 'Общий план' },
-				{ src: '../photos/garden/10.jpeg', alt: 'Портрет' },
-				{ src: '../photos/garden/11.jpeg', alt: 'Руки' },
-				{ src: '../photos/garden/12.jpeg', alt: 'Уход' },
+				{ src: '../photos/garden/1.jpg', alt: 'Фото 1' },
+				{ src: '../photos/garden/1-2.jpg', alt: 'Фото 1-2' },
+				{ src: '../photos/garden/1-3.jpg', alt: 'Фото 1-3' },
+				{ src: '../photos/garden/1-6.jpg', alt: 'Фото 1-6' },
+				{ src: '../photos/garden/1-7.jpg', alt: 'Фото 1-7' },
+				{ src: '../photos/garden/1-23.jpg', alt: 'Фото 1-23' },
+				{ src: '../photos/garden/1-25.jpg', alt: 'Фото 1-25' },
+				{ src: '../photos/garden/1-29.jpg', alt: 'Фото 1-29' },
+				{ src: '../photos/garden/1-32.jpg', alt: 'Фото 1-32' },
+				{ src: '../photos/garden/1-33.jpg', alt: 'Фото 1-33' },
+				{ src: '../photos/garden/1-34.jpg', alt: 'Фото 1-34' },
+				{ src: '../photos/garden/1-37.jpg', alt: 'Фото 1-37' },
+				{ src: '../photos/garden/1-38.jpg', alt: 'Фото 1-38' },
+				{ src: '../photos/garden/1-44.jpg', alt: 'Фото 1-44' },
+				{ src: '../photos/garden/1-45.jpg', alt: 'Фото 1-45' },
+				{ src: '../photos/garden/1-51.jpg', alt: 'Фото 1-51' },
+				{ src: '../photos/garden/1-52.jpg', alt: 'Фото 1-52' },
+				{ src: '../photos/garden/1-53.jpg', alt: 'Фото 1-53' },
+				{ src: '../photos/garden/1-58.jpg', alt: 'Фото 1-58' },
+				{ src: '../photos/garden/1-65.jpg', alt: 'Фото 1-65' },
+				{ src: '../photos/garden/1-69.jpg', alt: 'Фото 1-69' },
+				{ src: '../photos/garden/1-70.jpg', alt: 'Фото 1-70' },
+				{ src: '../photos/garden/1-72.jpg', alt: 'Фото 1-72' },
+				{ src: '../photos/garden/1-79.jpg', alt: 'Фото 1-79' },
+				{ src: '../photos/garden/1-84.jpg', alt: 'Фото 1-84' },
+				{ src: '../photos/garden/1-85.jpg', alt: 'Фото 1-85' },
+				{ src: '../photos/garden/1-87.jpg', alt: 'Фото 1-87' },
+				{ src: '../photos/garden/1-89.jpg', alt: 'Фото 1-89' },
+				{ src: '../photos/garden/1-94.jpg', alt: 'Фото 1-94' },
+				{ src: '../photos/garden/1-95.jpg', alt: 'Фото 1-95' },
+				{ src: '../photos/garden/1-96.jpg', alt: 'Фото 1-96' },
+				{ src: '../photos/garden/1-98.jpg', alt: 'Фото 1-98' },
+				{ src: '../photos/garden/1-99.jpg', alt: 'Фото 1-99' },
+				{ src: '../photos/garden/1-106.jpg', alt: 'Фото 1-106' },
+				{ src: '../photos/garden/1-107.jpg', alt: 'Фото 1-107' },
+				{ src: '../photos/garden/1-109.jpg', alt: 'Фото 1-109' },
+				{ src: '../photos/garden/1-110.jpg', alt: 'Фото 1-110' },
+				{ src: '../photos/garden/1-112.jpg', alt: 'Фото 1-112' },
+				{ src: '../photos/garden/1-120.jpg', alt: 'Фото 1-120' },
+				{ src: '../photos/garden/1-121.jpg', alt: 'Фото 1-121' },
+				{ src: '../photos/garden/1-122.jpg', alt: 'Фото 1-122' },
+				{ src: '../photos/garden/1-127.jpg', alt: 'Фото 1-127' },
+				{ src: '../photos/garden/1-128.jpg', alt: 'Фото 1-128' },
+				{ src: '../photos/garden/1-135.jpg', alt: 'Фото 1-135' },
+				{ src: '../photos/garden/1-140 (1).jpg', alt: 'Фото 1-140 (1)' },
+				{ src: '../photos/garden/1-141.jpg', alt: 'Фото 1-141' },
+				{ src: '../photos/garden/1-142 (2).jpg', alt: 'Фото 1-142 (2)' },
+				{ src: '../photos/garden/1-149.jpg', alt: 'Фото 1-149' },
+				{ src: '../photos/garden/1-154.jpg', alt: 'Фото 1-154' },
+				{ src: '../photos/garden/1-161.jpg', alt: 'Фото 1-161' },
+				{ src: '../photos/garden/1-164.jpg', alt: 'Фото 1-164' },
+				{ src: '../photos/garden/1-170.jpg', alt: 'Фото 1-170' },
+				{ src: '../photos/garden/1-176.jpg', alt: 'Фото 1-176' },
+				{ src: '../photos/garden/1-179.jpg', alt: 'Фото 1-179' },
+				{ src: '../photos/garden/1-180.jpg', alt: 'Фото 1-180' },
+				{ src: '../photos/garden/1-181.jpg', alt: 'Фото 1-181' },
+				{ src: '../photos/garden/1-182 (2).jpg', alt: 'Фото 1-182 (2)' },
+				{ src: '../photos/garden/1-183.jpg', alt: 'Фото 1-183' },
+				{ src: '../photos/garden/1-188.jpg', alt: 'Фото 1-188' },
+				{ src: '../photos/garden/1-189.jpg', alt: 'Фото 1-189' },
+				{ src: '../photos/garden/1-192.jpg', alt: 'Фото 1-192' },
+				{ src: '../photos/garden/1-193.jpg', alt: 'Фото 1-193' },
+				{ src: '../photos/garden/1-202.jpg', alt: 'Фото 1-202' },
+				{ src: '../photos/garden/1-206.jpg', alt: 'Фото 1-206' },
+				{ src: '../photos/garden/1-207.jpg', alt: 'Фото 1-207' },
+				{ src: '../photos/garden/1-209.jpg', alt: 'Фото 1-209' },
+				{ src: '../photos/garden/1-213.jpg', alt: 'Фото 1-213' },
+				{ src: '../photos/garden/1-215.jpg', alt: 'Фото 1-215' },
+				{ src: '../photos/garden/1-219.jpg', alt: 'Фото 1-219' },
+				{ src: '../photos/garden/1-220.jpg', alt: 'Фото 1-220' },
+				{ src: '../photos/garden/1-224.jpg', alt: 'Фото 1-224' },
+				{ src: '../photos/garden/1-230.jpg', alt: 'Фото 1-230' },
+				{ src: '../photos/garden/1-231.jpg', alt: 'Фото 1-231' },
+				{ src: '../photos/garden/1-235.jpg', alt: 'Фото 1-235' },
+				{ src: '../photos/garden/1-236.jpg', alt: 'Фото 1-236' },
+				{ src: '../photos/garden/1-237.jpg', alt: 'Фото 1-237' },
+				{ src: '../photos/garden/1-238.jpg', alt: 'Фото 1-238' },
+				{ src: '../photos/garden/1-239 (2).jpg', alt: 'Фото 1-239 (2)' },
+				{ src: '../photos/garden/1-242.jpg', alt: 'Фото 1-242' },
+				{ src: '../photos/garden/1-260.jpg', alt: 'Фото 1-260' },
+				{ src: '../photos/garden/1-266.jpg', alt: 'Фото 1-266' },
+				{ src: '../photos/garden/1-267.jpg', alt: 'Фото 1-267' },
+				{ src: '../photos/garden/1-269.jpg', alt: 'Фото 1-269' },
+				{ src: '../photos/garden/1-274.jpg', alt: 'Фото 1-274' },
+				{ src: '../photos/garden/1-275.jpg', alt: 'Фото 1-275' },
+				{ src: '../photos/garden/1-276 (3).jpg', alt: 'Фото 1-276 (3)' },
+				{ src: '../photos/garden/1-277.jpg', alt: 'Фото 1-277' },
+				{ src: '../photos/garden/1-278.jpg', alt: 'Фото 1-278' },
+				{ src: '../photos/garden/1-279.jpg', alt: 'Фото 1-279' },
+				{ src: '../photos/garden/1-285.jpg', alt: 'Фото 1-285' },
+				{ src: '../photos/garden/1-287.jpg', alt: 'Фото 1-287' },
+				{ src: '../photos/garden/1-294.jpg', alt: 'Фото 1-294' },
+				{ src: '../photos/garden/1-297.jpg', alt: 'Фото 1-297' },
+				{ src: '../photos/garden/1-305.jpg', alt: 'Фото 1-305' },
+				{ src: '../photos/garden/1-306.jpg', alt: 'Фото 1-306' },
+				{ src: '../photos/garden/1-312.jpg', alt: 'Фото 1-312' },
+				{ src: '../photos/garden/1-315.jpg', alt: 'Фото 1-315' },
+				{ src: '../photos/garden/1-320.jpg', alt: 'Фото 1-320' },
+				{ src: '../photos/garden/1-326.jpg', alt: 'Фото 1-326' },
+				{ src: '../photos/garden/1-337.jpg', alt: 'Фото 1-337' },
+				{ src: '../photos/garden/1-343.jpg', alt: 'Фото 1-343' },
+				{ src: '../photos/garden/1-344.jpg', alt: 'Фото 1-344' },
+				{ src: '../photos/garden/1-345.jpg', alt: 'Фото 1-345' },
+				{ src: '../photos/garden/1-350.jpg', alt: 'Фото 1-350' },
+				{ src: '../photos/garden/1-352.jpg', alt: 'Фото 1-352' },
+				{ src: '../photos/garden/1-353.jpg', alt: 'Фото 1-353' },
+				{ src: '../photos/garden/1-357.jpg', alt: 'Фото 1-357' },
+				{ src: '../photos/garden/1-360.jpg', alt: 'Фото 1-360' },
+				{ src: '../photos/garden/1-365.jpg', alt: 'Фото 1-365' },
+				{ src: '../photos/garden/1-370.jpg', alt: 'Фото 1-370' },
+				{ src: '../photos/garden/1-372.jpg', alt: 'Фото 1-372' },
+				{ src: '../photos/garden/1-373.jpg', alt: 'Фото 1-373' },
+				{ src: '../photos/garden/1-374.jpg', alt: 'Фото 1-374' },
+				{ src: '../photos/garden/1-377.jpg', alt: 'Фото 1-377' },
+				{ src: '../photos/garden/1-378.jpg', alt: 'Фото 1-378' },
+				{ src: '../photos/garden/1-381.jpg', alt: 'Фото 1-381' },
+				{ src: '../photos/garden/1-382.jpg', alt: 'Фото 1-382' },
+				{ src: '../photos/garden/1-387.jpg', alt: 'Фото 1-387' },
+				{ src: '../photos/garden/1-389.jpg', alt: 'Фото 1-389' },
+				{ src: '../photos/garden/1-390.jpg', alt: 'Фото 1-390' },
+				{ src: '../photos/garden/1-394.jpg', alt: 'Фото 1-394' },
+				{ src: '../photos/garden/1-401 (3).jpg', alt: 'Фото 1-401 (3)' },
+				{ src: '../photos/garden/1-401 (4).jpg', alt: 'Фото 1-401 (4)' },
+				{ src: '../photos/garden/1-402.jpg', alt: 'Фото 1-402' },
+				{ src: '../photos/garden/1-414.jpg', alt: 'Фото 1-414' },
+				{ src: '../photos/garden/1-422.jpg', alt: 'Фото 1-422' },
+				{ src: '../photos/garden/1-436.jpg', alt: 'Фото 1-436' },
+				{ src: '../photos/garden/1-440.jpg', alt: 'Фото 1-440' },
+				{ src: '../photos/garden/1-442.jpg', alt: 'Фото 1-442' },
+				{ src: '../photos/garden/1-462.jpg', alt: 'Фото 1-462' },
+				{ src: '../photos/garden/1-464.jpg', alt: 'Фото 1-464' },
+				{ src: '../photos/garden/1-465.jpg', alt: 'Фото 1-465' },
+				{ src: '../photos/garden/1-468.jpg', alt: 'Фото 1-468' },
+				{ src: '../photos/garden/1-474.jpg', alt: 'Фото 1-474' },
+				{ src: '../photos/garden/1-480.jpg', alt: 'Фото 1-480' },
+				{ src: '../photos/garden/1-484.jpg', alt: 'Фото 1-484' },
+				{ src: '../photos/garden/1-490.jpg', alt: 'Фото 1-490' },
+				{ src: '../photos/garden/1-498.jpg', alt: 'Фото 1-498' },
+				{ src: '../photos/garden/1-501.jpg', alt: 'Фото 1-501' },
+				{ src: '../photos/garden/1-502.jpg', alt: 'Фото 1-502' },
+				{ src: '../photos/garden/1-512.jpg', alt: 'Фото 1-512' },
+				{ src: '../photos/garden/1-513.jpg', alt: 'Фото 1-513' },
+				{ src: '../photos/garden/1-514.jpg', alt: 'Фото 1-514' },
+				{ src: '../photos/garden/1-523 (2).jpg', alt: 'Фото 1-523 (2)' },
+				{ src: '../photos/garden/1-523 (3).jpg', alt: 'Фото 1-523 (3)' },
+				{ src: '../photos/garden/1-526.jpg', alt: 'Фото 1-526' },
+				{ src: '../photos/garden/1-527.jpg', alt: 'Фото 1-527' },
+				{ src: '../photos/garden/1-532.jpg', alt: 'Фото 1-532' },
+				{ src: '../photos/garden/1-534.jpg', alt: 'Фото 1-534' },
+				{ src: '../photos/garden/1-535.jpg', alt: 'Фото 1-535' },
+				{ src: '../photos/garden/1-550.jpg', alt: 'Фото 1-550' },
+				{ src: '../photos/garden/1-553.jpg', alt: 'Фото 1-553' },
+				{ src: '../photos/garden/1-556.jpg', alt: 'Фото 1-556' },
+				{ src: '../photos/garden/1-557.jpg', alt: 'Фото 1-557' },
+				{ src: '../photos/garden/1-561.jpg', alt: 'Фото 1-561' },
+				{ src: '../photos/garden/1-562.jpg', alt: 'Фото 1-562' },
+				{ src: '../photos/garden/1-570.jpg', alt: 'Фото 1-570' },
+				{ src: '../photos/garden/1-572.jpg', alt: 'Фото 1-572' },
+				{ src: '../photos/garden/1-573.jpg', alt: 'Фото 1-573' },
+				{ src: '../photos/garden/1-580.jpg', alt: 'Фото 1-580' },
+				{ src: '../photos/garden/1-598.jpg', alt: 'Фото 1-598' },
+				{ src: '../photos/garden/1-601.jpg', alt: 'Фото 1-601' },
+				{ src: '../photos/garden/1-603.jpg', alt: 'Фото 1-603' },
+				{ src: '../photos/garden/1-604.jpg', alt: 'Фото 1-604' },
+				{ src: '../photos/garden/1-605.jpg', alt: 'Фото 1-605' },
+				{ src: '../photos/garden/1-606.jpg', alt: 'Фото 1-606' },
+				{ src: '../photos/garden/1-610.jpg', alt: 'Фото 1-610' },
+				{ src: '../photos/garden/1-611.jpg', alt: 'Фото 1-611' },
+				{ src: '../photos/garden/1-622.jpg', alt: 'Фото 1-622' },
+				{ src: '../photos/garden/1-623.jpg', alt: 'Фото 1-623' },
+				{ src: '../photos/garden/1-624.jpg', alt: 'Фото 1-624' },
+				{ src: '../photos/garden/1-627.jpg', alt: 'Фото 1-627' },
+				{ src: '../photos/garden/1-634.jpg', alt: 'Фото 1-634' },
+				{ src: '../photos/garden/1-636.jpg', alt: 'Фото 1-636' },
+				{ src: '../photos/garden/1-640.jpg', alt: 'Фото 1-640' },
+				{ src: '../photos/garden/1-641.jpg', alt: 'Фото 1-641' },
+				{ src: '../photos/garden/1-653.jpg', alt: 'Фото 1-653' },
+				{ src: '../photos/garden/1-658.jpg', alt: 'Фото 1-658' },
+				{ src: '../photos/garden/IMG_0267.jpg', alt: 'Фото IMG_0267' }
+			]
+		} );
+
+		// ==========================================
+		// 2. Блок «За кадром»
+		// ==========================================
+		initGallery( {
+			section: 'zags', // Тема для второго блока (киноварь)
+			gridId: 'galleryGridB',
+			counterId: 'photoCounterB',
+			initialCount: 15, // Показываем первые 15 фото (на будущее, когда их будет много)
+			photos: [
+				{ src: '../photos/garden-dop/100.jpg', alt: 'За кадром 100' },
+				{ src: '../photos/garden-dop/101.jpg', alt: 'За кадром 101' },
+				{ src: '../photos/garden-dop/102.jpg', alt: 'За кадром 102' },
+				{ src: '../photos/garden-dop/103.jpg', alt: 'За кадром 103' },
+				{ src: '../photos/garden-dop/104.jpg', alt: 'За кадром 104' },
+				{ src: '../photos/garden-dop/105.jpg', alt: 'За кадром 105' },
+				{ src: '../photos/garden-dop/106.jpg', alt: 'За кадром 106' },
+				{ src: '../photos/garden-dop/107.jpg', alt: 'За кадром 107' },
+				{ src: '../photos/garden-dop/108.jpg', alt: 'За кадром 108' },
+				{ src: '../photos/garden-dop/109.jpg', alt: 'За кадром 109' },
+				{ src: '../photos/garden-dop/110.jpg', alt: 'За кадром 110' },
+				{ src: '../photos/garden-dop/200.jpg', alt: 'За кадром 200' },
+				{ src: '../photos/garden-dop/201.jpg', alt: 'За кадром 201' },
+				{ src: '../photos/garden-dop/202.jpg', alt: 'За кадром 202' },
+				{ src: '../photos/garden-dop/203.jpg', alt: 'За кадром 203' },
+				{ src: '../photos/garden-dop/204.jpg', alt: 'За кадром 204' },
+				{ src: '../photos/garden-dop/205.jpg', alt: 'За кадром 205' },
+				{ src: '../photos/garden-dop/206.jpg', alt: 'За кадром 206' },
+				{ src: '../photos/garden-dop/207.jpg', alt: 'За кадром 207' }
 			]
 		} );
 	</script>

@@ -6,12 +6,16 @@
  * НАЗНАЧЕНИЕ:
  *   Строит адаптивную сетку фотографий.
  *   При клике на фото — открывает полноэкранный слайдер (slider.js).
+ *   Поддерживает ленивую подгрузку (кнопка "Показать все").
  * 
  * ИСПОЛЬЗОВАНИЕ:
  *   initGallery({
- *       section: 'garden',           // Идентификатор раздела
+ *       section: 'garden',           // Идентификатор раздела (для темы слайдера)
+ *       gridId: 'galleryGridA',      // ID контейнера сетки (по умолчанию 'galleryGrid')
+ *       counterId: 'photoCounterA',  // ID счетчика (по умолчанию 'photoCounter')
+ *       initialCount: 15,            // Сколько фото показать сразу (0 = все)
  *       photos: [                    // Массив фото
- *           { src: '...', alt: '...', span: '2-rows' },
+ *           { src: '...', alt: '...' },
  *           ...
  *       ]
  *   });
@@ -31,12 +35,15 @@ function initGallery( config ) {
 
 	const {
 		section,        // 'garden' | 'zags' | 'home'
-		photos          // Массив объектов фото
+		photos,         // Массив объектов фото
+		gridId = 'galleryGrid',       // ID сетки
+		counterId = 'photoCounter',   // ID счетчика
+		initialCount = 15             // Сколько показывать сразу
 	} = config;
 
 	// Защита: если нет секции или фото — выходим
 	if ( !section || !photos || !photos.length ) {
-		console.error( 'initGallery: не указан section или photos' );
+		console.error( `initGallery [${section || 'unknown'}]: не указан section или photos` );
 		return;
 	}
 
@@ -44,23 +51,28 @@ function initGallery( config ) {
 	// 2. ПОЛУЧЕНИЕ DOM-ЭЛЕМЕНТОВ
 	// ============================================================
 
-	const galleryGrid = document.getElementById( 'galleryGrid' );
-	const photoCounter = document.getElementById( 'photoCounter' );
+	const galleryGrid = document.getElementById( gridId );
+	const photoCounter = document.getElementById( counterId );
 
 	// Если сетки нет на странице — выходим
 	if ( !galleryGrid ) {
-		console.error( 'initGallery: не найден #galleryGrid' );
+		console.error( `initGallery: не найден #${gridId}` );
 		return;
 	}
+
+	// Вычисляем, сколько фото показать сразу и сколько останется
+	const showAll = initialCount <= 0 || initialCount >= photos.length;
+	const visiblePhotos = showAll ? photos : photos.slice( 0, initialCount );
+	const hiddenPhotos = showAll ? [] : photos.slice( initialCount );
+	const hiddenCount = hiddenPhotos.length;
+
+	// Флаг, чтобы не запускать повторную отрисовку
+	let isRenderedAll = showAll;
 
 	// ============================================================
 	// 3. УТИЛИТА: ОБНОВЛЕНИЕ СЧЁТЧИКА ФОТО
 	// ============================================================
 
-	/**
-	 * Записывает в шапку количество фото.
-	 * Пример: «12 фото»
-	 */
 	function updateCounter() {
 		if ( photoCounter ) {
 			photoCounter.textContent = `${photos.length} фото`;
@@ -71,42 +83,27 @@ function initGallery( config ) {
 	// 4. ФАБРИКА: СОЗДАНИЕ ОДНОГО ЭЛЕМЕНТА СЕТКИ
 	// ============================================================
 
-	/**
-	 * Создаёт DOM-элемент для одного фото.
-	 * 
-	 * @param {Object} photo - Объект фото
-	 * @param {string} photo.src - Путь к изображению
-	 * @param {string} [photo.alt] - Подпись (опционально)
-	 * @param {string} [photo.span] - Размер в сетке:
-	 *        ''         — обычный (1×1)
-	 *        '2-rows'   — двойная высота
-	 *        '2-cols'   — двойная ширина
-	 *        '2-both'   — двойной в обе стороны
-	 * @param {number} index - Индекс фото в массиве
-	 * @returns {HTMLElement} Готовый элемент галереи
-	 */
 	function createPhotoItem( photo, index ) {
 		// --- Контейнер ---
 		const item = document.createElement( 'div' );
 		item.className = 'gallery-item';
 
-		// Добавляем класс размера, если указан
 		if ( photo.span ) {
 			item.classList.add( `span-${photo.span}` );
 		}
 
-		// Задержка анимации: каждое следующее фото появляется чуть позже
-		// Это создаёт красивый каскадный эффект при загрузке
-		item.style.transitionDelay = `${index * 0.06}s`;
+		// Задержка анимации (каскадный эффект).
+		// Ограничиваем задержку для больших списков, чтобы не ждать долго.
+		item.style.transitionDelay = `${( index % 15 ) * 0.04}s`;
 
 		// --- Изображение ---
 		const img = document.createElement( 'img' );
 		img.src = photo.src;
 		img.alt = photo.alt || '';
-		img.loading = 'lazy';        // Ленивая загрузка для производительности
-		img.decoding = 'async';      // Асинхронный декодинг — не блокирует рендер
+		img.loading = 'lazy';
+		img.decoding = 'async';
 
-		// Если фото не загрузилось — показываем заглушку
+		// Заглушка, если фото не загрузилось
 		img.onerror = function () {
 			this.src = 'data:image/svg+xml,' +
 				'%3Csvg xmlns=\'http://www.w3.org/2000/svg\' ' +
@@ -119,7 +116,7 @@ function initGallery( config ) {
 
 		item.appendChild( img );
 
-		// --- Подпись (появляется при тапе на мобильных) ---
+		// --- Подпись ---
 		if ( photo.alt ) {
 			const caption = document.createElement( 'div' );
 			caption.className = 'gallery-caption';
@@ -127,12 +124,11 @@ function initGallery( config ) {
 			item.appendChild( caption );
 		}
 
-		// --- Обработчик клика: открытие слайдера ---
+		// --- Клик: открытие слайдера ---
 		item.addEventListener( 'click', () => {
-			// Вызывает функцию из slider.js
 			if ( typeof openSlider === 'function' ) {
 				openSlider( {
-					photos: photos,           // Все фото раздела
+					photos: photos,           // Передаем ВСЕ фото (чтобы листать)
 					startIndex: index,        // С какого начать
 					theme: section            // Тема для цветов
 				} );
@@ -148,38 +144,179 @@ function initGallery( config ) {
 	// 5. ПОСТРОЕНИЕ ВСЕЙ СЕТКИ
 	// ============================================================
 
+	// Храним обработчики на самом элементе сетки, чтобы не было утечек памяти
+	if ( galleryGrid._resizeHandler ) {
+		window.removeEventListener( 'resize', galleryGrid._resizeHandler );
+	}
+	if ( galleryGrid._resizeTimer ) {
+		clearTimeout( galleryGrid._resizeTimer );
+	}
+
 	/**
-	 * Очищает контейнер и наполняет его элементами фото.
-	 * После вставки запускает анимацию появления.
+	 * Вычисляет, сколько строк (высотой 1px + gap) занимает элемент.
 	 */
-	function buildGrid() {
-		// Очищаем сетку (на случай повторного вызова)
-		galleryGrid.innerHTML = '';
+	function setItemSpan( item ) {
+		if ( !item || !item.isConnected ) return;
 
-		// Создаём все элементы
-		photos.forEach( ( photo, index ) => {
-			galleryGrid.appendChild( createPhotoItem( photo, index ) );
-		} );
+		const img = item.querySelector( 'img' );
+		if ( !img ) return;
 
-		// Обновляем счётчик
-		updateCounter();
+		if ( !img.complete || img.naturalWidth === 0 || img.naturalHeight === 0 ) {
+			return;
+		}
 
-		// Запускаем анимацию появления
-		// requestAnimationFrame даёт браузеру отрисовать элементы
-		// перед добавлением класса .visible
-		requestAnimationFrame( () => {
-			const items = galleryGrid.querySelectorAll( '.gallery-item' );
-			items.forEach( item => item.classList.add( 'visible' ) );
+		const itemWidth = item.getBoundingClientRect().width;
+		if ( itemWidth === 0 ) return;
+
+		const imgHeight = ( img.naturalHeight / img.naturalWidth ) * itemWidth;
+
+		const gridStyle = getComputedStyle( galleryGrid );
+		const gap = parseFloat( gridStyle.rowGap ) || 12;
+
+		const rowSpan = Math.max( 1, Math.ceil( ( imgHeight + gap ) / ( 1 + gap ) ) );
+
+		item.style.gridRowEnd = `span ${rowSpan}`;
+	}
+
+	/**
+	 * Пересчитывает ВСЕ элементы сетки.
+	 */
+	function recalcAllSpans() {
+		const items = galleryGrid.querySelectorAll( '.gallery-item' );
+		items.forEach( item => setItemSpan( item ) );
+	}
+
+	/**
+	 * Навешивает обработчики загрузки на новые элементы,
+	 * чтобы высчитать их высоту и не сломать сетку.
+	 */
+	function watchImages( items, callback ) {
+		let loadedCount = 0;
+		const totalImages = items.length;
+
+		if ( totalImages === 0 ) {
+			if ( callback ) callback();
+			return;
+		}
+
+		items.forEach( item => {
+			const img = item.querySelector( 'img' );
+			if ( !img ) {
+				loadedCount++;
+				if ( loadedCount === totalImages && callback ) callback();
+				return;
+			}
+
+			if ( img.complete && img.naturalHeight > 0 ) {
+				setItemSpan( item );
+				loadedCount++;
+				if ( loadedCount === totalImages && callback ) callback();
+			} else {
+				img.addEventListener( 'load', () => {
+					setItemSpan( item );
+					loadedCount++;
+					if ( loadedCount === totalImages && callback ) callback();
+				}, { once: true } );
+
+				img.addEventListener( 'error', () => {
+					item.style.gridRowEnd = 'span 300';
+					loadedCount++;
+					if ( loadedCount === totalImages && callback ) callback();
+				}, { once: true } );
+			}
 		} );
 	}
 
+	/**
+	 * Добавляет элементы в сетку и запускает анимацию.
+	 */
+	function appendPhotos( photosToAdd, startIndexOffset = 0 ) {
+		const newItems = [];
+
+		photosToAdd.forEach( ( photo, index ) => {
+			const item = createPhotoItem( photo, startIndexOffset + index );
+			galleryGrid.appendChild( item );
+			newItems.push( item );
+		} );
+
+		// Анимация появления
+		requestAnimationFrame( () => {
+			newItems.forEach( item => item.classList.add( 'visible' ) );
+		} );
+
+		// Считаем высоты
+		watchImages( newItems, () => {
+			recalcAllSpans();
+		} );
+
+		return newItems;
+	}
+
+	function buildGrid() {
+		// Очищаем сетку
+		galleryGrid.innerHTML = '';
+
+		// Рисуем первую партию
+		appendPhotos( visiblePhotos, 0 );
+
+		updateCounter();
+
+		// Дополнительный пересчет через requestAnimationFrame
+		requestAnimationFrame( () => {
+			requestAnimationFrame( recalcAllSpans );
+		} );
+
+		// Обработчик ресайза
+		galleryGrid._resizeHandler = () => {
+			clearTimeout( galleryGrid._resizeTimer );
+			galleryGrid._resizeTimer = setTimeout( recalcAllSpans, 150 );
+		};
+		window.addEventListener( 'resize', galleryGrid._resizeHandler );
+	}
+
 	// ============================================================
-	// 6. ЗАПУСК
+	// 6. ЛОГИКА КНОПКИ "ПОКАЗАТЬ ВСЕ"
+	// ============================================================
+
+	function setupLoadMoreButton() {
+		if ( isRenderedAll || hiddenCount === 0 ) return;
+
+		// Ищем кнопку, привязанную к этой сетке
+		const loadMoreBtn = document.querySelector( `.gallery-load-more[data-target="${gridId}"]` );
+		if ( !loadMoreBtn ) {
+			console.warn( `gallery.js: не найдена кнопка .gallery-load-more[data-target="${gridId}"]` );
+			return;
+		}
+
+		// Показываем кнопку и пишем количество
+		loadMoreBtn.style.display = 'inline-flex';
+		const titleEl = loadMoreBtn.querySelector( '.bottom-nav-title' );
+		if ( titleEl ) {
+			titleEl.textContent = `Показать все фото (+${hiddenCount})`;
+		}
+
+		// Обработчик клика
+		loadMoreBtn.addEventListener( 'click', () => {
+			if ( isRenderedAll ) return;
+			isRenderedAll = true;
+
+			// Скрываем кнопку
+			loadMoreBtn.style.display = 'none';
+
+			// Дорисовываем оставшиеся фото
+			appendPhotos( hiddenPhotos, visiblePhotos.length );
+		}, { once: true } );
+	}
+
+	// ============================================================
+	// 7. ЗАПУСК
 	// ============================================================
 
 	buildGrid();
+	setupLoadMoreButton();
 
 	console.log(
-		`📸 Галерея «${section}» готова — ${photos.length} фото`
+		`📸 Галерея «${section}» [${gridId}] готова — ` +
+		`показано ${visiblePhotos.length} из ${photos.length} фото`
 	);
 }

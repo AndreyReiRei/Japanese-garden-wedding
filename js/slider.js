@@ -121,11 +121,11 @@ function openSlider( config ) {
 			prevEl: overlay.querySelector( '.swiper-button-prev' ),
 		},
 
-		// Пагинация
-		pagination: {
-			el: overlay.querySelector( '.swiper-pagination' ),
-			clickable: true,
-		},
+		// Пагинация (в нашем случае не нужна)
+		// pagination: {
+		// 	el: overlay.querySelector( '.swiper-pagination' ),
+		// 	clickable: true,
+		// },
 
 		// Колёсико мыши
 		mousewheel: {

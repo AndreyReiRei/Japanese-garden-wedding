@@ -7,13 +7,14 @@
    3.  Базовые стили (html, body)
    4.  Фоновые слои (изображение, фильтр)
    5.  Шапка
-   6.  Кнопки — единый стиль (назад + нижняя навигация)
+   6.  Кнопки — единый стиль (назад + нижняя навигация + "показать все")
    7.  Заголовок раздела
    8.  Счётчик фото
    9.  Галерея — Masonry-сетка + параллакс
-   10. Нижняя навигация — контейнер
-   11. Подвал
-   12. Адаптивность по брейкпоинтам (все @media здесь)
+   10. Свиток (кнопки управления, стрелка)
+   11. Нижняя навигация — контейнер
+   12. Подвал
+   13. Адаптивность по брейкпоинтам (все @media здесь)
    ============================================================ */
 
 /* ============================================================
@@ -194,9 +195,8 @@
 
 /* ============================================================
    3. БАЗОВЫЕ СТИЛИ
-   Фоновое изображение задаётся прямо на body.
+   Фоновое изображение задаётся отдельным слоем (body::before).
    Никакого background-attachment: fixed — плавный скролл.
-   translateZ(0) для аппаратного ускорения.
    ============================================================ */
 
 html,
@@ -209,37 +209,47 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 	overflow-y: auto;
 	overflow-x: hidden;
+}
+
+/* ============================================================
+   4. ФОНОВЫЕ СЛОИ ПОВЕРХ ИЗОБРАЖЕНИЯ
+   Порядок (снизу вверх):
+     фон          →  body::before (фоновое изображение)
+     z-index: -1  →  body::after  (акцентный градиент + затемнение)
+     z-index:  1+ →  контент
+   ============================================================ */
+
+/*
+ * 4.1. СТАТИЧНЫЙ ФОН (отдельный слой)
+ * position: fixed — фон прибит к экрану и не скроллится.
+ * z-index: -2 — самый нижний слой, ниже градиента.
+ */
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	z-index: -2;
+	pointer-events: none;
 
 	background-image: var(--bg-image);
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
 
-	/*
-     * УБРАН translateZ(0) — он ломает position: fixed у слайдера.
-     * Плавность достигается через will-change на конкретных элементах.
-     */
+	/* Аппаратное ускорение для плавности */
+	transform: translateZ(0);
+	will-change: transform;
 }
 
-/* ============================================================
-   4. ФОНОВЫЕ СЛОИ ПОВЕРХ ИЗОБРАЖЕНИЯ
-   Порядок (снизу вверх):
-     фон          →  body (фоновое изображение)
-     z-index: -1  →  body::after  (акцентный градиент + затемнение)
-     z-index:  1+ →  контент
-   ============================================================ */
-
 /*
- * 4.1. АКЦЕНТНОЕ СВЕЧЕНИЕ РАЗДЕЛА
+ * 4.2. АКЦЕНТНОЕ СВЕЧЕНИЕ РАЗДЕЛА
  * Градиент поверх фонового фото.
  * position: fixed — всегда покрывает экран.
- * translateZ(0) + will-change — плавный рендеринг без рывков.
  *
  * Сад  → розовое свечение снизу
  * ЗАГС → красное свечение снизу
  * Дом  → янтарное свечение снизу
  */
-
 body::after {
 	content: '';
 	position: fixed;
@@ -247,9 +257,6 @@ body::after {
 	z-index: -1;
 	pointer-events: none;
 
-	/*
-     * translateZ(0) здесь безопасен — это отдельный слой.
-     */
 	transform: translateZ(0);
 	will-change: transform;
 
@@ -263,7 +270,6 @@ body::after {
 /* ============================================================
    5. ШАПКА
    Полупрозрачная — фото и фильтр видны сквозь неё.
-   Оптимизирована для плавного sticky на мобильных.
    ============================================================ */
 
 .gallery-header {
@@ -273,13 +279,18 @@ body::after {
 	background: rgba(8, 8, 8, 0.2);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	padding: 16px 20px;
-
-	/*
-     * УБРАН translateZ(0) — sticky тоже может конфликтовать.
-     * Плавность достигается через внутренние элементы.
-     */
 }
 
+/*
+ * 5.0. ШАПКИ ВНУТРИ СЕКЦИЙ ГАЛЕРЕИ
+ * Отключаем sticky, чтобы две шапки (А и Т, За кадром)
+ * не накладывались друг на друга при скролле.
+ */
+.gallery-section .gallery-header {
+	position: relative;
+	top: auto;
+	z-index: 1;
+}
 
 .header-inner {
 	display: flex;
@@ -360,9 +371,9 @@ body::after {
 
 /* ============================================================
    6. КНОПКИ — ЕДИНЫЙ СТИЛЬ
-   Все кнопки на странице (назад, предыдущий, следующий, обложка)
-   имеют одинаковый стиль: бегущая обводка, градиентный фон,
-   скруглённые края, отражение при hover.
+   Все кнопки на странице (назад, предыдущий, следующий, обложка,
+   «показать все») имеют одинаковый стиль: бегущая обводка,
+   градиентный фон, скруглённые края, отражение при hover.
    ============================================================ */
 
 /*
@@ -613,6 +624,17 @@ body::after {
 	}
 }
 
+/*
+ * 6.9. ОБЕРТКА ДЛЯ КНОПКИ «ПОКАЗАТЬ ВСЕ»
+ * Центрирует кнопку под сеткой галереи.
+ */
+.gallery-load-more-wrapper {
+	display: flex;
+	justify-content: center;
+	padding: 32px 0 10px;
+	width: 100%;
+}
+
 /* ============================================================
    7. ЗАГОЛОВОК РАЗДЕЛА
    С анимированным отражением как от водной глади.
@@ -695,10 +717,25 @@ body::after {
 	padding: var(--grid-padding);
 }
 
+/*
+ * 9.0. РАЗДЕЛИТЕЛЬ МЕЖДУ ДВУМЯ СЕКЦИЯМИ ГАЛЕРЕИ
+ * Визуально отделяет «А и Т» от «За кадром».
+ */
+.gallery-section+.gallery-section {
+	margin-top: 60px;
+	border-top: 1px solid rgba(255, 255, 255, 0.08);
+	padding-top: 60px;
+}
+
 .gallery-grid {
-	column-count: var(--masonry-columns);
-	column-gap: var(--masonry-gap);
+	display: grid;
+	grid-template-columns: repeat(var(--masonry-columns), 1fr);
+	grid-auto-rows: 1px;
+	/* Базовая высота строки для JS-расчета */
+	gap: var(--masonry-gap);
 	padding: 0;
+	/* Выравниваем элементы по началу, чтобы они не растягивались */
+	align-items: start;
 }
 
 /*
@@ -713,8 +750,6 @@ body::after {
 	cursor: pointer;
 	background: rgba(255, 255, 255, 0.01);
 	box-shadow: var(--shadow-card);
-	margin-bottom: var(--masonry-gap);
-	break-inside: avoid;
 
 	/*
      * Аппаратное ускорение.
@@ -722,12 +757,11 @@ body::after {
 	transform: translateY(30px) translateZ(0);
 	will-change: transform, opacity;
 
-	opacity: 0;
-	transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+	opacity: 1;
+	transition: transform 0.5s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
 }
 
 .gallery-item.visible {
-	opacity: 1;
 	transform: translateY(0) translateZ(0);
 }
 
@@ -770,7 +804,6 @@ body::after {
 
 /*
  * 9.4. HOVER — BOX-SHADOW ВМЕСТО FILTER
- * box-shadow не вызывает перерисовку всего элемента.
  */
 @media (hover: hover) {
 	.gallery-item:hover {
@@ -800,6 +833,7 @@ body::after {
 .gallery-item img {
 	width: 100%;
 	height: auto;
+	min-height: 50px;
 	display: block;
 	border-radius: var(--radius-md);
 
@@ -846,7 +880,84 @@ body::after {
 }
 
 /* ============================================================
-   10. НИЖНЯЯ НАВИГАЦИЯ — КОНТЕЙНЕР
+   10. СВИТОК — ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
+   ============================================================ */
+
+/*
+ * 10.1. СТРЕЛОЧКА В ЗАГОЛОВКЕ СВИТКА
+ * Плавно «прыгает» вниз, намекая на раскрытие.
+ */
+.scroll-trigger-inner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	cursor: pointer;
+}
+
+.scroll-trigger-arrow {
+	color: var(--accent-color, #E8A0B4);
+	opacity: 0.7;
+	animation: arrowBounce 2s ease-in-out infinite;
+	transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.scroll-trigger-inner:hover .scroll-trigger-arrow {
+	opacity: 1;
+}
+
+@keyframes arrowBounce {
+
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+
+	50% {
+		transform: translateY(6px);
+	}
+}
+
+/*
+ * 10.2. КНОПКА ЗАКРЫТИЯ СВИТКА (сверху справа)
+ * Позволяет закрыть свиток, не прокручивая до низа.
+ */
+.scroll-paper {
+	position: relative;
+}
+
+.scroll-close-btn {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	background: rgba(0, 0, 0, 0.05);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 50%;
+	color: var(--accent-color, #E84040);
+
+	cursor: pointer;
+	z-index: 10;
+	transition: all 0.3s ease;
+}
+
+.scroll-close-btn:hover {
+	background: rgba(0, 0, 0, 0.1);
+	transform: scale(1.1) rotate(90deg);
+}
+
+.scroll-close-btn:active {
+	transform: scale(0.95);
+}
+
+/* ============================================================
+   11. НИЖНЯЯ НАВИГАЦИЯ — КОНТЕЙНЕР
    ============================================================ */
 
 .section-bottom-nav {
@@ -863,7 +974,7 @@ body::after {
 }
 
 /* ============================================================
-   11. ПОДВАЛ
+   12. ПОДВАЛ
    ============================================================ */
 
 .section-footer {
@@ -876,7 +987,7 @@ body::after {
 }
 
 /*
- * 11.1. ДЕКОРАТИВНАЯ ЛИНИЯ С БЕГУЩЕЙ ТОЧКОЙ
+ * 12.1. ДЕКОРАТИВНАЯ ЛИНИЯ С БЕГУЩЕЙ ТОЧКОЙ
  */
 .footer-accent {
 	display: inline-block;
@@ -934,7 +1045,7 @@ body::after {
 }
 
 /*
- * 11.2. ТЕКСТ ПОДВАЛА С АНИМИРОВАННЫМ ОТРАЖЕНИЕМ
+ * 12.2. ТЕКСТ ПОДВАЛА С АНИМИРОВАННЫМ ОТРАЖЕНИЕМ
  */
 .footer-text {
 	font-size: 23px;
@@ -981,7 +1092,7 @@ body::after {
 }
 
 /* ============================================================
-   12. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
+   13. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
    Все @media собраны здесь.
    ============================================================ */
 
@@ -1093,6 +1204,47 @@ body::after {
 			transform: translateX(-50%) scale(1.4);
 		}
 	}
+
+	/* --- Адаптив новых элементов --- */
+	.gallery-section+.gallery-section {
+		margin-top: 30px;
+		padding-top: 24px;
+	}
+
+	.gallery-load-more-wrapper {
+		padding: 20px 0 8px;
+	}
+
+	.gallery-load-more .bottom-nav-title {
+		font-size: 12px;
+		white-space: normal;
+		line-height: 1.3;
+	}
+
+	.gallery-load-more .bottom-nav-label {
+		font-size: 8px;
+	}
+
+	.scroll-trigger-arrow {
+		width: 18px;
+		height: 18px;
+	}
+
+	.scroll-trigger-inner {
+		gap: 4px;
+	}
+
+	.scroll-close-btn {
+		top: 12px;
+		right: 12px;
+		width: 32px;
+		height: 32px;
+	}
+
+	.scroll-close-btn svg {
+		width: 16px;
+		height: 16px;
+	}
 }
 
 /*
@@ -1133,6 +1285,18 @@ body::after {
 
 	.footer-text {
 		font-size: 19px;
+	}
+
+	/* --- Адаптив новых элементов --- */
+	.gallery-load-more-wrapper {
+		padding: 24px 0 8px;
+	}
+
+	.scroll-close-btn {
+		top: 16px;
+		right: 16px;
+		width: 36px;
+		height: 36px;
 	}
 }
 

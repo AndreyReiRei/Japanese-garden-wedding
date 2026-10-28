@@ -59,6 +59,7 @@ function initScroll( config ) {
 	const scrollBlock = document.getElementById( 'scrollBlock' );
 	const scrollTrigger = document.getElementById( 'scrollTrigger' );
 	const collapseBtn = document.getElementById( 'scrollCollapseBtn' );
+	const closeBtnTop = document.getElementById( 'scrollCloseBtnTop' ); // Новая кнопка закрытия сверху
 
 	if ( !scrollBlock ) {
 		console.error( 'initScroll: не найден #scrollBlock' );
@@ -159,9 +160,17 @@ function initScroll( config ) {
 		} );
 	}
 
-	// Клик по кнопке «Свернуть» → сворачиваем
+	// Клик по нижней кнопке «Свернуть» → сворачиваем
 	if ( collapseBtn ) {
 		collapseBtn.addEventListener( 'click', ( e ) => {
+			e.stopPropagation();
+			collapse();
+		} );
+	}
+
+	// Клик по верхней кнопке закрытия (крестик) → сворачиваем
+	if ( closeBtnTop ) {
+		closeBtnTop.addEventListener( 'click', ( e ) => {
 			e.stopPropagation();
 			collapse();
 		} );
