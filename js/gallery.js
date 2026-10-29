@@ -7,6 +7,7 @@
  *   Строит адаптивную сетку фотографий.
  *   При клике на фото — открывает полноэкранный слайдер (slider.js).
  *   Поддерживает ленивую подгрузку (кнопка "Показать все").
+ *   Поддерживает адаптивные изображения (srcset: маленькие для сетки, большие для лайтбокса).
  * 
  * ИСПОЛЬЗОВАНИЕ:
  *   initGallery({
@@ -15,7 +16,11 @@
  *       counterId: 'photoCounterA',  // ID счетчика (по умолчанию 'photoCounter')
  *       initialCount: 15,            // Сколько фото показать сразу (0 = все)
  *       photos: [                    // Массив фото
- *           { src: '...', alt: '...' },
+ *           { 
+ *               src: '.../thumbs/1.avif',     // Маленькое фото для сетки (1000px)
+ *               srcFull: '.../full/1.avif',   // Большое фото для слайдера (3000px)
+ *               alt: '...' 
+ *           },
  *           ...
  *       ]
  *   });
@@ -98,7 +103,19 @@ function initGallery( config ) {
 
 		// --- Изображение ---
 		const img = document.createElement( 'img' );
-		img.src = photo.src;
+
+		// Логика адаптивных изображений:
+		// Если переданы srcSmall и srcFull (или src), используем их.
+		const srcThumb = photo.srcSmall || photo.src;
+		const srcFull = photo.srcFull || photo.src;
+
+		// Для сетки всегда используем превью (srcThumb)
+		img.src = srcThumb;
+
+		// Если хотите, чтобы браузер на Retina-экранах мог подгрузить более качественную версию,
+		// можно добавить srcset. Но для экономии трафика лучше оставить только thumb.
+		// img.srcset = `${srcThumb} 600w, ${srcFull} 1600w`; 
+
 		img.alt = photo.alt || '';
 		img.loading = 'lazy';
 		img.decoding = 'async';
@@ -128,7 +145,7 @@ function initGallery( config ) {
 		item.addEventListener( 'click', () => {
 			if ( typeof openSlider === 'function' ) {
 				openSlider( {
-					photos: photos,           // Передаем ВСЕ фото (чтобы листать)
+					photos: photos,           // Передаем ВСЕ фото (слайдер сам возьмет srcFull для показа)
 					startIndex: index,        // С какого начать
 					theme: section            // Тема для цветов
 				} );

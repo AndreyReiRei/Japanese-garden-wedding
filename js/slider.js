@@ -10,10 +10,15 @@
  *   - Встроенный зум Swiper (двойной тап / пинч / перетаскивание)
  *   - Кнопки +/− для зума
  *   - Автоматическая блокировка перелистывания при зуме
+ *   - Поддержка полноразмерных изображений (srcFull)
  * 
  * ИСПОЛЬЗОВАНИЕ:
  *   openSlider({
- *       photos: [{ src: '...', alt: '...' }, ...],
+ *       photos: [{ 
+ *           src: '.../thumbs/1.avif',    // превью для сетки
+ *           srcFull: '.../full/1.avif',  // полное фото для лайтбокса
+ *           alt: '...' 
+ *       }, ...],
  *       startIndex: 0,
  *       theme: 'garden'
  *   });
@@ -44,11 +49,16 @@ function openSlider( config ) {
 	overlay.className = 'slider-overlay';
 	overlay.setAttribute( 'data-theme', theme );
 
-	const slidesHTML = photos.map( ( photo, i ) => `
+	// ВАЖНО: Используем srcFull (если есть) для показа в полном размере.
+	// Если srcFull нет, откатываемся на src.
+	const slidesHTML = photos.map( ( photo, i ) => {
+		const fullSrc = photo.srcFull || photo.src;
+
+		return `
         <div class="swiper-slide">
             <div class="swiper-zoom-container">
                 <img 
-                    src="${photo.src}" 
+                    src="${fullSrc}" 
                     alt="${photo.alt || ''}" 
                     data-index="${i}"
                     loading="lazy"
@@ -57,7 +67,8 @@ function openSlider( config ) {
             </div>
             ${photo.alt ? `<p class="slide-caption">${photo.alt}</p>` : ''}
         </div>
-    ` ).join( '' );
+    `;
+	} ).join( '' );
 
 	overlay.innerHTML = `
         <button class="slider-close" id="sliderClose" aria-label="Закрыть">✕</button>
