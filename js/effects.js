@@ -3,25 +3,6 @@
  * effects.js — Лепестки сакуры и светлячки
  * Общие эффекты для всех страниц альбома.
  * ============================================================
- * 
- * ЧТО ДЕЛАЕТ:
- *   - Добавляет падающие лепестки сакуры на фон страницы (всегда).
- *   - Добавляет летающих светлячков на фон страницы (только на главной).
- *   - Предоставляет функции для светлячков в оверлее/свитке.
- * 
- * ИСПОЛЬЗОВАНИЕ:
- *   Подключается на странице — лепестки запускаются автоматически.
- *   Фоновые светлячки — только если на странице есть #storyToggle.
- *   Для светлячков в модальном окне/свитке:
- *     const ctrl = window.startOverlayFireflies( element );
- *     window.stopOverlayFireflies( ctrl );
- * 
- * ВАЖНО:
- *   - Фоновые светлячки (position: fixed) — только на главной.
- *   - Оверлейные светлячки (position: fixed) — на всём экране,
- *     добавляются в переданный элемент, удаляются при закрытии.
- *   - Лепестки — на всех страницах.
- * ============================================================
  */
 
 ( function () {
@@ -34,12 +15,14 @@
 		init();
 	}
 
+	// Определяем, мобильное ли устройство
+	const IS_MOBILE = window.matchMedia( '(max-width: 768px)' ).matches;
+
 	// ============================================================
 	// 1. ИНИЦИАЛИЗАЦИЯ
 	// ============================================================
 
 	function init() {
-		// Контейнер для фоновых эффектов (лепестки + фоновые светлячки)
 		let container = document.getElementById( 'effectsContainer' );
 		if ( !container ) {
 			container = document.createElement( 'div' );
@@ -54,17 +37,9 @@
 			document.body.appendChild( container );
 		}
 
-		// Добавляем CSS-анимации в <head> (один раз)
 		injectStyles();
-
-		// Лепестки сакуры — на всех страницах
 		initPetals( container );
 
-		/*
-		 * Фоновые светлячки — ТОЛЬКО на главной странице.
-		 * Главную определяем по наличию элемента #storyToggle.
-		 * На страницах галерей светлячки включаются только в свитке.
-		 */
 		if ( document.getElementById( 'storyToggle' ) ) {
 			initFireflies( container );
 			console.log( '🌸🪲 Эффекты запущены (лепестки + фоновые светлячки)' );
@@ -83,18 +58,24 @@
 		const style = document.createElement( 'style' );
 		style.id = 'effects-styles';
 		style.textContent = `
+            /* Падение вниз (на внешней обертке) */
             @keyframes petalFall {
-                0%   { transform: translateY(-40px) rotate(0deg) translateX(0px); opacity: 0; }
+                0%   { transform: translateY(-40px); opacity: 0; }
                 8%   { opacity: 0.8; }
                 50%  { opacity: 0.6; }
                 85%  { opacity: 0.3; }
-                100% { transform: translateY(110vh) rotate(420deg) translateX(-20px); opacity: 0; }
+                100% { transform: translateY(110vh); opacity: 0; }
             }
+            
+            /* Покачивание и вращение (на внутреннем элементе) */
             @keyframes petalSway {
-                0%, 100% { margin-left: 0px; }
-                30%      { margin-left: 18px; }
-                70%      { margin-left: -14px; }
+                0%   { transform: translateX(0px) rotate(0deg); }
+                30%  { transform: translateX(18px) rotate(90deg); }
+                70%  { transform: translateX(-14px) rotate(270deg); }
+                100% { transform: translateX(0px) rotate(420deg); }
             }
+            
+            /* Светлячки */
             @keyframes fireflyFloat {
                 0%, 100% { opacity: 0.15; transform: translate(0, 0) scale(0.8); }
                 20%      { opacity: 0.9;  transform: translate(12px, -18px) scale(1.6); }
@@ -107,40 +88,54 @@
 	}
 
 	// ============================================================
-	// 3. ЛЕПЕСТКИ САКУРЫ (ФОН)
-	// Всегда активны на всех страницах.
+	// 3. ЛЕПЕСТКИ САКУРЫ
 	// ============================================================
 
 	function initPetals( container ) {
 		function createPetal() {
-			const petal = document.createElement( 'div' );
-			const size = Math.random() * 8 + 5;
+			// Внешняя обертка (отвечает за падение)
+			const wrapper = document.createElement( 'div' );
+			wrapper.className = 'petal-wrapper';
+
 			const startX = Math.random() * 95;
 			const dur = Math.random() * 9 + 8;
 			const delay = Math.random() * 8;
+
+			wrapper.style.cssText = `
+				position: absolute;
+				top: -30px;
+				left: ${startX}%;
+				width: 10px;
+				height: 15px;
+				animation: petalFall ${dur}s ${delay}s linear infinite;
+				pointer-events: none;
+				z-index: 0;
+				will-change: transform;
+			`;
+
+			// Внутренний элемент (сам лепесток, отвечает за покачивание)
+			const petal = document.createElement( 'div' );
+			const size = Math.random() * 8 + 5;
 			const op = Math.random() * 0.2 + 0.06;
 			const isPink = Math.random() > 0.4;
 
 			petal.className = 'petal-leaf';
 			petal.style.cssText = `
-                position: absolute;
-                top: -25px;
-                left: ${startX}%;
-                width: ${size}px;
-                height: ${size * 1.5}px;
-                background: radial-gradient(ellipse at 30% 30%,
-                    ${isPink ? 'rgba(232, 64, 64,' : 'rgba(201, 169, 110,'} ${op + 0.08}) 0%,
-                    ${isPink ? 'rgba(176, 32, 32,' : 'rgba(160, 130, 80,'} ${op}) 100%);
-                border-radius: ${Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%'};
-                box-shadow: 
-                    0 0 6px ${isPink ? 'rgba(255, 80, 80, 0.4)' : 'rgba(220, 180, 100, 0.3)'},
-                    0 0 14px ${isPink ? 'rgba(255, 50, 50, 0.2)' : 'rgba(200, 160, 80, 0.15)'};
-                animation: petalFall ${dur}s ${delay}s linear infinite,
-                           petalSway ${dur * 0.6}s ${delay}s ease-in-out infinite;
-                pointer-events: none;
-                z-index: 0;
-            `;
-			return petal;
+				width: ${size}px;
+				height: ${size * 1.5}px;
+				background: radial-gradient(ellipse at 30% 30%,
+					${isPink ? 'rgba(232, 64, 64,' : 'rgba(201, 169, 110,'} ${op + 0.08}) 0%,
+					${isPink ? 'rgba(176, 32, 32,' : 'rgba(160, 130, 80,'} ${op}) 100%);
+				border-radius: ${Math.random() > 0.5 ? '50% 0 50% 0' : '0 50% 0 50%'};
+				box-shadow: 
+					0 0 6px ${isPink ? 'rgba(255, 80, 80, 0.4)' : 'rgba(220, 180, 100, 0.3)'},
+					0 0 14px ${isPink ? 'rgba(255, 50, 50, 0.2)' : 'rgba(200, 160, 80, 0.15)'};
+				animation: petalSway ${dur * 0.6}s ${delay}s ease-in-out infinite;
+				will-change: transform;
+			`;
+
+			wrapper.appendChild( petal );
+			return wrapper;
 		}
 
 		const COUNT = 15;
@@ -150,20 +145,18 @@
 
 		// Поддержание количества лепестков
 		setInterval( () => {
-			const petals = container.querySelectorAll( '.petal-leaf' );
+			const petals = container.querySelectorAll( '.petal-wrapper' );
 			if ( petals.length < COUNT + 8 ) {
 				container.appendChild( createPetal() );
 			}
 			if ( petals.length > COUNT + 16 && petals[0] ) {
 				petals[0].remove();
 			}
-		}, 4000 );
+		}, 6000 );
 	}
 
 	// ============================================================
-	// 4. ФОНОВЫЕ СВЕТЛЯЧКИ (только на главной странице)
-	// position: absolute внутри effectsContainer (position: fixed).
-	// Летают по всему экрану.
+	// 4. ФОНОВЫЕ СВЕТЛЯЧКИ
 	// ============================================================
 
 	function initFireflies( container ) {
@@ -194,18 +187,19 @@
                 animation: fireflyFloat ${dur}s ${delay}s ease-in-out infinite;
                 pointer-events: none;
                 z-index: 0;
+                will-change: transform, opacity;
             `;
 			return firefly;
 		}
 
-		const COUNT = 10;
+		const COUNT = IS_MOBILE ? 6 : 10;
+
 		for ( let i = 0; i < COUNT; i++ ) {
 			setTimeout( () => {
 				container.appendChild( createFirefly() );
 			}, i * 400 );
 		}
 
-		// Обновление светлячков каждые 10 секунд
 		setInterval( () => {
 			const fireflies = container.querySelectorAll( '.firefly' );
 			fireflies.forEach( f => f.remove() );
@@ -214,36 +208,19 @@
 					container.appendChild( createFirefly() );
 				}, i * 300 );
 			}
-		}, 10000 );
+		}, 30000 );
 	}
 
 	// ============================================================
 	// 5. СВЕТЛЯЧКИ ДЛЯ ОВЕРЛЕЯ / СВИТКА
-	//    position: fixed — всегда на экране, не скроллятся.
-	//    Добавляются в переданный элемент (document.body или другой).
-	//    При закрытии полностью удаляются через stopOverlayFireflies.
 	// ============================================================
 
-	/**
-	 * Создаёт светлячков на весь экран и добавляет их в переданный элемент.
-	 * Светлячки используют position: fixed — они всегда видны,
-	 * независимо от скролла внутри свитка.
-	 * 
-	 * @param {HTMLElement} el — DOM-элемент-контейнер для светлячков.
-	 *        Обычно document.body (для оверлея на главной)
-	 *        или .scroll-paper (для свитка).
-	 * @returns {Object} { fireflies: HTMLElement[], intervalId: number }
-	 */
 	window.startOverlayFireflies = function ( el ) {
 		if ( !el ) return null;
 
 		const fireflies = [];
-		const COUNT = 14;
+		const COUNT = IS_MOBILE ? 6 : 14;
 
-		/**
-		 * Создаёт одного светлячка.
-		 * position: fixed — привязан к окну браузера, не скроллится.
-		 */
 		function create() {
 			const f = document.createElement( 'div' );
 			const s = Math.random() * 4 + 2;
@@ -271,11 +248,11 @@
                 animation: fireflyFloat ${dur}s ${del}s ease-in-out infinite;
                 pointer-events: none;
                 z-index: 101;
+                will-change: transform, opacity;
             `;
 			return f;
 		}
 
-		// Создаём первых светлячков с задержкой
 		for ( let i = 0; i < COUNT; i++ ) {
 			setTimeout( () => {
 				const ff = create();
@@ -284,7 +261,6 @@
 			}, i * 250 );
 		}
 
-		// Обновляем светлячков каждые 8 секунд
 		const intervalId = setInterval( () => {
 			fireflies.forEach( f => f.remove() );
 			fireflies.length = 0;
@@ -295,16 +271,11 @@
 					el.appendChild( ff );
 				}, i * 250 );
 			}
-		}, 8000 );
+		}, 15000 );
 
 		return { fireflies, intervalId };
 	};
 
-	/**
-	 * Удаляет светлячков, созданных через startOverlayFireflies.
-	 * 
-	 * @param {Object} ctrl — объект, возвращённый startOverlayFireflies.
-	 */
 	window.stopOverlayFireflies = function ( ctrl ) {
 		if ( !ctrl ) return;
 		if ( ctrl.intervalId ) clearInterval( ctrl.intervalId );
