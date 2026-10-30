@@ -736,6 +736,11 @@ body::after {
 	padding: 0;
 	/* Выравниваем элементы по началу, чтобы они не растягивались */
 	align-items: start;
+
+	transform: translate3d(0, 0, 0);
+	-webkit-transform: translate3d(0, 0, 0);
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
 }
 
 /*

@@ -12,6 +12,17 @@
 	<link rel="icon" type="image/png" href="/photos/favicon.png">
 	<link rel="apple-touch-icon" href="/photos/favicon.png">
 
+	<!-- ============================================ -->
+	<!-- OPEN GRAPH (Превью для Telegram, WhatsApp)   -->
+	<!-- ============================================ -->
+	<meta property="og:type" content="article">
+	<meta property="og:title" content="Бракосочетание — Андрей и Татьяна">
+	<meta property="og:description" content="История нашего дня. Часть 2: Бракосочетание.">
+	<meta property="og:image" content="https://japanese-garden-wedding.vercel.app/photos/og-image-zags.jpg">
+	<meta property="og:url" content="https://japanese-garden-wedding.vercel.app/zags.html">
+	<meta property="og:site_name" content="Андрей и Татьяна">
+	<meta name="twitter:card" content="summary_large_image">
+
 	<!-- Галерея -->
 	<link rel="stylesheet" href="../css/gallery.css">
 	<!-- Свиток -->
@@ -31,6 +42,15 @@
 
 <body data-theme="zags">
 
+	<!-- Страховка: если JS отключен, страница все равно будет видна -->
+	<noscript>
+		<style>
+			body {
+				opacity: 1 !important;
+			}
+		</style>
+	</noscript>
+
 	<div class="bg-noise"></div>
 
 	<!-- Шапка -->
@@ -49,7 +69,7 @@
 				<h1 class="section-title" data-text="Бракосочетание">Бракосочетание</h1>
 			</div>
 
-			<span class="photo-counter" id="photoCounter"></span>
+			<span class="photo-counter"></span>
 		</div>
 	</header>
 
@@ -59,11 +79,24 @@
 		<div class="scroll-trigger" id="scrollTrigger">
 			<div class="scroll-trigger-inner">
 				<span class="scroll-trigger-text">История этого дня</span>
+				<svg class="scroll-trigger-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="6 9 12 15 18 9"></polyline>
+				</svg>
 			</div>
 		</div>
 
 		<div class="scroll-expanded" id="scrollExpanded">
 			<div class="scroll-paper">
+
+				<!-- Кнопка закрытия -->
+				<button class="scroll-close-btn" id="scrollCloseBtnTop" aria-label="Закрыть">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+						stroke-linecap="round">
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
+				</button>
 
 				<div class="scroll-seal-top">
 					<svg width="36" height="36" viewBox="0 0 36 36" fill="none">
@@ -81,7 +114,14 @@
 					<span class="scroll-divider-line"></span>
 				</div>
 
-				<div class="scroll-text"></div>
+				<!-- История дня -->
+				<div class="scroll-text">
+					<p>Торжественный зал, мерцание люстр, шёпот гостей. Ручка скользнула по бумаге, оставляя росчерк,
+						который изменил всё. Кольца вспыхнули в свете ламп, и мир на мгновение замер.</p>
+					<p>«Да» прозвучало одновременно — тихо, но уверенно. Первый поцелуй как муж и жена. Аплодисменты.
+						Конфетти. Слёзы радости на глазах мамы.</p>
+					<p>Этот момент останется в памяти навсегда — день, когда две жизни стали одной.</p>
+				</div>
 
 				<div class="scroll-seal-bottom">
 					<svg width="40" height="40" viewBox="0 0 44 44" fill="none">
@@ -106,10 +146,63 @@
 
 	</div>
 
-	<!-- Галерея -->
-	<main class="gallery-container">
-		<div class="gallery-grid" id="galleryGrid"></div>
-	</main>
+	<!-- ========================================== -->
+	<!-- БЛОК 1: «А & Т» (Основные фото)            -->
+	<!-- ========================================== -->
+	<section class="gallery-section" data-theme="zags">
+		<header class="gallery-header">
+			<div class="header-inner">
+				<div class="title-block" style="flex: 1; text-align: center;">
+					<h2 class="section-title" data-text="А & Т">А & Т</h2>
+				</div>
+			</div>
+		</header>
+
+		<div class="gallery-container">
+			<div class="gallery-grid" id="galleryGridA"></div>
+
+			<!-- Кнопка "Показать все" -->
+			<div class="gallery-load-more-wrapper">
+				<button class="animated-btn gallery-load-more" data-target="galleryGridA" style="display:none;">
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="bottom-nav-content">
+						<span class="bottom-nav-label">Галерея</span>
+						<span class="bottom-nav-title">Показать все фото</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	</section>
+
+	<!-- ========================================== -->
+	<!-- БЛОК 2: «За кадром»                        -->
+	<!-- ========================================== -->
+	<section class="gallery-section" data-theme="home">
+		<header class="gallery-header">
+			<div class="header-inner">
+				<div class="title-block" style="flex: 1; text-align: center;">
+					<h2 class="section-title" data-text="За кадром">За кадром</h2>
+				</div>
+			</div>
+		</header>
+
+		<div class="gallery-container">
+			<div class="gallery-grid" id="galleryGridB"></div>
+
+			<!-- Кнопка "Показать все" -->
+			<div class="gallery-load-more-wrapper">
+				<button class="animated-btn gallery-load-more" data-target="galleryGridB" style="display:none;">
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="bottom-nav-content">
+						<span class="bottom-nav-label">Галерея</span>
+						<span class="bottom-nav-title">Показать все фото</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	</section>
 
 	<!-- Нижняя навигация -->
 	<nav class="section-bottom-nav">
@@ -154,8 +247,10 @@
 			подписи, клятвы. Момент, когда две жизни становятся одной.</p>
 	</footer>
 
-	<!-- Swiper JS -->
+	<!-- Swiper JS (Основной) -->
 	<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+	<!-- Swiper JS (Модуль Thumbs для миниатюр) -->
+	<script src="https://cdn.jsdelivr.net/npm/swiper@11/modules/thumbs.min.js"></script>
 	<!-- Наш слайдер -->
 	<script src="../js/slider.js"></script>
 	<!-- Свиток -->
@@ -169,16 +264,13 @@
 		// Истории для свитка
 		const STORIES = {
 			garden: {
-				title: 'Японский сад',
-				text: 'Утро началось с тишины. Камни, вода, изогнутые мостики и вековые деревья парка Галицкого стали свидетелями первых кадров этого дня. Воздух был наполнен спокойствием, а каждый шаг по дорожке сада отзывался в сердце предвкушением.'
+				title: 'Японский сад'
 			},
 			zags: {
-				title: 'Бракосочетание',
-				text: 'Торжественный зал, мерцание люстр, шёпот гостей. Ручка скользнула по бумаге, оставляя росчерк, который изменил всё. Кольца вспыхнули в свете ламп, и мир на мгновение замер. «Да» прозвучало одновременно — тихо, но уверенно. Первый поцелуй как муж и жена. Аплодисменты. Конфетти. Слёзы радости на глазах мамы. Этот момент останется в памяти навсегда — день, когда две жизни стали одной.'
+				title: 'Бракосочетание'
 			},
 			home: {
-				title: 'Купеческий дом',
-				text: 'Вечер опустился на старинный купеческий дом, зажигая свечи и наполняя комнаты теплом. Родные лица вокруг длинного стола, звон бокалов, смех и бесконечные истории.'
+				title: 'Купеческий дом'
 			}
 		};
 
@@ -188,22 +280,103 @@
 			section: 'zags'
 		} );
 
-		// Инициализация галереи
+		// ==========================================
+		// 1. Блок «А & Т» (Основные фото, начиная с 1-667)
+		// ==========================================
 		initGallery( {
 			section: 'zags',
+			gridId: 'galleryGridA',
+			initialCount: 15,
 			photos: [
-				{ src: '../photos/zags/01.jpeg', alt: 'Здание ЗАГСа' },
-				{ src: '../photos/zags/02.jpeg', alt: 'Ожидание' },
-				{ src: '../photos/zags/03.jpeg', alt: 'Роспись в книге' },
-				{ src: '../photos/zags/04.jpeg', alt: 'Крупно руки' },
-				{ src: '../photos/zags/05.jpg', alt: 'Обмен кольцами' },
-				{ src: '../photos/zags/06.jpg', alt: 'Кольца макро' },
-				{ src: '../photos/zags/07.jpg', alt: 'Первый поцелуй' },
-				{ src: '../photos/zags/08.jpg', alt: 'Свидетельство' },
-				{ src: '../photos/zags/09.jpg', alt: 'Выход из ЗАГСа' },
-				{ src: '../photos/zags/10.jpeg', alt: 'Поздравления' },
-				{ src: '../photos/zags/11.jpeg', alt: 'Объятия' },
-				{ src: '../photos/zags/12.jpeg', alt: 'Общее фото' },
+				{ src: '../photos/zags-thumbs/1-677.avif', srcFull: '../photos/zags-full/1-677.avif', alt: 'Фото 1-667' },
+				{ src: '../photos/zags-thumbs/1-683.avif', srcFull: '../photos/zags-full/1-683.avif', alt: 'Фото 1-683' },
+				{ src: '../photos/zags-thumbs/1-685.avif', srcFull: '../photos/zags-full/1-685.avif', alt: 'Фото 1-685' },
+				{ src: '../photos/zags-thumbs/1-696.avif', srcFull: '../photos/zags-full/1-696.avif', alt: 'Фото 1-696' },
+				{ src: '../photos/zags-thumbs/1-702.avif', srcFull: '../photos/zags-full/1-702.avif', alt: 'Фото 1-702' },
+				{ src: '../photos/zags-thumbs/1-703.avif', srcFull: '../photos/zags-full/1-703.avif', alt: 'Фото 1-703' },
+				{ src: '../photos/zags-thumbs/1-716.avif', srcFull: '../photos/zags-full/1-716.avif', alt: 'Фото 1-716' },
+				{ src: '../photos/zags-thumbs/1-719.avif', srcFull: '../photos/zags-full/1-719.avif', alt: 'Фото 1-719' },
+				{ src: '../photos/zags-thumbs/1-723.avif', srcFull: '../photos/zags-full/1-723.avif', alt: 'Фото 1-723' },
+				{ src: '../photos/zags-thumbs/1-725.avif', srcFull: '../photos/zags-full/1-725.avif', alt: 'Фото 1-725' },
+				{ src: '../photos/zags-thumbs/1-727.avif', srcFull: '../photos/zags-full/1-727.avif', alt: 'Фото 1-727' },
+				{ src: '../photos/zags-thumbs/1-731.avif', srcFull: '../photos/zags-full/1-731.avif', alt: 'Фото 1-731' },
+				{ src: '../photos/zags-thumbs/1-732.avif', srcFull: '../photos/zags-full/1-732.avif', alt: 'Фото 1-732' },
+				{ src: '../photos/zags-thumbs/1-733.avif', srcFull: '../photos/zags-full/1-733.avif', alt: 'Фото 1-733' },
+				{ src: '../photos/zags-thumbs/1-737.avif', srcFull: '../photos/zags-full/1-737.avif', alt: 'Фото 1-737' },
+				{ src: '../photos/zags-thumbs/1-738.avif', srcFull: '../photos/zags-full/1-738.avif', alt: 'Фото 1-738' },
+				{ src: '../photos/zags-thumbs/1-743.avif', srcFull: '../photos/zags-full/1-743.avif', alt: 'Фото 1-743' },
+				{ src: '../photos/zags-thumbs/1-745.avif', srcFull: '../photos/zags-full/1-745.avif', alt: 'Фото 1-745' },
+				{ src: '../photos/zags-thumbs/1-748.avif', srcFull: '../photos/zags-full/1-748.avif', alt: 'Фото 1-748' },
+				{ src: '../photos/zags-thumbs/1-753.avif', srcFull: '../photos/zags-full/1-753.avif', alt: 'Фото 1-753' },
+				{ src: '../photos/zags-thumbs/1-761.avif', srcFull: '../photos/zags-full/1-761.avif', alt: 'Фото 1-761' },
+				{ src: '../photos/zags-thumbs/1-767.avif', srcFull: '../photos/zags-full/1-767.avif', alt: 'Фото 1-767' },
+				{ src: '../photos/zags-thumbs/1-768.avif', srcFull: '../photos/zags-full/1-768.avif', alt: 'Фото 1-768' },
+				{ src: '../photos/zags-thumbs/1-771.avif', srcFull: '../photos/zags-full/1-771.avif', alt: 'Фото 1-771' },
+				{ src: '../photos/zags-thumbs/1-772.avif', srcFull: '../photos/zags-full/1-772.avif', alt: 'Фото 1-772' },
+				{ src: '../photos/zags-thumbs/1-782.avif', srcFull: '../photos/zags-full/1-782.avif', alt: 'Фото 1-782' },
+				{ src: '../photos/zags-thumbs/1-785.avif', srcFull: '../photos/zags-full/1-785.avif', alt: 'Фото 1-785' },
+				{ src: '../photos/zags-thumbs/1-786.avif', srcFull: '../photos/zags-full/1-786.avif', alt: 'Фото 1-786' },
+				{ src: '../photos/zags-thumbs/1-791.avif', srcFull: '../photos/zags-full/1-791.avif', alt: 'Фото 1-791' },
+				{ src: '../photos/zags-thumbs/1-794.avif', srcFull: '../photos/zags-full/1-794.avif', alt: 'Фото 1-794' },
+				{ src: '../photos/zags-thumbs/1-809.avif', srcFull: '../photos/zags-full/1-809.avif', alt: 'Фото 1-809' },
+				{ src: '../photos/zags-thumbs/1-813.avif', srcFull: '../photos/zags-full/1-813.avif', alt: 'Фото 1-813' },
+				{ src: '../photos/zags-thumbs/1-816.avif', srcFull: '../photos/zags-full/1-816.avif', alt: 'Фото 1-816' },
+				{ src: '../photos/zags-thumbs/1-818.avif', srcFull: '../photos/zags-full/1-818.avif', alt: 'Фото 1-818' },
+				{ src: '../photos/zags-thumbs/1-823.avif', srcFull: '../photos/zags-full/1-823.avif', alt: 'Фото 1-823' },
+				{ src: '../photos/zags-thumbs/1-826.avif', srcFull: '../photos/zags-full/1-826.avif', alt: 'Фото 1-826' },
+				{ src: '../photos/zags-thumbs/1-829.avif', srcFull: '../photos/zags-full/1-829.avif', alt: 'Фото 1-829' },
+				{ src: '../photos/zags-thumbs/1-844.avif', srcFull: '../photos/zags-full/1-844.avif', alt: 'Фото 1-844' },
+				{ src: '../photos/zags-thumbs/1-849.avif', srcFull: '../photos/zags-full/1-849.avif', alt: 'Фото 1-849' }
+			]
+		} );
+
+		// ==========================================
+		// 2. Блок «За кадром» (Доп. фото, начиная с 1-660)
+		// ==========================================
+		initGallery( {
+			section: 'home', // Другая тема для второго блока
+			gridId: 'galleryGridB',
+			initialCount: 15,
+			photos: [
+				{ src: '../photos/zags-dop-thumbs/1-660.avif', srcFull: '../photos/zags-dop-full/1-660.avif', alt: 'За кадром 1-660' },
+				{ src: '../photos/zags-dop-thumbs/1-661.avif', srcFull: '../photos/zags-dop-full/1-661.avif', alt: 'За кадром 1-661' },
+				{ src: '../photos/zags-dop-thumbs/1-662.avif', srcFull: '../photos/zags-dop-full/1-662.avif', alt: 'За кадром 1-662' },
+				{ src: '../photos/zags-dop-thumbs/1-663.avif', srcFull: '../photos/zags-dop-full/1-663.avif', alt: 'За кадром 1-663' },
+				{ src: '../photos/zags-dop-thumbs/1-664.avif', srcFull: '../photos/zags-dop-full/1-664.avif', alt: 'За кадром 1-664' },
+				{ src: '../photos/zags-dop-thumbs/1-666.avif', srcFull: '../photos/zags-dop-full/1-666.avif', alt: 'За кадром 1-666' },
+				{ src: '../photos/zags-dop-thumbs/1-667.avif', srcFull: '../photos/zags-dop-full/1-667.avif', alt: 'За кадром 1-667' },
+				{ src: '../photos/zags-dop-thumbs/1-668.avif', srcFull: '../photos/zags-dop-full/1-668.avif', alt: 'За кадром 1-668' },
+				{ src: '../photos/zags-dop-thumbs/1-669.avif', srcFull: '../photos/zags-dop-full/1-669.avif', alt: 'За кадром 1-669' },
+				{ src: '../photos/zags-dop-thumbs/1-671.avif', srcFull: '../photos/zags-dop-full/1-671.avif', alt: 'За кадром 1-671' },
+				{ src: '../photos/zags-dop-thumbs/1-675.avif', srcFull: '../photos/zags-dop-full/1-675.avif', alt: 'За кадром 1-675' },
+				{ src: '../photos/zags-dop-thumbs/1-712.avif', srcFull: '../photos/zags-dop-full/1-712.avif', alt: 'За кадром 1-712' },
+				{ src: '../photos/zags-dop-thumbs/1-713.avif', srcFull: '../photos/zags-dop-full/1-713.avif', alt: 'За кадром 1-713' },
+				{ src: '../photos/zags-dop-thumbs/1-714.avif', srcFull: '../photos/zags-dop-full/1-714.avif', alt: 'За кадром 1-714' },
+				{ src: '../photos/zags-dop-thumbs/1-737.avif', srcFull: '../photos/zags-dop-full/1-737.avif', alt: 'За кадром 1-737' },
+				{ src: '../photos/zags-dop-thumbs/1-754.avif', srcFull: '../photos/zags-dop-full/1-754.avif', alt: 'За кадром 1-754' },
+				{ src: '../photos/zags-dop-thumbs/1-756.avif', srcFull: '../photos/zags-dop-full/1-756.avif', alt: 'За кадром 1-756' },
+				{ src: '../photos/zags-dop-thumbs/1-757.avif', srcFull: '../photos/zags-dop-full/1-757.avif', alt: 'За кадром 1-757' },
+				{ src: '../photos/zags-dop-thumbs/1-758.avif', srcFull: '../photos/zags-dop-full/1-758.avif', alt: 'За кадром 1-758' },
+				{ src: '../photos/zags-dop-thumbs/1-759.avif', srcFull: '../photos/zags-dop-full/1-759.avif', alt: 'За кадром 1-759' },
+				{ src: '../photos/zags-dop-thumbs/1-760.avif', srcFull: '../photos/zags-dop-full/1-760.avif', alt: 'За кадром 1-760' },
+				{ src: '../photos/zags-dop-thumbs/1-762.avif', srcFull: '../photos/zags-dop-full/1-762.avif', alt: 'За кадром 1-762' },
+				{ src: '../photos/zags-dop-thumbs/1-766.avif', srcFull: '../photos/zags-dop-full/1-766.avif', alt: 'За кадром 1-766' },
+				{ src: '../photos/zags-dop-thumbs/1-778.avif', srcFull: '../photos/zags-dop-full/1-778.avif', alt: 'За кадром 1-778' },
+				{ src: '../photos/zags-dop-thumbs/1-779.avif', srcFull: '../photos/zags-dop-full/1-779.avif', alt: 'За кадром 1-779' },
+				{ src: '../photos/zags-dop-thumbs/1-792.avif', srcFull: '../photos/zags-dop-full/1-792.avif', alt: 'За кадром 1-792' },
+				{ src: '../photos/zags-dop-thumbs/1-795.avif', srcFull: '../photos/zags-dop-full/1-795.avif', alt: 'За кадром 1-795' },
+				{ src: '../photos/zags-dop-thumbs/1-798.avif', srcFull: '../photos/zags-dop-full/1-798.avif', alt: 'За кадром 1-798' },
+				{ src: '../photos/zags-dop-thumbs/1-799.avif', srcFull: '../photos/zags-dop-full/1-799.avif', alt: 'За кадром 1-799' },
+				{ src: '../photos/zags-dop-thumbs/1-800.avif', srcFull: '../photos/zags-dop-full/1-800.avif', alt: 'За кадром 1-800' },
+				{ src: '../photos/zags-dop-thumbs/1-803.avif', srcFull: '../photos/zags-dop-full/1-803.avif', alt: 'За кадром 1-803' },
+				{ src: '../photos/zags-dop-thumbs/1-804.avif', srcFull: '../photos/zags-dop-full/1-804.avif', alt: 'За кадром 1-804' },
+				{ src: '../photos/zags-dop-thumbs/1-808.avif', srcFull: '../photos/zags-dop-full/1-808.avif', alt: 'За кадром 1-808' },
+				{ src: '../photos/zags-dop-thumbs/1-812.avif', srcFull: '../photos/zags-dop-full/1-812.avif', alt: 'За кадром 1-812' },
+				{ src: '../photos/zags-dop-thumbs/1-830.avif', srcFull: '../photos/zags-dop-full/1-830.avif', alt: 'За кадром 1-830' },
+				{ src: '../photos/zags-dop-thumbs/1-832.avif', srcFull: '../photos/zags-dop-full/1-832.avif', alt: 'За кадром 1-832' },
+				{ src: '../photos/zags-dop-thumbs/1-835.avif', srcFull: '../photos/zags-dop-full/1-835.avif', alt: 'За кадром 1-835' },
+				{ src: '../photos/zags-dop-thumbs/1-838.avif', srcFull: '../photos/zags-dop-full/1-838.avif', alt: 'За кадром 1-838' },
+				{ src: '../photos/zags-dop-thumbs/1-890.avif', srcFull: '../photos/zags-dop-full/1-890.avif', alt: 'За кадром 1-890' }
 			]
 		} );
 	</script>
