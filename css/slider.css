@@ -10,7 +10,7 @@
    4.  Слайд
    5.  Обёртка и изображение
    6.  Подпись
-   7.  Кнопки действий (Скачать / Поделиться)
+   7.  Кнопки действий (Скачать / Поделиться / Полный экран)
    8.  Навигационные стрелки
    9.  Пагинация (точки)
    10. Кнопка закрытия
@@ -18,7 +18,8 @@
    12. Подсказка о зуме
    13. Кнопки зума +/−
    14. Зум (состояния и эффекты)
-   15. Адаптивность (все @media)
+   15. Полноэкранный режим
+   16. Адаптивность (все @media)
    ============================================================ */
 
 /* ============================================================
@@ -131,6 +132,8 @@ body:has(.slider-overlay.open) {
 	flex: 1 1 auto;
 	min-height: 0;
 	overflow: hidden;
+	transition: height 0.3s ease;
+	/* Для полноэкранного режима */
 }
 
 /* Полоска миниатюр */
@@ -146,6 +149,8 @@ body:has(.slider-overlay.open) {
 	-webkit-backdrop-filter: blur(10px);
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 	z-index: 10;
+	transition: opacity 0.3s ease;
+	/* Для полноэкранного режима */
 }
 
 .swiper-wrapper {
@@ -193,7 +198,9 @@ body:has(.slider-overlay.open) {
 	background: #080808;
 	transition:
 		box-shadow 0.6s var(--ease-out-expo),
-		transform 0.6s var(--ease-out-expo);
+		transform 0.6s var(--ease-out-expo),
+		border-radius 0.3s ease;
+	/* Для полноэкранного режима */
 }
 
 .swiper-slide-active {
@@ -213,7 +220,7 @@ body:has(.slider-overlay.open) {
 	background: #080808;
 	overflow: hidden;
 	border-radius: 24px;
-	transition: transform 0.8s var(--ease-out-expo);
+	transition: transform 0.8s var(--ease-out-expo), border-radius 0.3s ease;
 }
 
 .swiper-slide-zoomed .swiper-zoom-container {
@@ -287,7 +294,7 @@ body:has(.slider-overlay.open) {
 }
 
 /* ============================================================
-   7. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться)
+   7. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться / Полный экран)
    ============================================================ */
 
 .slider-actions {
@@ -297,6 +304,8 @@ body:has(.slider-overlay.open) {
 	display: flex;
 	gap: 12px;
 	z-index: 1001;
+	transition: opacity 0.3s ease;
+	/* Для полноэкранного режима */
 }
 
 .slider-action-btn {
@@ -340,7 +349,7 @@ body:has(.slider-overlay.open) {
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
 	color: rgba(255, 255, 255, 0.6);
-	transition: all 0.4s var(--ease-out-expo);
+	transition: all 0.4s var(--ease-out-expo), opacity 0.3s ease;
 	top: 50%;
 	transform: translateY(-50%);
 }
@@ -387,6 +396,7 @@ body:has(.slider-overlay.open) {
 
 .swiper-pagination {
 	bottom: 24px !important;
+	transition: opacity 0.3s ease;
 }
 
 .swiper-pagination-bullet {
@@ -434,7 +444,7 @@ body:has(.slider-overlay.open) {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.4s var(--ease-out-expo);
+	transition: all 0.4s var(--ease-out-expo), opacity 0.3s ease;
 }
 
 .slider-close:hover {
@@ -482,6 +492,7 @@ body:has(.slider-overlay.open) {
 
 	pointer-events: none;
 	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+	transition: opacity 0.3s ease, bottom 0.3s ease;
 }
 
 /* ============================================================
@@ -677,7 +688,78 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 }
 
 /* ============================================================
-   15. АДАПТИВНОСТЬ (ВСЕ МЕДИА-ЗАПРОСЫ)
+   15. ПОЛНОЭКРАННЫЙ РЕЖИМ
+   ============================================================ */
+
+/* 1. Скрываем миниатюры, подписи, пагинацию и зум-контролы */
+.slider-overlay.is-fullscreen .swiper-thumbs,
+.slider-overlay.is-fullscreen .swiper-pagination,
+.slider-overlay.is-fullscreen .slider-zoom-controls,
+.slider-overlay.is-fullscreen .slider-zoom-hint,
+.slider-overlay.is-fullscreen .slider-counter,
+.slider-overlay.is-fullscreen .slide-caption {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* 2. Кнопка закрытия слайдера (крестик) — скрываем */
+.slider-overlay.is-fullscreen .slider-close {
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* 3. Основной слайдер на весь экран */
+.slider-overlay.is-fullscreen .swiper-main {
+	height: 100% !important;
+	transition: height 0.3s ease;
+}
+
+/* 4. Убираем скругления у фото */
+.slider-overlay.is-fullscreen .swiper-slide,
+.slider-overlay.is-fullscreen .swiper-zoom-container {
+	border-radius: 0 !important;
+	transition: border-radius 0.3s ease;
+}
+
+/* 5. Кнопка выхода из полноэкранного режима — она видна всегда, 
+      чтобы пользователь мог вернуться к альбому */
+.slider-overlay.is-fullscreen .slider-actions {
+	opacity: 1;
+	visibility: visible;
+	pointer-events: all;
+	transition: opacity 0.3s ease;
+}
+
+/* 6. Стрелки навигации — появляются только при наведении на экран */
+.slider-overlay.is-fullscreen .swiper-button-prev,
+.slider-overlay.is-fullscreen .swiper-button-next {
+	opacity: 0;
+	transition: opacity 0.3s ease;
+}
+
+.slider-overlay.is-fullscreen:hover .swiper-button-prev,
+.slider-overlay.is-fullscreen:hover .swiper-button-next {
+	opacity: 0.6;
+}
+
+.slider-overlay.is-fullscreen .swiper-button-prev:hover,
+.slider-overlay.is-fullscreen .swiper-button-next:hover {
+	opacity: 1;
+}
+
+/* На тачскринах (телефонах) стрелки не нужны, свайп работает */
+@media (hover: none) {
+
+	.slider-overlay.is-fullscreen:hover .swiper-button-prev,
+	.slider-overlay.is-fullscreen:hover .swiper-button-next {
+		opacity: 0;
+	}
+}
+
+/* ============================================================
+   16. АДАПТИВНОСТЬ (ВСЕ МЕДИА-ЗАПРОСЫ)
    ============================================================ */
 
 /* Мобильные (< 481px) */

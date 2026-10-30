@@ -2,16 +2,6 @@
  * ============================================================
  * slider.js — Полноэкранный слайдер на Swiper
  * ============================================================
- * 
- * ВОЗМОЖНОСТИ:
- *   - Перелистывание (свайп, стрелки, колёсико, клавиатура)
- *   - Все фото видны целиком (object-fit: contain)
- *   - Встроенный зум Swiper (двойной тап / пинч / перетаскивание)
- *   - Кнопки +/− для зума
- *   - Кнопки «Скачать» и «Поделиться»
- *   - Полоска миниатюр внизу (Thumbs)
- *   - Умный лоадер (появляется только если фото грузится > 1 сек)
- * ============================================================
  */
 
 let swiperInstance = null;
@@ -22,19 +12,16 @@ function openSlider( config ) {
 
 	const { photos, startIndex = 0, theme = 'garden' } = config;
 
-	// ============================================================
 	// 1. ЗАЩИТА ОТ ДУБЛИРОВАНИЯ
-	// ============================================================
 	if ( document.querySelector( '.slider-overlay' ) ) return;
 	if ( !photos || !photos.length ) return;
 
-	// ============================================================
-	// 2. ВНЕДРЕНИЕ CSS ДЛЯ ЛОАДЕРА
-	// ============================================================
+	// 2. ВНЕДРЕНИЕ CSS (ЛОАДЕР + ПОЛНОЭКРАННЫЙ РЕЖИМ)
 	if ( !document.getElementById( 'slider-loader-styles' ) ) {
 		const style = document.createElement( 'style' );
 		style.id = 'slider-loader-styles';
 		style.textContent = `
+			/* Лоадер */
 			.slider-loader {
 				position: absolute;
 				top: 50%;
@@ -71,13 +58,65 @@ function openSlider( config ) {
 					border-width: 2px;
 				}
 			}
+
+			/* Полноэкранный режим */
+			.slider-overlay.is-fullscreen .swiper-pagination,
+			.slider-overlay.is-fullscreen .slider-zoom-controls,
+			.slider-overlay.is-fullscreen .slider-zoom-hint,
+			.slider-overlay.is-fullscreen .slider-counter,
+			.slider-overlay.is-fullscreen .slide-caption,
+			.slider-overlay.is-fullscreen .slider-close {
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+				transition: opacity 0.3s ease, visibility 0.3s ease;
+			}
+
+			/* Скрываем миниатюры и убираем место под них */
+			.slider-overlay.is-fullscreen .swiper-thumbs {
+				display: none !important;
+			}
+
+			/* Основной слайдер на весь экран */
+			.slider-overlay.is-fullscreen .swiper-main {
+				height: 100% !important;
+				transition: height 0.3s ease;
+			}
+
+			/* Кнопки действий остаются видны */
+			.slider-overlay.is-fullscreen .slider-actions {
+				opacity: 1;
+				visibility: visible;
+				pointer-events: all;
+			}
+
+			/* Стрелки появляются при наведении */
+			.slider-overlay.is-fullscreen .swiper-button-prev,
+			.slider-overlay.is-fullscreen .swiper-button-next {
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+			.slider-overlay.is-fullscreen:hover .swiper-button-prev,
+			.slider-overlay.is-fullscreen:hover .swiper-button-next {
+				opacity: 0.6;
+			}
+
+			/* Убираем скругления */
+			.slider-overlay.is-fullscreen .swiper-slide,
+			.slider-overlay.is-fullscreen .swiper-zoom-container {
+				border-radius: 0 !important;
+				transition: border-radius 0.3s ease;
+			}
+
+			/* Прячем соседние слайды */
+			.slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
+				opacity: 0;
+			}
 		`;
 		document.head.appendChild( style );
 	}
 
-	// ============================================================
 	// 3. ПОСТРОЕНИЕ HTML
-	// ============================================================
 	const overlay = document.createElement( 'div' );
 	overlay.className = 'slider-overlay';
 	overlay.setAttribute( 'data-theme', theme );
@@ -92,6 +131,7 @@ function openSlider( config ) {
                     alt="${photo.alt || ''}" 
                     data-index="${i}"
                     loading="lazy"
+                    decoding="async" 
                     draggable="false"
                 >
             </div>
@@ -108,6 +148,7 @@ function openSlider( config ) {
                 src="${thumbSrc}" 
                 alt="Миниатюра ${i + 1}"
                 loading="lazy"
+                decoding="async"
                 draggable="false"
             >
         </div>
@@ -130,6 +171,11 @@ function openSlider( config ) {
                     <circle cx="18" cy="19" r="3"></circle>
                     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
                     <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+            </button>
+            <button class="slider-action-btn" id="sliderFullscreen" aria-label="Полный экран" title="Полный экран">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
                 </svg>
             </button>
         </div>
@@ -168,14 +214,12 @@ function openSlider( config ) {
 
 	requestAnimationFrame( () => overlay.classList.add( 'open' ) );
 
-	// ============================================================
 	// 4. ИНИЦИАЛИЗАЦИЯ SWIPER
-	// ============================================================
 	const swiperMainEl = overlay.querySelector( '.swiper-main' );
 	const swiperThumbsEl = overlay.querySelector( '.swiper-thumbs' );
 	const loaderEl = overlay.querySelector( '#sliderLoader' );
 
-	// --- ПЕРЕМЕННЫЕ ДЛЯ ЛОАДЕРА (ОБЪЯВЛЯЕМ ЗАРАНЕЕ) ---
+	// --- ПЕРЕМЕННЫЕ ДЛЯ ЛОАДЕРА ---
 	let loaderTimer = null;
 
 	function checkCurrentImageLoaded() {
@@ -209,7 +253,6 @@ function openSlider( config ) {
 	}
 	// ----------------------------------------------------
 
-	// Скрываем до готовности
 	swiperMainEl.style.visibility = 'hidden';
 	swiperMainEl.style.opacity = '0';
 	swiperMainEl.style.transition = 'opacity 0.3s ease';
@@ -287,12 +330,9 @@ function openSlider( config ) {
 		},
 	} );
 
-	// Проверка при открытии
 	checkCurrentImageLoaded();
 
-	// ============================================================
-	// 5. КНОПКИ СКАЧАТЬ / ПОДЕЛИТЬСЯ
-	// ============================================================
+	// 5. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться / Полный экран)
 	function updateActionButtons( index ) {
 		const photo = photos[index];
 		if ( !photo ) return;
@@ -341,9 +381,49 @@ function openSlider( config ) {
 
 	updateActionButtons( startIndex );
 
-	// ============================================================
+	// --- Логика кнопки Полный экран ---
+	const fullscreenBtn = document.getElementById( 'sliderFullscreen' );
+
+	if ( fullscreenBtn ) {
+		fullscreenBtn.addEventListener( 'click', () => {
+			const isFullscreen = overlay.classList.toggle( 'is-fullscreen' );
+
+			if ( isFullscreen ) {
+				fullscreenBtn.innerHTML = `
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
+					</svg>
+				`;
+			} else {
+				fullscreenBtn.innerHTML = `
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+					</svg>
+				`;
+			}
+
+			// Меняем параметры Swiper в зависимости от режима
+			if ( isFullscreen ) {
+				swiperInstance.params.slidesPerView = 1;
+				swiperInstance.params.centeredSlides = false;
+				swiperInstance.params.spaceBetween = 0;
+			} else {
+				swiperInstance.params.slidesPerView = 1.5;
+				swiperInstance.params.centeredSlides = true;
+				swiperInstance.params.spaceBetween = 40;
+			}
+
+			swiperInstance.update();
+
+			setTimeout( () => {
+				if ( swiperInstance ) {
+					swiperInstance.updateSize();
+				}
+			}, 300 );
+		} );
+	}
+
 	// 6. ЦЕНТРИРОВАНИЕ И ПОКАЗ
-	// ============================================================
 	function refreshSwiper() {
 		if ( !swiperInstance || swiperInstance.destroyed ) return;
 		swiperInstance.updateSize();
@@ -408,9 +488,7 @@ function openSlider( config ) {
 		}
 	}, 1500 );
 
-	// ============================================================
 	// 7. СЧЁТЧИК
-	// ============================================================
 	function updateCounter( index, total ) {
 		const counter = document.getElementById( 'sliderCounter' );
 		if ( counter ) {
@@ -418,9 +496,7 @@ function openSlider( config ) {
 		}
 	}
 
-	// ============================================================
 	// 8. ЗУМ
-	// ============================================================
 	const ZOOM_STEPS = [1, 2, 4, 8];
 
 	function getNextZoomStep( currentScale ) {
@@ -508,9 +584,7 @@ function openSlider( config ) {
 		}
 	}
 
-	// ============================================================
 	// 9. ЗАКРЫТИЕ
-	// ============================================================
 	function closeSlider() {
 		overlay.classList.remove( 'open' );
 		setTimeout( () => {
@@ -529,11 +603,16 @@ function openSlider( config ) {
 	}
 
 	overlay.querySelector( '#sliderClose' ).addEventListener( 'click', closeSlider );
+
 	overlay.addEventListener( 'click', e => {
-		if ( e.target === overlay || e.target.classList.contains( 'slider-container' ) ) {
+		const isClickOnOverlay = e.target === overlay;
+		const isClickOnEmptyContainer = e.target.classList.contains( 'slider-container' ) && !e.target.closest( '.swiper' );
+
+		if ( isClickOnOverlay || isClickOnEmptyContainer ) {
 			closeSlider();
 		}
 	} );
+
 	document.addEventListener( 'keydown', function esc( e ) {
 		if ( e.key === 'Escape' ) {
 			closeSlider();
@@ -541,9 +620,7 @@ function openSlider( config ) {
 		}
 	} );
 
-	// ============================================================
 	// 10. ЗАПУСК
-	// ============================================================
 	updateZoomUI();
 	if ( window.navigator?.vibrate ) window.navigator.vibrate( 10 );
 	console.log( `📸 Слайдер открыт с миниатюрами: ${startIndex + 1} / ${photos.length}` );
