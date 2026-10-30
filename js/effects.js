@@ -1,6 +1,6 @@
 /**
  * ============================================================
- * effects.js — Лепестки сакуры и светлячки
+ * effects.js — Лепестки сакуры, светлячки и плавные переходы
  * Общие эффекты для всех страниц альбома.
  * ============================================================
  */
@@ -19,10 +19,11 @@
 	const IS_MOBILE = window.matchMedia( '(max-width: 768px)' ).matches;
 
 	// ============================================================
-	// 1. ИНИЦИАЛИЗАЦИЯ
+	// 1. ИНИЦИАЛИЗАЦИЯ ЭФФЕКТОВ
 	// ============================================================
 
 	function init() {
+		// --- Инициализация эффектов ---
 		let container = document.getElementById( 'effectsContainer' );
 		if ( !container ) {
 			container = document.createElement( 'div' );
@@ -46,10 +47,13 @@
 		} else {
 			console.log( '🌸 Эффекты запущены (только лепестки)' );
 		}
+
+		// --- Запуск плавных переходов ---
+		initPageTransitions();
 	}
 
 	// ============================================================
-	// 2. CSS-АНИМАЦИИ
+	// 2. CSS-АНИМАЦИИ ДЛЯ ЭФФЕКТОВ
 	// ============================================================
 
 	function injectStyles() {
@@ -281,5 +285,55 @@
 		if ( ctrl.intervalId ) clearInterval( ctrl.intervalId );
 		if ( ctrl.fireflies ) ctrl.fireflies.forEach( f => f.remove() );
 	};
+
+	// ============================================================
+	// 6. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ (ЧЕРНОЕ ЗАТУХАНИЕ)
+	// ============================================================
+
+	function initPageTransitions() {
+		// Создаем черный занавес
+		const curtain = document.createElement( 'div' );
+		curtain.id = 'page-curtain';
+		document.body.appendChild( curtain );
+
+		// Функция для запуска анимации и перехода
+		function navigateTo( href ) {
+			// Показываем черный занавес
+			curtain.classList.add( 'active' );
+
+			// Ждем окончания анимации (0.6 секунды) и переходим
+			setTimeout( () => {
+				window.location.href = href;
+			}, 600 );
+		}
+
+		// 1. Перехват кликов по обычным ссылкам <a>
+		const links = document.querySelectorAll( 'a[href]:not([target="_blank"]):not([href^="#"])' );
+		links.forEach( link => {
+			link.addEventListener( 'click', ( e ) => {
+				const href = link.getAttribute( 'href' );
+				if ( href && !href.startsWith( 'mailto:' ) && !href.startsWith( 'tel:' ) ) {
+					e.preventDefault();
+					navigateTo( href );
+				}
+			} );
+		} );
+
+		// 2. Перехват кликов по кнопкам на главной (data-section)
+		// Ищем кнопки с атрибутом data-section
+		const navButtons = document.querySelectorAll( 'button[data-section]' );
+		navButtons.forEach( btn => {
+			btn.addEventListener( 'click', ( e ) => {
+				const section = btn.getAttribute( 'data-section' );
+
+				// Формируем путь к странице (например, pages/garden.html)
+				// Замените 'pages/' на вашу реальную папку, где лежат страницы
+				const href = `pages/${section}.html`;
+
+				e.preventDefault();
+				navigateTo( href );
+			} );
+		} );
+	}
 
 } )();
