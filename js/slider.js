@@ -6,30 +6,16 @@
  * ВОЗМОЖНОСТИ:
  *   - Перелистывание (свайп, стрелки, колёсико, клавиатура)
  *   - Все фото видны целиком (object-fit: contain)
- *   - Ч/б → цвет при активации слайда
  *   - Встроенный зум Swiper (двойной тап / пинч / перетаскивание)
  *   - Кнопки +/− для зума
- *   - Автоматическая блокировка перелистывания при зуме
- *   - Поддержка полноразмерных изображений (srcFull)
- * 
- * ИСПОЛЬЗОВАНИЕ:
- *   openSlider({
- *       photos: [{ 
- *           src: '.../thumbs/1.avif',    // превью для сетки
- *           srcFull: '.../full/1.avif',  // полное фото для лайтбокса
- *           alt: '...' 
- *       }, ...],
- *       startIndex: 0,
- *       theme: 'garden'
- *   });
- * 
- * ЗАВИСИМОСТИ:
- *   - Swiper 11 (CDN: swiper-bundle.min.js)
- *   - slider.css
+ *   - Кнопки «Скачать» и «Поделиться»
+ *   - Полоска миниатюр внизу (Thumbs)
+ *   - Умный лоадер (появляется только если фото грузится > 1 сек)
  * ============================================================
  */
 
 let swiperInstance = null;
+let thumbsInstance = null;
 
 function openSlider( config ) {
 	'use strict';
@@ -43,17 +29,61 @@ function openSlider( config ) {
 	if ( !photos || !photos.length ) return;
 
 	// ============================================================
-	// 2. ПОСТРОЕНИЕ HTML
+	// 2. ВНЕДРЕНИЕ CSS ДЛЯ ЛОАДЕРА
+	// ============================================================
+	if ( !document.getElementById( 'slider-loader-styles' ) ) {
+		const style = document.createElement( 'style' );
+		style.id = 'slider-loader-styles';
+		style.textContent = `
+			.slider-loader {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				z-index: 5;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				pointer-events: none;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+			.slider-loader.visible {
+				opacity: 1;
+			}
+			.slider-loader-ring {
+				width: 48px;
+				height: 48px;
+				border-radius: 50%;
+				border: 3px solid rgba(255, 255, 255, 0.1);
+				border-top-color: var(--accent-color, #E8A0B4);
+				animation: sliderLoaderSpin 1s linear infinite;
+				box-shadow: 0 0 20px rgba(var(--accent-rgb, 232, 160, 180), 0.2);
+			}
+			@keyframes sliderLoaderSpin {
+				0% { transform: rotate(0deg); }
+				100% { transform: rotate(360deg); }
+			}
+			@media (width < 481px) {
+				.slider-loader-ring {
+					width: 36px;
+					height: 36px;
+					border-width: 2px;
+				}
+			}
+		`;
+		document.head.appendChild( style );
+	}
+
+	// ============================================================
+	// 3. ПОСТРОЕНИЕ HTML
 	// ============================================================
 	const overlay = document.createElement( 'div' );
 	overlay.className = 'slider-overlay';
 	overlay.setAttribute( 'data-theme', theme );
 
-	// ВАЖНО: Используем srcFull (если есть) для показа в полном размере.
-	// Если srcFull нет, откатываемся на src.
 	const slidesHTML = photos.map( ( photo, i ) => {
 		const fullSrc = photo.srcFull || photo.src;
-
 		return `
         <div class="swiper-slide">
             <div class="swiper-zoom-container">
@@ -70,17 +100,61 @@ function openSlider( config ) {
     `;
 	} ).join( '' );
 
+	const thumbsHTML = photos.map( ( photo, i ) => {
+		const thumbSrc = photo.src || photo.srcFull;
+		return `
+        <div class="swiper-slide thumb-slide">
+            <img 
+                src="${thumbSrc}" 
+                alt="Миниатюра ${i + 1}"
+                loading="lazy"
+                draggable="false"
+            >
+        </div>
+    `;
+	} ).join( '' );
+
 	overlay.innerHTML = `
+        <div class="slider-actions">
+            <button class="slider-action-btn" id="sliderDownload" aria-label="Скачать" title="Скачать фото">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+            </button>
+            <button class="slider-action-btn" id="sliderShare" aria-label="Поделиться" title="Поделиться фото">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+            </button>
+        </div>
+
         <button class="slider-close" id="sliderClose" aria-label="Закрыть">✕</button>
+        
         <div class="slider-container">
-            <div class="swiper">
+            <div class="slider-loader" id="sliderLoader">
+                <div class="slider-loader-ring"></div>
+            </div>
+
+            <div class="swiper swiper-main">
                 <div class="swiper-wrapper">${slidesHTML}</div>
                 <div class="swiper-pagination"></div>
                 <div class="swiper-button-prev"></div>
                 <div class="swiper-button-next"></div>
             </div>
+            
+            <div class="swiper swiper-thumbs">
+                <div class="swiper-wrapper">${thumbsHTML}</div>
+            </div>
         </div>
+
         <span class="slider-counter" id="sliderCounter">${startIndex + 1} / ${photos.length}</span>
+        
         <div class="slider-zoom-controls" id="sliderZoomControls">
             <button class="zoom-btn zoom-out" id="zoomOut" aria-label="Уменьшить">−</button>
             <span class="zoom-level" id="zoomLevel">1×</span>
@@ -92,22 +166,71 @@ function openSlider( config ) {
 	document.body.appendChild( overlay );
 	document.body.style.overflow = 'hidden';
 
-	// ============================================================
-	// 3. АНИМАЦИЯ ПОЯВЛЕНИЯ
-	// ============================================================
 	requestAnimationFrame( () => overlay.classList.add( 'open' ) );
 
 	// ============================================================
 	// 4. ИНИЦИАЛИЗАЦИЯ SWIPER
 	// ============================================================
-	const swiperEl = overlay.querySelector( '.swiper' );
+	const swiperMainEl = overlay.querySelector( '.swiper-main' );
+	const swiperThumbsEl = overlay.querySelector( '.swiper-thumbs' );
+	const loaderEl = overlay.querySelector( '#sliderLoader' );
+
+	// --- ПЕРЕМЕННЫЕ ДЛЯ ЛОАДЕРА (ОБЪЯВЛЯЕМ ЗАРАНЕЕ) ---
+	let loaderTimer = null;
+
+	function checkCurrentImageLoaded() {
+		if ( loaderTimer ) {
+			clearTimeout( loaderTimer );
+			loaderTimer = null;
+		}
+		if ( loaderEl ) loaderEl.classList.remove( 'visible' );
+
+		if ( !swiperInstance ) return;
+
+		const activeSlide = swiperInstance.slides[swiperInstance.activeIndex];
+		if ( !activeSlide ) return;
+
+		const img = activeSlide.querySelector( 'img' );
+		if ( !img ) return;
+
+		if ( img.complete && img.naturalWidth > 0 ) return;
+
+		loaderTimer = setTimeout( () => {
+			if ( loaderEl ) loaderEl.classList.add( 'visible' );
+		}, 1000 );
+
+		const onLoad = () => {
+			if ( loaderTimer ) clearTimeout( loaderTimer );
+			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
+		};
+
+		img.addEventListener( 'load', onLoad, { once: true } );
+		img.addEventListener( 'error', onLoad, { once: true } );
+	}
+	// ----------------------------------------------------
 
 	// Скрываем до готовности
-	swiperEl.style.visibility = 'hidden';
-	swiperEl.style.opacity = '0';
-	swiperEl.style.transition = 'opacity 0.3s ease';
+	swiperMainEl.style.visibility = 'hidden';
+	swiperMainEl.style.opacity = '0';
+	swiperMainEl.style.transition = 'opacity 0.3s ease';
 
-	swiperInstance = new Swiper( swiperEl, {
+	swiperThumbsEl.style.opacity = '0';
+	swiperThumbsEl.style.transition = 'opacity 0.3s ease';
+
+	// 4.1. Миниатюры
+	thumbsInstance = new Swiper( swiperThumbsEl, {
+		spaceBetween: 8,
+		slidesPerView: 'auto',
+		freeMode: true,
+		watchSlidesProgress: true,
+		lazy: {
+			loadPrevNext: true,
+			loadPrevNextAmount: 5,
+		},
+	} );
+
+	// 4.2. Основной слайдер
+	swiperInstance = new Swiper( swiperMainEl, {
 		grabCursor: true,
 		slidesPerView: 1.5,
 		centeredSlides: true,
@@ -116,7 +239,10 @@ function openSlider( config ) {
 		spaceBetween: 40,
 		watchSlidesProgress: true,
 
-		// Встроенный зум Swiper
+		thumbs: {
+			swiper: thumbsInstance,
+		},
+
 		zoom: {
 			enabled: true,
 			maxRatio: 4,
@@ -126,31 +252,21 @@ function openSlider( config ) {
 			zoomedSlideClass: 'swiper-slide-zoomed',
 		},
 
-		// Навигация
 		navigation: {
 			nextEl: overlay.querySelector( '.swiper-button-next' ),
 			prevEl: overlay.querySelector( '.swiper-button-prev' ),
 		},
 
-		// Пагинация (в нашем случае не нужна)
-		// pagination: {
-		// 	el: overlay.querySelector( '.swiper-pagination' ),
-		// 	clickable: true,
-		// },
-
-		// Колёсико мыши
 		mousewheel: {
 			thresholdDelta: 50,
 			sensitivity: 1,
 		},
 
-		// Клавиатура
 		keyboard: {
 			enabled: true,
 			onlyInViewport: true,
 		},
 
-		// Адаптивность
 		breakpoints: {
 			320: { slidesPerView: 1.1, spaceBetween: 12 },
 			481: { slidesPerView: 1.2, spaceBetween: 20 },
@@ -158,11 +274,12 @@ function openSlider( config ) {
 			993: { slidesPerView: 1.5, spaceBetween: 40 },
 		},
 
-		// События
 		on: {
 			slideChange: function () {
 				updateCounter( this.activeIndex, photos.length );
 				updateZoomUI();
+				updateActionButtons( this.activeIndex );
+				checkCurrentImageLoaded();
 			},
 			zoomChange: function ( swiper, scale ) {
 				updateZoomUI( scale );
@@ -170,8 +287,62 @@ function openSlider( config ) {
 		},
 	} );
 
+	// Проверка при открытии
+	checkCurrentImageLoaded();
+
 	// ============================================================
-	// 5. ЦЕНТРИРОВАНИЕ ПРИ ПЕРВОМ ЗАПУСКЕ
+	// 5. КНОПКИ СКАЧАТЬ / ПОДЕЛИТЬСЯ
+	// ============================================================
+	function updateActionButtons( index ) {
+		const photo = photos[index];
+		if ( !photo ) return;
+
+		const fullSrc = photo.srcFull || photo.src;
+		const downloadBtn = document.getElementById( 'sliderDownload' );
+		const shareBtn = document.getElementById( 'sliderShare' );
+
+		if ( downloadBtn ) {
+			downloadBtn.onclick = () => {
+				const a = document.createElement( 'a' );
+				a.href = fullSrc;
+				const filename = fullSrc.split( '/' ).pop() || 'photo.avif';
+				a.download = filename;
+				document.body.appendChild( a );
+				a.click();
+				document.body.removeChild( a );
+			};
+		}
+
+		if ( shareBtn ) {
+			shareBtn.onclick = async () => {
+				if ( navigator.share ) {
+					try {
+						await navigator.share( {
+							title: 'Японский сад — Андрей и Татьяна',
+							text: photo.alt || 'Свадебное фото',
+							url: window.location.href
+						} );
+					} catch ( err ) {
+						console.log( 'Поделиться отменено', err );
+					}
+				} else {
+					try {
+						await navigator.clipboard.writeText( window.location.href );
+						const originalHTML = shareBtn.innerHTML;
+						shareBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+						setTimeout( () => shareBtn.innerHTML = originalHTML, 2000 );
+					} catch ( err ) {
+						alert( 'Не удалось скопировать ссылку. Скопируйте вручную: ' + window.location.href );
+					}
+				}
+			};
+		}
+	}
+
+	updateActionButtons( startIndex );
+
+	// ============================================================
+	// 6. ЦЕНТРИРОВАНИЕ И ПОКАЗ
 	// ============================================================
 	function refreshSwiper() {
 		if ( !swiperInstance || swiperInstance.destroyed ) return;
@@ -179,15 +350,26 @@ function openSlider( config ) {
 		swiperInstance.updateSlides();
 		swiperInstance.update();
 		swiperInstance.slideTo( startIndex, 0 );
+
+		if ( thumbsInstance && !thumbsInstance.destroyed ) {
+			thumbsInstance.updateSize();
+			thumbsInstance.updateSlides();
+			thumbsInstance.update();
+			thumbsInstance.slideTo( startIndex, 0 );
+		}
 	}
 
 	function showSwiper() {
-		if ( !swiperEl ) return;
-		swiperEl.style.visibility = 'visible';
-		swiperEl.style.opacity = '1';
+		if ( swiperMainEl ) {
+			swiperMainEl.style.visibility = 'visible';
+			swiperMainEl.style.opacity = '1';
+		}
+		if ( swiperThumbsEl ) {
+			swiperThumbsEl.style.opacity = '1';
+		}
 	}
 
-	const allSliderImages = overlay.querySelectorAll( 'img[data-index]' );
+	const allSliderImages = overlay.querySelectorAll( '.swiper-main img[data-index]' );
 	const totalImages = allSliderImages.length;
 	let loadedCount = 0;
 	let isReady = false;
@@ -227,7 +409,7 @@ function openSlider( config ) {
 	}, 1500 );
 
 	// ============================================================
-	// 6. СЧЁТЧИК
+	// 7. СЧЁТЧИК
 	// ============================================================
 	function updateCounter( index, total ) {
 		const counter = document.getElementById( 'sliderCounter' );
@@ -237,20 +419,11 @@ function openSlider( config ) {
 	}
 
 	// ============================================================
-	// 7. ЗУМ — ДВОЙНОЙ ТАП И КНОПКИ +/−
+	// 8. ЗУМ
 	// ============================================================
-
-	/**
-	 * Ступени зума: 1× → 2× → 4× → 1×
-	 */
 	const ZOOM_STEPS = [1, 2, 4, 8];
 
-	/**
-	 * Вычисляет следующий масштаб по кругу.
-	 * 1 → 2 → 4 → 1 → ...
-	 */
 	function getNextZoomStep( currentScale ) {
-		// Находим текущую ступень или ближайшую
 		let currentStep = 1;
 		for ( let i = ZOOM_STEPS.length - 1; i >= 0; i-- ) {
 			if ( currentScale >= ZOOM_STEPS[i] - 0.1 ) {
@@ -258,42 +431,22 @@ function openSlider( config ) {
 				break;
 			}
 		}
-
-		// Находим индекс текущей ступени
 		const currentIndex = ZOOM_STEPS.indexOf( currentStep );
-
-		// Следующая ступень (по кругу)
 		const nextIndex = ( currentIndex + 1 ) % ZOOM_STEPS.length;
-
 		return ZOOM_STEPS[nextIndex];
 	}
 
-	/**
-	 * Двойной тап — переключение зума по ступеням.
-	 * Swiper сам определяет двойной тап через doubleTapClick.
-	 */
 	swiperInstance.on( 'doubleTap', function ( swiper, event ) {
 		const currentScale = swiper.zoom.scale || 1;
 		const nextScale = getNextZoomStep( currentScale );
 
-		if ( nextScale <= 1 ) {
-			// Сбрасываем зум
-			swiper.zoom.out( 1 );
-		} else {
-			// Увеличиваем до следующей ступени
-			swiper.zoom.in( nextScale );
-		}
+		if ( nextScale <= 1 ) swiper.zoom.out( 1 );
+		else swiper.zoom.in( nextScale );
 
 		updateZoomUI( nextScale );
-
-		if ( window.navigator?.vibrate ) {
-			window.navigator.vibrate( 8 );
-		}
+		if ( window.navigator?.vibrate ) window.navigator.vibrate( 8 );
 	} );
 
-	/**
-	 * Кнопка «+» — следующая ступень зума.
-	 */
 	const zoomInBtn = overlay.querySelector( '#zoomIn' );
 	zoomInBtn.addEventListener( 'click', function ( e ) {
 		e.stopPropagation();
@@ -302,28 +455,19 @@ function openSlider( config ) {
 		const currentScale = swiperInstance.zoom.scale || 1;
 		const nextScale = getNextZoomStep( currentScale );
 
-		if ( nextScale <= 1 ) {
-			swiperInstance.zoom.out( 1 );
-		} else {
-			swiperInstance.zoom.in( nextScale );
-		}
+		if ( nextScale <= 1 ) swiperInstance.zoom.out( 1 );
+		else swiperInstance.zoom.in( nextScale );
 
 		updateZoomUI( nextScale );
-
 		if ( window.navigator?.vibrate ) window.navigator.vibrate( 5 );
 	} );
 
-	/**
-	 * Кнопка «−» — предыдущая ступень зума.
-	 */
 	const zoomOutBtn = overlay.querySelector( '#zoomOut' );
 	zoomOutBtn.addEventListener( 'click', function ( e ) {
 		e.stopPropagation();
 		if ( !swiperInstance?.zoom ) return;
 
 		const currentScale = swiperInstance.zoom.scale || 1;
-
-		// Находим предыдущую ступень
 		let prevStep = 1;
 		for ( let i = 0; i < ZOOM_STEPS.length; i++ ) {
 			if ( currentScale > ZOOM_STEPS[i] + 0.1 ) {
@@ -331,20 +475,13 @@ function openSlider( config ) {
 			}
 		}
 
-		if ( prevStep <= 1 ) {
-			swiperInstance.zoom.out( 1 );
-		} else {
-			swiperInstance.zoom.in( prevStep );
-		}
+		if ( prevStep <= 1 ) swiperInstance.zoom.out( 1 );
+		else swiperInstance.zoom.in( prevStep );
 
 		updateZoomUI( prevStep );
-
 		if ( window.navigator?.vibrate ) window.navigator.vibrate( 5 );
 	} );
 
-	/**
-	 * Обновление интерфейса зума.
-	 */
 	function updateZoomUI( currentScale ) {
 		const hint = document.getElementById( 'sliderZoomHint' );
 		const zoomLevel = document.getElementById( 'zoomLevel' );
@@ -372,7 +509,7 @@ function openSlider( config ) {
 	}
 
 	// ============================================================
-	// 8. ЗАКРЫТИЕ
+	// 9. ЗАКРЫТИЕ
 	// ============================================================
 	function closeSlider() {
 		overlay.classList.remove( 'open' );
@@ -380,6 +517,10 @@ function openSlider( config ) {
 			if ( swiperInstance ) {
 				swiperInstance.destroy( true, true );
 				swiperInstance = null;
+			}
+			if ( thumbsInstance ) {
+				thumbsInstance.destroy( true, true );
+				thumbsInstance = null;
 			}
 			overlay.remove();
 			document.body.style.overflow = '';
@@ -401,9 +542,9 @@ function openSlider( config ) {
 	} );
 
 	// ============================================================
-	// 9. ЗАПУСК
+	// 10. ЗАПУСК
 	// ============================================================
 	updateZoomUI();
 	if ( window.navigator?.vibrate ) window.navigator.vibrate( 10 );
-	console.log( `📸 Слайдер открыт: ${startIndex + 1} / ${photos.length}` );
+	console.log( `📸 Слайдер открыт с миниатюрами: ${startIndex + 1} / ${photos.length}` );
 }

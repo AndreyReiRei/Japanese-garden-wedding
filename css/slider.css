@@ -6,19 +6,19 @@
    СОДЕРЖАНИЕ:
    1.  Сброс стилей и CSS-переменные
    2.  Контейнер слайдера (фон, оверлей)
-   3.  Swiper-контейнер
+   3.  Swiper-контейнер и полоска миниатюр
    4.  Слайд
    5.  Обёртка и изображение
    6.  Подпись
-   7.  Навигационные стрелки
-   8.  Пагинация (точки)
-   9.  Кнопка закрытия
-   10. Счётчик фото
-   11. Подсказка о зуме
-   12. Кнопки зума +/−
-   13. Зум (состояния и эффекты)
-   14. Скрытие скроллбара при зуме
-   15. Адаптивность
+   7.  Кнопки действий (Скачать / Поделиться)
+   8.  Навигационные стрелки
+   9.  Пагинация (точки)
+   10. Кнопка закрытия
+   11. Счётчик фото
+   12. Подсказка о зуме
+   13. Кнопки зума +/−
+   14. Зум (состояния и эффекты)
+   15. Адаптивность (все @media)
    ============================================================ */
 
 /* ============================================================
@@ -32,76 +32,40 @@
 }
 
 :root {
-	/* 
-     * ЦВЕТОВАЯ ПАЛИТРА
-     * Меняйте значения здесь — весь слайдер перекрасится.
-     */
-
-	/* Фон слайдера */
+	/* ЦВЕТОВАЯ ПАЛИТРА */
 	--slider-bg: #0a0a0a;
-	/* Глубокий чёрный */
-
-	/* Цвета текста */
 	--slider-text: rgba(240, 255, 255, 0.95);
-	/* Почти белый */
 	--slider-text-muted: rgba(240, 255, 255, 0.4);
-	/* Приглушённый */
 
-	/* 
-     * АКЦЕНТНЫЙ ЦВЕТ (по умолчанию — красный для ЗАГС)
-     * Переопределяется в data-theme ниже.
-     * Формат: #HEX для цвета, rgba() для свечений.
-     */
+	/* АКЦЕНТНЫЙ ЦВЕТ */
 	--accent-color: #E84040;
-	/* Основной акцентный */
 	--accent-glow: rgba(232, 64, 64, 0.4);
-	/* Ближнее свечение */
 	--accent-glow-strong: rgba(232, 64, 64, 0.6);
-	/* Дальнее свечение */
 
-	/* 
-     * АНИМАЦИИ
-     * Кривые для разных типов движения.
-     */
+	/* АНИМАЦИИ */
 	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-	/* Плавное торможение */
 	--ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
-	/* Пружинистый эффект */
 	--ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
-	/* Симметричный плавный */
 
-	/* Длительности переходов */
 	--transition-fast: 0.2s ease;
-	/* Быстрые реакции (нажатия) */
 	--transition-normal: 0.35s var(--ease-out-expo);
-	/* Обычные hover */
 	--transition-slow: 0.6s var(--ease-out-expo);
-	/* Медленные (смена слайдов) */
 	--transition-spring: 0.5s var(--ease-out-back);
-	/* Пружинистые появления */
 }
 
-/*
- * ТЕМЫ РАЗДЕЛОВ
- * Применяются через data-theme на body.
- * Меняют акцентный цвет в зависимости от раздела свадьбы.
- */
-
-/* Сад — холодный тёмно-алый */
+/* ТЕМЫ РАЗДЕЛОВ */
 [data-theme="garden"] {
 	--accent-color: #C0392B;
 	--accent-glow: rgba(192, 57, 43, 0.4);
 	--accent-glow-strong: rgba(192, 57, 43, 0.6);
 }
 
-/* ЗАГС — яркая киноварь */
 [data-theme="zags"] {
 	--accent-color: #E84040;
 	--accent-glow: rgba(232, 64, 64, 0.45);
 	--accent-glow-strong: rgba(232, 64, 64, 0.65);
 }
 
-/* Дом — тёплый янтарь/золото */
 [data-theme="home"] {
 	--accent-color: #D4A24E;
 	--accent-glow: rgba(212, 162, 78, 0.4);
@@ -110,9 +74,6 @@
 
 /* ============================================================
    2. КОНТЕЙНЕР СЛАЙДЕРА (ФОН)
-   ============================================================
-   Полупрозрачный оверлей с шумом и градиентами.
-   Появляется плавно при открытии.
    ============================================================ */
 
 .slider-overlay {
@@ -120,27 +81,22 @@
 	inset: 0;
 	z-index: 1000;
 	background: var(--slider-bg);
-
-	/* Скрыт по умолчанию */
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.5s var(--ease-out-expo);
 }
 
-
-/* Открытое состояние */
 .slider-overlay.open {
 	opacity: 1;
 	pointer-events: all;
 	overflow: hidden;
 }
 
-/* Дополнительно — запрещаем скролл на body */
 body:has(.slider-overlay.open) {
 	overflow: hidden;
 }
 
-/* Фоновые эффекты: шум + акцентное свечение */
+/* Фоновые эффекты */
 .slider-overlay::before {
 	content: '';
 	position: absolute;
@@ -148,37 +104,81 @@ body:has(.slider-overlay.open) {
 	z-index: 0;
 	pointer-events: none;
 	background:
-		/* Лёгкое свечение сверху */
 		radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 60%),
-		/* Акцентное свечение снизу */
 		radial-gradient(ellipse at 50% 70%, var(--accent-glow) 0%, transparent 50%);
 }
 
 /* ============================================================
-   3. SWIPER-КОНТЕЙНЕР
+   3. SWIPER-КОНТЕЙНЕР И ПОЛОСКА МИНИАТЮР
    ============================================================ */
 
+/* Главный контейнер (флекс-колонка: фото сверху, миниатюры снизу) */
 .slider-container {
 	width: 100%;
 	height: 100%;
 	position: relative;
 	z-index: 1;
 	display: flex;
-	align-items: center;
-	justify-content: center;
+	flex-direction: column;
+	overflow: hidden;
 }
 
-.swiper {
+/* Основной слайдер */
+.swiper-main {
 	width: 100%;
-	height: 85vh;
-	max-height: 900px;
+	height: calc(100% - 80px);
+	/* Место под миниатюры */
+	flex: 1 1 auto;
+	min-height: 0;
 	overflow: hidden;
-	/* Обрезает слайды за пределами */
+}
+
+/* Полоска миниатюр */
+.swiper-thumbs {
+	height: 80px;
+	flex: 0 0 80px;
+	width: 100%;
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 8px 10px;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	z-index: 10;
 }
 
 .swiper-wrapper {
 	align-items: center;
-	/* Вертикальное центрирование слайдов */
+}
+
+/* Слайд миниатюры */
+.thumb-slide {
+	width: 64px !important;
+	height: 64px !important;
+	opacity: 0.5;
+	cursor: pointer;
+	border-radius: 4px;
+	overflow: hidden;
+	border: 2px solid transparent;
+	transition: all 0.3s ease;
+}
+
+.thumb-slide img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.thumb-slide.swiper-slide-thumb-active {
+	opacity: 1;
+	border-color: var(--accent-color);
+	box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.thumb-slide:hover {
+	opacity: 0.8;
 }
 
 /* ============================================================
@@ -189,7 +189,6 @@ body:has(.slider-overlay.open) {
 	position: relative;
 	height: 100%;
 	overflow: hidden;
-	/* Обрезаем содержимое (кроме зума) */
 	border-radius: 24px;
 	background: #080808;
 	transition:
@@ -197,16 +196,12 @@ body:has(.slider-overlay.open) {
 		transform 0.6s var(--ease-out-expo);
 }
 
-/* Активный слайд — чуть выше остальных */
 .swiper-slide-active {
 	z-index: 2;
 }
 
 /* ============================================================
    5. ОБЁРТКА И ИЗОБРАЖЕНИЕ
-   ============================================================
-   Контейнер для Swiper Zoom.
-   Масштабируется для неактивных слайдов.
    ============================================================ */
 
 .swiper-zoom-container {
@@ -217,51 +212,39 @@ body:has(.slider-overlay.open) {
 	justify-content: center;
 	background: #080808;
 	overflow: hidden;
-	/* Без зума — обрезаем */
 	border-radius: 24px;
 	transition: transform 0.8s var(--ease-out-expo);
 }
 
-/* При зуме — показываем содержимое полностью */
 .swiper-slide-zoomed .swiper-zoom-container {
 	overflow: visible;
 }
 
-/* Неактивные слайды — слегка увеличены для эффекта глубины */
 .swiper-slide:not(.swiper-slide-active) .swiper-zoom-container {
 	transform: scale(1.15);
 }
 
-/* Активный слайд — нормальный размер */
 .swiper-slide-active .swiper-zoom-container {
 	transform: scale(1);
 }
 
-/* Изображение */
 .swiper-slide img {
 	width: 100%;
 	height: 100%;
 	object-fit: contain;
-	/* Все фото видны целиком */
 	background: #080808;
 	user-select: none;
 	-webkit-user-drag: none;
-
-	/* Неактивные — ч/б и затемнены */
 	filter: grayscale(1) brightness(0.6);
 	transition: filter 0.6s var(--ease-out-expo);
 }
 
-/* Активный слайд — цветной */
 .swiper-slide-active img {
 	filter: grayscale(0) brightness(0.95);
 }
 
 /* ============================================================
    6. ПОДПИСЬ
-   ============================================================
-   Текст снизу слева.
-   Появляется только у активного слайда.
    ============================================================ */
 
 .swiper-slide .slide-caption {
@@ -269,41 +252,30 @@ body:has(.slider-overlay.open) {
 	left: 28px;
 	bottom: 28px;
 	z-index: 2;
-
-	/* Шрифт: Cormorant Garamond (основной) */
 	font-family: 'Cormorant Garamond', serif;
 	font-size: 22px;
 	font-weight: 400;
 	letter-spacing: 0.04em;
 	color: var(--slider-text-muted);
 	user-select: none;
-
-	/* По умолчанию скрыта */
 	transform: translateY(12px);
 	opacity: 0;
 	transition: all 0.6s var(--ease-out-expo);
 }
 
-/* Активный слайд — подпись видна */
 .swiper-slide-active .slide-caption {
 	color: var(--slider-text);
 	transform: translateY(0);
 	opacity: 1;
-	text-shadow:
-		0 2px 12px rgba(0, 0, 0, 0.6),
-		/* Ближняя тень */
-		0 0 40px rgba(0, 0, 0, 0.3);
-	/* Дальнее размытие */
+	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 0, 0, 0.3);
 }
 
-/* Затемнение под подписью (для читаемости) */
+/* Затемнение под подписью */
 .swiper-slide::after {
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(to top,
-			rgba(0, 0, 0, 0.55) 0%,
-			transparent 40%);
+	background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 40%);
 	pointer-events: none;
 	z-index: 1;
 	opacity: 0;
@@ -315,10 +287,47 @@ body:has(.slider-overlay.open) {
 }
 
 /* ============================================================
-   7. НАВИГАЦИОННЫЕ СТРЕЛКИ
-   ============================================================
-   Стеклянные кнопки по бокам.
-   При hover: свечение, увеличение, стрелка сдвигается.
+   7. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться)
+   ============================================================ */
+
+.slider-actions {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	display: flex;
+	gap: 12px;
+	z-index: 1001;
+}
+
+.slider-action-btn {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	transition: all 0.3s ease;
+}
+
+.slider-action-btn:hover {
+	background: rgba(0, 0, 0, 0.8);
+	border-color: var(--accent-color);
+	color: var(--accent-color);
+	transform: scale(1.1);
+}
+
+.slider-action-btn:active {
+	transform: scale(0.95);
+}
+
+/* ============================================================
+   8. НАВИГАЦИОННЫЕ СТРЕЛКИ
    ============================================================ */
 
 .swiper-button-prev,
@@ -326,20 +335,16 @@ body:has(.slider-overlay.open) {
 	width: 52px;
 	height: 52px;
 	border-radius: 50%;
-
-	/* Стеклянный фон */
 	background: rgba(0, 0, 0, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-
 	color: rgba(255, 255, 255, 0.6);
 	transition: all 0.4s var(--ease-out-expo);
 	top: 50%;
 	transform: translateY(-50%);
 }
 
-/* Размер иконки стрелки */
 .swiper-button-prev::after,
 .swiper-button-next::after {
 	font-size: 16px;
@@ -347,19 +352,15 @@ body:has(.slider-overlay.open) {
 	transition: transform 0.3s var(--ease-out-expo);
 }
 
-/* Hover: подсветка, увеличение, тень */
 .swiper-button-prev:hover,
 .swiper-button-next:hover {
 	background: rgba(0, 0, 0, 0.6);
 	border-color: rgba(255, 255, 255, 0.25);
 	color: #fff;
-	box-shadow:
-		0 0 30px rgba(0, 0, 0, 0.4),
-		0 0 0 1px rgba(255, 255, 255, 0.05);
+	box-shadow: 0 0 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
 	transform: translateY(-50%) scale(1.08);
 }
 
-/* Стрелка сдвигается при hover */
 .swiper-button-prev:hover::after {
 	transform: translateX(-3px);
 }
@@ -368,14 +369,12 @@ body:has(.slider-overlay.open) {
 	transform: translateX(3px);
 }
 
-/* Нажатие */
 .swiper-button-prev:active,
 .swiper-button-next:active {
 	transform: translateY(-50%) scale(0.94);
 	transition: transform 0.15s ease;
 }
 
-/* Неактивная стрелка (когда нельзя листать) */
 .swiper-button-disabled {
 	opacity: 0.15 !important;
 	pointer-events: none;
@@ -383,10 +382,7 @@ body:has(.slider-overlay.open) {
 }
 
 /* ============================================================
-   8. ПАГИНАЦИЯ (ТОЧКИ)
-   ============================================================
-   Активная точка — вытянутая капсула с двойным свечением.
-   Неактивные — маленькие кружки.
+   9. ПАГИНАЦИЯ (ТОЧКИ)
    ============================================================ */
 
 .swiper-pagination {
@@ -403,30 +399,20 @@ body:has(.slider-overlay.open) {
 	margin: 0 5px !important;
 }
 
-/* Hover: подсветка и приподнимание */
 .swiper-pagination-bullet:hover {
 	background: rgba(255, 255, 255, 0.5);
 	transform: translateY(-2px);
 }
 
-/* Активная точка */
 .swiper-pagination-bullet-active {
 	background: var(--accent-color);
 	width: 28px;
-	/* Вытянутая форма */
 	border-radius: 3px;
-	box-shadow:
-		0 0 10px var(--accent-glow),
-		/* Ближнее свечение */
-		0 0 20px var(--accent-glow);
-	/* Дальнее свечение */
+	box-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-glow);
 }
 
 /* ============================================================
-   9. КНОПКА ЗАКРЫТИЯ (КРЕСТИК)
-   ============================================================
-   Правый верхний угол.
-   При hover: поворот на 90°, красное свечение.
+   10. КНОПКА ЗАКРЫТИЯ (КРЕСТИК)
    ============================================================ */
 
 .slider-close {
@@ -437,13 +423,10 @@ body:has(.slider-overlay.open) {
 	width: 44px;
 	height: 44px;
 	border-radius: 50%;
-
-	/* Стеклянный фон */
 	background: rgba(0, 0, 0, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.1);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-
 	color: rgba(255, 255, 255, 0.6);
 	font-size: 18px;
 	font-weight: 200;
@@ -454,50 +437,55 @@ body:has(.slider-overlay.open) {
 	transition: all 0.4s var(--ease-out-expo);
 }
 
-/* Hover: красная подсветка + поворот */
 .slider-close:hover {
 	background: rgba(232, 64, 64, 0.2);
 	border-color: rgba(232, 64, 64, 0.4);
 	color: #fff;
-	box-shadow:
-		0 0 30px rgba(232, 64, 64, 0.15),
-		0 0 0 1px rgba(232, 64, 64, 0.1);
+	box-shadow: 0 0 30px rgba(232, 64, 64, 0.15), 0 0 0 1px rgba(232, 64, 64, 0.1);
 	transform: rotate(90deg) scale(1.08);
 }
 
-/* Нажатие */
 .slider-close:active {
 	transform: rotate(90deg) scale(0.9);
 	transition: transform 0.12s ease;
 }
 
 /* ============================================================
-   10. СЧЁТЧИК ФОТО
-   ============================================================
-   По центру внизу.
-   «3 / 12»
+   11. СЧЁТЧИК ФОТО
    ============================================================ */
 
 .slider-counter {
 	position: absolute;
-	bottom: 28px;
+	bottom: 100px;
+	/* Подняли выше полоски миниатюр (80px + отступ) */
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 10;
 
 	font-family: 'Inter', sans-serif;
-	font-size: 12px;
-	font-weight: 500;
+	font-size: 13px;
+	/* Чуть увеличили */
+	font-weight: 600;
+	/* Сделали жирнее */
 	letter-spacing: 0.15em;
-	color: rgba(255, 255, 255, 0.3);
+
+	/* Увеличили контраст: почти белый с легкой прозрачностью */
+	color: rgba(255, 255, 255, 0.85);
+
+	/* Добавили подложку для читаемости на любом фоне */
+	background: rgba(0, 0, 0, 0.45);
+	padding: 6px 16px;
+	border-radius: 100px;
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+
 	pointer-events: none;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================================
-   11. ПОДСКАЗКА О ЗУМЕ
-   ============================================================
-   Всплывает сверху при открытии.
-   «Двойной тап — увеличить»
+   12. ПОДСКАЗКА О ЗУМЕ
    ============================================================ */
 
 .slider-zoom-hint {
@@ -506,20 +494,15 @@ body:has(.slider-overlay.open) {
 	left: 50%;
 	transform: translateX(-50%) translateY(-10px);
 	z-index: 10;
-
 	font-family: 'Inter', sans-serif;
 	font-size: 11px;
 	font-weight: 500;
 	letter-spacing: 0.08em;
 	color: rgba(255, 255, 255, 0.4);
-
-	/* Стеклянная капсула */
 	background: rgba(0, 0, 0, 0.5);
 	border: 1px solid rgba(255, 255, 255, 0.06);
 	border-radius: 100px;
 	padding: 7px 16px;
-
-	/* Скрыта по умолчанию */
 	opacity: 0;
 	pointer-events: none;
 	transition: all 0.4s var(--ease-out-expo);
@@ -527,17 +510,13 @@ body:has(.slider-overlay.open) {
 	-webkit-backdrop-filter: blur(10px);
 }
 
-/* Видима */
 .slider-zoom-hint.visible {
 	opacity: 1;
 	transform: translateX(-50%) translateY(0);
 }
 
 /* ============================================================
-   12. КНОПКИ ЗУМА +/−
-   ============================================================
-   Появляются снизу при активном зуме.
-   Выезжают с пружинной анимацией.
+   13. КНОПКИ ЗУМА +/−
    ============================================================ */
 
 .slider-zoom-controls {
@@ -546,18 +525,13 @@ body:has(.slider-overlay.open) {
 	left: 50%;
 	transform: translateX(-50%) translateY(10px) scale(0.9);
 	z-index: 10;
-
 	display: flex;
 	align-items: center;
 	gap: 2px;
-
-	/* Стеклянный фон */
 	background: rgba(0, 0, 0, 0.55);
 	border: 1px solid rgba(255, 255, 255, 0.08);
 	border-radius: 100px;
 	padding: 5px;
-
-	/* Скрыты по умолчанию */
 	opacity: 0;
 	pointer-events: none;
 	transition: all 0.5s var(--ease-out-expo);
@@ -566,14 +540,12 @@ body:has(.slider-overlay.open) {
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
-/* Видимы — выезжают с пружиной */
 .slider-zoom-controls.visible {
 	opacity: 1;
 	pointer-events: all;
 	transform: translateX(-50%) translateY(0) scale(1);
 }
 
-/* Кнопка + или − */
 .zoom-btn {
 	width: 36px;
 	height: 36px;
@@ -593,7 +565,6 @@ body:has(.slider-overlay.open) {
 	position: relative;
 }
 
-/* Круглая подсветка при hover */
 .zoom-btn::before {
 	content: '';
 	position: absolute;
@@ -613,13 +584,11 @@ body:has(.slider-overlay.open) {
 	box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
 }
 
-/* Нажатие */
 .zoom-btn:active {
 	transform: scale(0.85);
 	transition: transform 0.12s ease;
 }
 
-/* Уровень зума «2×» */
 .zoom-level {
 	font-family: 'Inter', sans-serif;
 	font-size: 12px;
@@ -632,28 +601,18 @@ body:has(.slider-overlay.open) {
 }
 
 /* ============================================================
-   13. ЗУМ (СОСТОЯНИЯ И ЭФФЕКТЫ)
-   ============================================================
-   При активном зуме:
-   - Фон затемняется с blur
-   - Подпись скрывается
-   - Фильтры убираются
-   - Слайд и контейнер — overflow: visible
-   - Стрелки и пагинация скрываются
+   14. ЗУМ (СОСТОЯНИЯ И ЭФФЕКТЫ)
    ============================================================ */
 
-/* При зуме — убираем ч/б фильтр */
 .swiper-slide-zoomed img {
 	filter: none !important;
 }
 
-/* Слайд при зуме: visible + выше всего */
 .swiper-slide-zoomed {
 	overflow: visible !important;
 	z-index: 100 !important;
 }
 
-/* Затемнённый фон позади увеличенного изображения */
 .swiper-slide-zoomed::before {
 	content: '';
 	position: fixed;
@@ -666,7 +625,6 @@ body:has(.slider-overlay.open) {
 	animation: fadeIn 0.3s ease;
 }
 
-/* Анимация появления фона */
 @keyframes fadeIn {
 	from {
 		opacity: 0;
@@ -677,64 +635,31 @@ body:has(.slider-overlay.open) {
 	}
 }
 
-/* Скрываем подпись при зуме */
 .swiper-slide-zoomed .slide-caption {
 	opacity: 0 !important;
 	pointer-events: none;
 	transition: opacity 0.2s ease;
 }
 
-/* Скрываем затемнение под подписью */
 .swiper-slide-zoomed::after {
 	opacity: 0 !important;
 }
 
-/* Скрываем стрелки при зуме */
 .swiper:has(.swiper-slide-zoomed) .swiper-button-prev,
-.swiper:has(.swiper-slide-zoomed) .swiper-button-next {
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.3s ease;
-}
-
-/* Скрываем пагинацию при зуме */
+.swiper:has(.swiper-slide-zoomed) .swiper-button-next,
 .swiper:has(.swiper-slide-zoomed) .swiper-pagination {
 	opacity: 0;
 	pointer-events: none;
 	transition: opacity 0.3s ease;
 }
 
-/* Запрещаем жесты браузера при зуме */
 .swiper-slide-zoomed {
 	touch-action: none;
 }
 
-/* ============================================================
-   14. СКРЫТИЕ СКРОЛЛБАРА СТРАНИЦЫ
-   ============================================================
-   Скроллбар скрыт всегда когда слайдер открыт.
-   Применяется и к html, и к body.
-   ============================================================ */
-
-/* Когда слайдер открыт — скролла нет */
+/* Скрытие скроллбара */
 html:has(.slider-overlay.open),
-body:has(.slider-overlay.open) {
-	overflow: hidden !important;
-	scrollbar-width: none;
-	/* Firefox */
-	-ms-overflow-style: none;
-	/* IE/Edge */
-}
-
-/* Скрываем сам скроллбар в Webkit (Chrome, Safari) */
-html:has(.slider-overlay.open)::-webkit-scrollbar,
-body:has(.slider-overlay.open)::-webkit-scrollbar {
-	display: none;
-	width: 0;
-	height: 0;
-}
-
-/* При зуме — дополнительная гарантия */
+body:has(.slider-overlay.open),
 html:has(.swiper-slide-zoomed),
 body:has(.swiper-slide-zoomed) {
 	overflow: hidden !important;
@@ -742,6 +667,8 @@ body:has(.swiper-slide-zoomed) {
 	-ms-overflow-style: none;
 }
 
+html:has(.slider-overlay.open)::-webkit-scrollbar,
+body:has(.slider-overlay.open)::-webkit-scrollbar,
 html:has(.swiper-slide-zoomed)::-webkit-scrollbar,
 body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	display: none;
@@ -749,18 +676,25 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	height: 0;
 }
 
-
 /* ============================================================
-   15. АДАПТИВНОСТЬ
-   ============================================================
-   Уменьшаем размеры элементов на маленьких экранах.
-   Плавно увеличиваем с ростом ширины.
+   15. АДАПТИВНОСТЬ (ВСЕ МЕДИА-ЗАПРОСЫ)
    ============================================================ */
 
 /* Мобильные (< 481px) */
 @media (width < 481px) {
-	.swiper {
-		height: 70vh;
+	.swiper-main {
+		height: calc(100% - 60px);
+	}
+
+	.swiper-thumbs {
+		flex: 0 0 60px;
+		height: 60px;
+		padding: 4px 6px;
+	}
+
+	.thumb-slide {
+		width: 48px !important;
+		height: 48px !important;
 	}
 
 	.swiper-slide {
@@ -779,13 +713,24 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 
 	.swiper-button-prev,
 	.swiper-button-next {
-		width: 40px;
-		height: 40px;
+		display: none;
+		/* Скрываем стрелки на мобильных */
 	}
 
-	.swiper-button-prev::after,
-	.swiper-button-next::after {
-		font-size: 13px;
+	.slider-actions {
+		top: 12px;
+		left: 12px;
+		gap: 8px;
+	}
+
+	.slider-action-btn {
+		width: 36px;
+		height: 36px;
+	}
+
+	.slider-action-btn svg {
+		width: 18px;
+		height: 18px;
 	}
 
 	.slider-close {
@@ -797,8 +742,10 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	}
 
 	.slider-counter {
-		bottom: 18px;
-		font-size: 10px;
+		bottom: 75px;
+		/* На мобильных миниатюры 60px + отступ */
+		font-size: 11px;
+		padding: 4px 12px;
 	}
 
 	.slider-zoom-hint {
@@ -830,10 +777,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 
 /* Мобильные L (481px – 576px) */
 @media (481px <=width < 577px) {
-	.swiper {
-		height: 75vh;
-	}
-
 	.swiper-slide {
 		border-radius: 16px;
 	}
@@ -851,10 +794,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 
 /* Большие мобильные (577px – 768px) */
 @media (577px <=width < 769px) {
-	.swiper {
-		height: 78vh;
-	}
-
 	.swiper-slide {
 		border-radius: 20px;
 	}
@@ -894,7 +833,7 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	}
 }
 
-/* Большой десктоп (1201px – 1440px) */
+/* Большой десктоп (1201px – 1441px) */
 @media (1201px <=width < 1441px) {
 	.swiper-slide .slide-caption {
 		font-size: 26px;
@@ -905,7 +844,7 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 
 /* Ультраширокие (≥ 1441px) */
 @media (width >=1441px) {
-	.swiper {
+	.swiper-main {
 		max-height: 1000px;
 	}
 
