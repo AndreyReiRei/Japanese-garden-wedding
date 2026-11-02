@@ -12,6 +12,17 @@
 	<link rel="icon" type="image/png" href="/photos/favicon.png">
 	<link rel="apple-touch-icon" href="/photos/favicon.png">
 
+	<!-- ============================================ -->
+	<!-- OPEN GRAPH (Превью для Telegram, WhatsApp)   -->
+	<!-- ============================================ -->
+	<meta property="og:type" content="article">
+	<meta property="og:title" content="Купеческий дом — Андрей и Татьяна">
+	<meta property="og:description" content="История нашего дня. Часть 3: Купеческий дом.">
+	<meta property="og:image" content="https://japanese-garden-wedding.vercel.app/photos/og-image-home.jpg">
+	<meta property="og:url" content="https://japanese-garden-wedding.vercel.app/home.html">
+	<meta property="og:site_name" content="Андрей и Татьяна">
+	<meta name="twitter:card" content="summary_large_image">
+
 	<!-- Галерея -->
 	<link rel="stylesheet" href="../css/gallery.css">
 	<!-- Свиток -->
@@ -31,6 +42,15 @@
 
 <body data-theme="home">
 
+	<!-- Страховка: если JS отключен, страница все равно будет видна -->
+	<noscript>
+		<style>
+			body {
+				opacity: 1 !important;
+			}
+		</style>
+	</noscript>
+
 	<div class="bg-noise"></div>
 
 	<!-- Шапка -->
@@ -49,7 +69,7 @@
 				<h1 class="section-title" data-text="Купеческий дом">Купеческий дом</h1>
 			</div>
 
-			<span class="photo-counter" id="photoCounter"></span>
+			<span class="photo-counter"></span>
 		</div>
 	</header>
 
@@ -59,11 +79,24 @@
 		<div class="scroll-trigger" id="scrollTrigger">
 			<div class="scroll-trigger-inner">
 				<span class="scroll-trigger-text">История этого дня</span>
+				<svg class="scroll-trigger-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="6 9 12 15 18 9"></polyline>
+				</svg>
 			</div>
 		</div>
 
 		<div class="scroll-expanded" id="scrollExpanded">
 			<div class="scroll-paper">
+
+				<!-- Кнопка закрытия -->
+				<button class="scroll-close-btn" id="scrollCloseBtnTop" aria-label="Закрыть">
+					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+						stroke-linecap="round">
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
+				</button>
 
 				<div class="scroll-seal-top">
 					<svg width="36" height="36" viewBox="0 0 36 36" fill="none">
@@ -81,7 +114,59 @@
 					<span class="scroll-divider-line"></span>
 				</div>
 
-				<div class="scroll-text"></div>
+				<!-- История дня -->
+				<div class="scroll-text">
+
+					<!-- Список действующих лиц -->
+					<ul class="dramatis-personae">
+						<li><strong>Я</strong> — Муж, который боролся за каравай и проиграл</li>
+						<li><strong>Она</strong> — Жена, которая откусила первой и не пожалела</li>
+						<li><strong>Макарена</strong> — Главный танец этого вечера</li>
+						<li><strong>Родители</strong> — Хранители традиций, икон и каравая</li>
+						<li><strong>Дружка Эвелина</strong> — Мастер интерактивов и неожиданных конкурсов</li>
+					</ul>
+
+					<!-- Разделитель -->
+					<div class="act-separator">✦ ✦ ✦</div>
+
+					<!-- Сцена 1 -->
+					<h3><span class="scene-num">Сцена 1</span> На пороге дома</h3>
+					<p>Мы прибыли в старинный купеческий дом. На пороге нас уже ждали родители с иконой и караваем.
+						После крещения и старинных обрядов (но без бубнов) настал черед каравая. Первой откусила моя уже
+						жена, но я не стал поддаваться и откусил кусок побольше, пожертвовав своей губой — от жадности
+						порвал губу, кусая каравай. Больно? Да. Стоило ли оно того? Абсолютно.</p>
+					<p>Далее были слова сопутствия и осыпание монетами и лепестками роз, как в традиционной христианской
+						свадьбе. Мы прошли внутрь, неся на себе этот сладкий груз традиций. (И порванную губу, но об
+						этом мы старались забыть).</p>
+
+					<!-- Сцена 2 -->
+					<h3><span class="scene-num">Сцена 2</span> Тепло и веселье</h3>
+					<p>Мы прошли в старинный купеческий дом. Накрывая столы, настраивая аппаратуру и музыку, мы
+						наполняли комнаты теплом и весельем. Родные лица вокруг длинного стола, звон бокалов,
+						поздравления и трогательные пожелания в стихах от родных и близких. Смех и бесконечные истории
+						не
+						смолкали ни на минуту. В этом доме, помнящем столетия, родилась новая семья.</p>
+					<p>Не обошлось и без жарки шашлыка на свежем воздухе во дворе! Вскоре даже пришлось пробежаться по
+						магазинам, чтобы докупить шампанского — веселье набирало обороты, и запасы таяли на глазах. Это
+						был тот самый момент, когда понимаешь: вечер удался.</p>
+
+					<!-- Сцена 3 -->
+					<h3><span class="scene-num">Сцена 3</span> Танцы до утра</h3>
+					<p>Танцы, много танцев, еще больше танцев! Макарена! Дружка устроила нам неожиданные конкурсы и
+						настоящий интерактив, в котором участвовали даже самые стеснительные родственники. Мы кружили
+						хороводы, прыгали так, что, казалось, дрожал старинный пол, и даже не обошлось без
+						зажигательного танца живота! И стены, казалось, улыбались вместе с нами. Каждый тост звучал как
+						клятва, каждый взгляд говорил больше слов.</p>
+
+					<!-- Сцена 4 -->
+					<h3><span class="scene-num">Сцена 4</span> Финальный аккорд</h3>
+					<p>Я думаю, всем понравился этот вечер. Он стал идеальным завершением дня, который мы никогда не
+						забудем. Мы уходили из этого дома с чувством, что теперь у нас есть не только мы друг у друга,
+						но и
+						огромная семья, готовая поддержать в любой момент.</p>
+
+					<p><em>(Конец Третьего акта)</em></p>
+				</div>
 
 				<div class="scroll-seal-bottom">
 					<svg width="40" height="40" viewBox="0 0 44 44" fill="none">
@@ -106,10 +191,35 @@
 
 	</div>
 
-	<!-- Галерея -->
-	<main class="gallery-container">
-		<div class="gallery-grid" id="galleryGrid"></div>
-	</main>
+	<!-- ========================================== -->
+	<!-- БЛОК 1: «Праздничный вечер»                -->
+	<!-- ========================================== -->
+
+	<section class="gallery-section" data-theme="home">
+		<header class="gallery-header">
+			<div class="header-inner">
+				<div class="title-block" style="flex: 1; text-align: center;">
+					<h2 class="section-title" data-text="Праздничный вечер">Праздничный вечер</h2>
+				</div>
+			</div>
+		</header>
+
+		<div class="gallery-container">
+			<div class="gallery-grid" id="galleryGridHome"></div>
+
+			<!-- ВОТ ЭТА КНОПКА ДОЛЖНА БЫТЬ ДОБАВЛЕНА: -->
+			<div class="gallery-load-more-wrapper">
+				<button class="animated-btn gallery-load-more" data-target="galleryGridHome" style="display:none;">
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="btn-line"></span><span class="btn-line"></span>
+					<span class="bottom-nav-content">
+						<span class="bottom-nav-label">Галерея</span>
+						<span class="bottom-nav-title">Показать все фото</span>
+					</span>
+				</button>
+			</div>
+		</div>
+	</section>
 
 	<!-- Нижняя навигация -->
 	<nav class="section-bottom-nav">
@@ -156,18 +266,9 @@
 	<script>
 		// Истории для свитка
 		const STORIES = {
-			garden: {
-				title: 'Японский сад',
-				text: 'Утро началось с тишины. Камни, вода, изогнутые мостики и вековые деревья парка Галицкого стали свидетелями первых кадров этого дня.'
-			},
-			zags: {
-				title: 'Бракосочетание',
-				text: 'Торжественный зал, мерцание люстр, шёпот гостей. Ручка скользнула по бумаге, оставляя росчерк, который изменил всё.'
-			},
-			home: {
-				title: 'Купеческий дом',
-				text: 'Вечер опустился на старинный купеческий дом, зажигая свечи и наполняя комнаты теплом. Родные лица вокруг длинного стола, звон бокалов, смех и бесконечные истории. Пиршество, достойное традиций, и танцы, от которых кружилась голова. В этом доме, помнящем столетия, родилась новая семья. И стены, казалось, улыбались вместе с нами. Каждый тост звучал как клятва, каждый взгляд говорил больше слов. Этот вечер стал идеальным завершением дня, который мы никогда не забудем.'
-			}
+			garden: { title: 'Японский сад' },
+			zags: { title: 'Бракосочетание' },
+			home: { title: 'Купеческий дом' }
 		};
 
 		// Инициализация свитка
@@ -176,22 +277,33 @@
 			section: 'home'
 		} );
 
-		// Инициализация галереи
+		// ==========================================
+		// Галерея «Купеческий дом»
+		// ==========================================
 		initGallery( {
 			section: 'home',
+			gridId: 'galleryGridHome',
+			initialCount: 15, // Показываем все 19 фото сразу, так как их мало
 			photos: [
-				{ src: '../photos/home/01.jpg', alt: 'Интерьер дома' },
-				{ src: '../photos/home/02.jpg', alt: 'Сервировка стола' },
-				{ src: '../photos/home/03.jpg', alt: 'Детали декора' },
-				{ src: '../photos/home/04.jpg', alt: 'Гости собираются' },
-				{ src: '../photos/home/05.jpg', alt: 'Первый тост' },
-				{ src: '../photos/home/06.jpeg', alt: 'Бокалы' },
-				{ src: '../photos/home/07.jpeg', alt: 'Родители' },
-				{ src: '../photos/home/08.jpg', alt: 'Смех за столом' },
-				{ src: '../photos/home/09.jpg', alt: 'Объятия с родными' },
-				{ src: '../photos/home/10.jpeg', alt: 'Друзья' },
-				{ src: '../photos/home/11.jpeg', alt: 'Общее фото' },
-				{ src: '../photos/home/12.jpeg', alt: 'Финальный кадр' },
+				{ src: '../photos/home-thumbs/2.avif', srcFull: '../photos/home-full/2.jpg', alt: 'Фото 2' },
+				{ src: '../photos/home-thumbs/3.avif', srcFull: '../photos/home-full/3.jpg', alt: 'Фото 3' },
+				{ src: '../photos/home-thumbs/1.avif', srcFull: '../photos/home-full/1.jpg', alt: 'Фото 1' },
+				{ src: '../photos/home-thumbs/4.avif', srcFull: '../photos/home-full/4.jpg', alt: 'Фото 4' },
+				{ src: '../photos/home-thumbs/5.avif', srcFull: '../photos/home-full/5.jpg', alt: 'Фото 5' },
+				{ src: '../photos/home-thumbs/6.avif', srcFull: '../photos/home-full/6.jpg', alt: 'Фото 6' },
+				{ src: '../photos/home-thumbs/7.avif', srcFull: '../photos/home-full/7.jpg', alt: 'Фото 7' },
+				{ src: '../photos/home-thumbs/8.avif', srcFull: '../photos/home-full/8.jpg', alt: 'Фото 8' },
+				{ src: '../photos/home-thumbs/9.avif', srcFull: '../photos/home-full/9.jpg', alt: 'Фото 9' },
+				{ src: '../photos/home-thumbs/10.avif', srcFull: '../photos/home-full/10.jpg', alt: 'Фото 10' },
+				{ src: '../photos/home-thumbs/11.avif', srcFull: '../photos/home-full/11.jpg', alt: 'Фото 11' },
+				{ src: '../photos/home-thumbs/12.avif', srcFull: '../photos/home-full/12.jpg', alt: 'Фото 12' },
+				{ src: '../photos/home-thumbs/13.avif', srcFull: '../photos/home-full/13.jpg', alt: 'Фото 13' },
+				{ src: '../photos/home-thumbs/14.avif', srcFull: '../photos/home-full/14.jpg', alt: 'Фото 14' },
+				{ src: '../photos/home-thumbs/15.avif', srcFull: '../photos/home-full/15.jpg', alt: 'Фото 15' },
+				{ src: '../photos/home-thumbs/16.avif', srcFull: '../photos/home-full/16.jpg', alt: 'Фото 16' },
+				{ src: '../photos/home-thumbs/17.avif', srcFull: '../photos/home-full/17.jpg', alt: 'Фото 17' },
+				{ src: '../photos/home-thumbs/18.avif', srcFull: '../photos/home-full/18.jpg', alt: 'Фото 18' },
+				{ src: '../photos/home-thumbs/19.avif', srcFull: '../photos/home-full/19.jpg', alt: 'Фото 19' }
 			]
 		} );
 	</script>
