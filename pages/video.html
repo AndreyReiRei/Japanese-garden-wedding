@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Видеоархив — Андрей & Татьяна</title>
+
+	<!-- FAVICON -->
+	<link rel="icon" type="image/png" href="/photos/favicon.png">
+	<link rel="apple-touch-icon" href="/photos/favicon.png">
+
+	<!-- Open Graph -->
+	<meta property="og:type" content="website">
+	<meta property="og:title" content="Видеоархив — Андрей и Татьяна">
+	<meta property="og:description" content="Наш видеоархив со свадебного дня.">
+	<meta property="og:image" content="https://japanese-garden-wedding.vercel.app/photos/og-image-video.jpg">
+	<meta property="og:url" content="https://japanese-garden-wedding.vercel.app/video.html">
+
+	<!-- Стили -->
+	<link rel="stylesheet" href="../css/gallery.css">
+	<link rel="stylesheet" href="../css/scroll.css">
+	<link rel="stylesheet" href="../css/gallery-video.css"> <!-- Подключаем наш новый CSS -->
+
+	<!-- Swiper (если нужен для других страниц, но для видео не обязателен) -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+	<link rel="stylesheet" href="../css/slider.css">
+
+	<!-- Гугл шрифты -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link
+		href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Noto+Serif+JP:wght@200;300;400;500;600&family=Zen+Old+Mincho:wght@400;500;600;700&display=swap"
+		rel="stylesheet">
+</head>
+
+<body data-theme="garden"> <!-- Используем тему сада (розовую) -->
+
+	<!-- Занавес для переходов -->
+	<div id="page-curtain"></div>
+
+	<noscript>
+		<style>
+			body {
+				opacity: 1 !important;
+			}
+		</style>
+	</noscript>
+
+	<div class="bg-noise"></div>
+
+	<!-- Шапка -->
+	<header class="gallery-header">
+		<div class="header-inner">
+			<a href="../index.html" class="back-btn">
+				<span class="btn-line"></span>
+				<span class="btn-line"></span>
+				<span class="btn-line"></span>
+				<span class="btn-line"></span>
+				<span class="back-arrow">←</span>
+				<span>Главная</span>
+			</a>
+
+			<div class="title-block">
+				<h1 class="section-title" data-text="Видеоархив">Видеоархив</h1>
+			</div>
+
+			<span class="photo-counter"></span>
+		</div>
+	</header>
+
+	<!-- Контейнер для видео -->
+	<main class="gallery-container" style="padding-top: 20px;">
+
+		<!-- ========================================== -->
+		<!-- ГЛАВНОЕ ВИДЕО (Горизонтальное, 16:9)       -->
+		<!-- ========================================== -->
+		<div class="video-main-wrapper">
+			<!-- Замените ID видео на свой -->
+			<div class="video-card video-card-horizontal video-card-main" data-video="Iz9rVWjrOqs"
+				data-format="horizontal">
+				<img src="../photos/video/main-poster.jpg" alt="Андрей и Татьяна 15.05.24" class="video-poster"
+					loading="lazy">
+				<div class="video-play-btn">
+					<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+						<polygon points="5 3 19 12 5 21 5 3"></polygon>
+					</svg>
+				</div>
+				<div class="video-title-overlay">
+					<h2 class="video-title">Андрей и Татьяна</h2>
+					<span class="video-date">15.05.24</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========================================== -->
+		<!-- ОСТАЛЬНЫЕ ВИДЕО (Вертикальные, 9:16)       -->
+		<!-- ========================================== -->
+		<div class="video-grid">
+			<!-- Замените ID видео на свои -->
+			<div class="video-card video-card-vertical" data-video="jMWOVi69oqA" data-format="vertical">
+				<img src="../photos/video/garden-poster.jpg" alt="Японский сад" class="video-poster" loading="lazy">
+				<div class="video-play-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<polygon points="5 3 19 12 5 21 5 3"></polygon>
+					</svg>
+				</div>
+				<div class="video-title-overlay">
+					<h3 class="video-title">Японский сад</h3>
+				</div>
+			</div>
+
+			<div class="video-card video-card-vertical" data-video="yqAiC-j4lw4" data-format="vertical">
+				<img src="../photos/video/zags-poster.jpg" alt="Зал бракосочетания" class="video-poster" loading="lazy">
+				<div class="video-play-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<polygon points="5 3 19 12 5 21 5 3"></polygon>
+					</svg>
+				</div>
+				<div class="video-title-overlay">
+					<h3 class="video-title">Зал бракосочетания</h3>
+				</div>
+			</div>
+
+			<div class="video-card video-card-vertical" data-video="t2U3lbn18Cw" data-format="vertical">
+				<img src="../photos/video/home-poster.jpg" alt="Купеческий дом" class="video-poster" loading="lazy">
+				<div class="video-play-btn">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+						<polygon points="5 3 19 12 5 21 5 3"></polygon>
+					</svg>
+				</div>
+				<div class="video-title-overlay">
+					<h3 class="video-title">Купеческий дом</h3>
+				</div>
+			</div>
+		</div>
+
+	</main>
+
+	<!-- Нижняя навигация -->
+	<nav class="section-bottom-nav">
+		<a href="../index.html" class="animated-btn">
+			<span class="btn-line"></span>
+			<span class="btn-line"></span>
+			<span class="btn-line"></span>
+			<span class="btn-line"></span>
+			<span class="bottom-nav-home-icon">⟡</span>
+			<span class="bottom-nav-content">
+				<span class="bottom-nav-label">На главную</span>
+				<span class="bottom-nav-title">Обложка</span>
+			</span>
+		</a>
+	</nav>
+
+	<!-- Подвал -->
+	<footer class="section-footer">
+		<div class="footer-accent"></div>
+		<p class="footer-text" data-text="Кадры, которые говорят громче слов">Кадры, которые говорят громче слов</p>
+	</footer>
+
+	<!-- ========================================== -->
+	<!-- МОДАЛЬНОЕ ОКНО ДЛЯ ВИДЕО                   -->
+	<!-- ========================================== -->
+	<div class="video-modal" id="videoModal">
+		<div class="video-modal-content" id="videoModalContent">
+			<button class="video-modal-close" id="videoModalClose" aria-label="Закрыть">✕</button>
+			<!-- Сюда будет вставляться iframe -->
+			<div class="video-iframe-container" id="videoIframeContainer"></div>
+		</div>
+	</div>
+
+	<!-- Скрипты -->
+	<script src="../js/effects.js"></script>
+
+	<!-- Скрипт для видео -->
+	<script>
+		document.addEventListener( 'DOMContentLoaded', () => {
+			const modal = document.getElementById( 'videoModal' );
+			const modalContent = document.getElementById( 'videoModalContent' );
+			const iframeContainer = document.getElementById( 'videoIframeContainer' );
+			const closeBtn = document.getElementById( 'videoModalClose' );
+
+			// Открытие видео
+			document.querySelectorAll( '.video-card' ).forEach( card => {
+				card.addEventListener( 'click', () => {
+					const videoId = card.getAttribute( 'data-video' );
+					const format = card.getAttribute( 'data-format' ); // 'horizontal' или 'vertical'
+
+					if ( videoId && videoId !== 'ВАШ_ID_ВИДЕО_1' ) { // Проверка, что ID заменен
+
+						// Управляем размером окна в зависимости от формата
+						if ( format === 'vertical' ) {
+							modalContent.classList.add( 'is-vertical' );
+						} else {
+							modalContent.classList.remove( 'is-vertical' );
+						}
+
+						// Вставляем iframe с YouTube
+						iframeContainer.innerHTML = `
+							<iframe 
+								src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+								title="YouTube video player" 
+								frameborder="0" 
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+								allowfullscreen>
+							</iframe>
+						`;
+						modal.classList.add( 'open' );
+						document.body.style.overflow = 'hidden';
+					} else {
+						alert( 'ID видео не указан в HTML.' );
+					}
+				} );
+			} );
+
+			// Закрытие
+			function closeModal() {
+				modal.classList.remove( 'open' );
+				iframeContainer.innerHTML = ''; // Удаляем iframe, чтобы видео остановилось
+				document.body.style.overflow = '';
+			}
+
+			closeBtn.addEventListener( 'click', closeModal );
+			modal.addEventListener( 'click', ( e ) => {
+				if ( e.target === modal ) closeModal();
+			} );
+			document.addEventListener( 'keydown', ( e ) => {
+				if ( e.key === 'Escape' && modal.classList.contains( 'open' ) ) {
+					closeModal();
+				}
+			} );
+		} );
+	</script>
+</body>
+
+</html>

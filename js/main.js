@@ -313,7 +313,8 @@
 	const SECTION_PAGES = {
 		garden: 'pages/garden.html',
 		zags: 'pages/zags.html',
-		home: 'pages/home.html'
+		home: 'pages/home.html',
+		video: 'pages/video.html'
 	};
 
 	/**
