@@ -226,15 +226,30 @@ body::after {
 	position: sticky;
 	top: 0;
 	z-index: 20;
-	background: rgba(8, 8, 8, 0.2);
 	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	padding: 16px 20px;
+
+	background: rgba(8, 8, 8, 0.6);
+	/* Сделали чуть плотнее, чтобы текст под ней не просвечивал */
+	backdrop-filter: blur(5px);
+	/* <--- Добавили эффект матового стекла */
+	-webkit-backdrop-filter: blur(10px);
 }
 
+/* Остальные блоки на странице  */
 .gallery-section .gallery-header {
 	position: relative;
 	top: auto;
 	z-index: 1;
+	background: transparent;
+	/* Убираем фон */
+	backdrop-filter: none;
+	/* Убираем размытие */
+	-webkit-backdrop-filter: none;
+	border-bottom: none;
+	/* Если не нужна линия снизу */
+
+
 }
 
 .header-inner {
@@ -570,6 +585,101 @@ body::after {
 }
 
 /* ============================================================
+   ТУМБЛЕР УПРАВЛЕНИЯ ЭФФЕКТАМИ
+   ============================================================ */
+
+.effects-toggle-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	width: 140px;
+	/* Такая же ширина, как у старого счетчика */
+	flex-shrink: 0;
+}
+
+.effects-toggle {
+	position: relative;
+	display: inline-block;
+	width: 44px;
+	height: 24px;
+	cursor: pointer;
+}
+
+/* Скрываем стандартный чекбокс */
+.effects-toggle input {
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+/* Фон тумблера (по умолчанию — выключен, серый) */
+.effects-toggle-slider {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 34px;
+	transition: .4s;
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}
+
+/* Кружок внутри (по умолчанию — слева, серый) */
+.effects-toggle-slider::before {
+	content: "";
+	position: absolute;
+	height: 16px;
+	width: 16px;
+	left: 4px;
+	bottom: 3px;
+	background-color: rgba(255, 255, 255, 0.5);
+	/* Серый кружок */
+	border-radius: 50%;
+	transition: .4s var(--ease-out-expo);
+}
+
+/* 
+ * СОСТОЯНИЕ "ВКЛЮЧЕНО" (чекбокс отмечен)
+ * Эффекты работают — тумблер становится акцентным, кружок едет вправо.
+ */
+.effects-toggle input:checked+.effects-toggle-slider {
+	background-color: rgba(var(--accent-rgb), 0.2);
+	border-color: var(--accent-color);
+}
+
+.effects-toggle input:checked+.effects-toggle-slider::before {
+	transform: translateX(20px);
+	background-color: var(--accent-color);
+	box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* На мобильных делаем тумблер чуть меньше */
+@media (width < 481px) {
+	.effects-toggle-wrapper {
+		width: auto;
+	}
+
+	.effects-toggle {
+		width: 36px;
+		height: 20px;
+	}
+
+	.effects-toggle-slider::before {
+		height: 12px;
+		width: 12px;
+		left: 3px;
+		bottom: 3px;
+	}
+
+	.effects-toggle input:checked+.effects-toggle-slider::before {
+		transform: translateX(16px);
+	}
+}
+
+/* ============================================================
    7. ЗАГОЛОВОК РАЗДЕЛА
    ============================================================ */
 
@@ -580,16 +690,33 @@ body::after {
 }
 
 .section-title {
-	font-size: 28px;
-	font-weight: 500;
-	letter-spacing: 0.06em;
-	color: var(--white);
-	margin-bottom: 4px;
-	line-height: 1.15;
-	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 40px rgba(0, 0, 0, 0.2);
+	/* 1. Увеличиваем размер (было 28px) */
+	font-size: 52px;
+
+	/* 2. Делаем шрифт более выразительным */
+	font-weight: 600;
+	letter-spacing: 0.08em;
+
+	/* 3. Создаем градиентный текст (от белого к акцентному цвету темы) */
+	background: linear-gradient(135deg, #ffffff 0%, var(--accent-color) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+
+	margin-bottom: 8px;
+	line-height: 1.1;
+
+	/* 4. Добавляем свечение через drop-shadow (text-shadow не работает с градиентом) */
+	filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 20px var(--accent-glow));
+
 	position: relative;
+	display: inline-block;
+	/* Важно для корректного отображения градиента и отражения */
 }
 
+/* 
+ * Отражение (сохраняем логику, но адаптируем под градиент)
+ */
 .section-title::after {
 	content: attr(data-text);
 	position: absolute;
@@ -597,7 +724,13 @@ body::after {
 	left: 0;
 	right: 0;
 	transform: scaleY(-1);
+
+	/* Для отражения используем сплошной цвет, чтобы не было багов с прозрачностью */
 	color: var(--white);
+	-webkit-text-fill-color: var(--white);
+	background: none;
+	-webkit-background-clip: border-box;
+
 	font-size: inherit;
 	font-weight: inherit;
 	letter-spacing: inherit;
@@ -649,10 +782,14 @@ body::after {
 	padding: var(--grid-padding);
 }
 
+/* Стало: убираем линию и сокращаем отступ */
 .gallery-section+.gallery-section {
-	margin-top: 60px;
-	border-top: 1px solid rgba(255, 255, 255, 0.08);
-	padding-top: 60px;
+	margin-top: 20px;
+	/* Было 60px, стало 20px */
+	border-top: none;
+	/* Убираем линию */
+	padding-top: 0;
+	/* Убираем внутренний отступ сверху */
 }
 
 .gallery-grid {
@@ -788,6 +925,13 @@ body::after {
    10. СВИТОК — ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
    ============================================================ */
 
+/* Принудительно убираем нижнюю линию у блока "История этого дня" */
+.scroll-block,
+.scroll-trigger,
+.scroll-trigger-inner {
+	border-bottom: none !important;
+}
+
 .scroll-trigger-inner {
 	display: flex;
 	flex-direction: column;
@@ -795,17 +939,59 @@ body::after {
 	justify-content: center;
 	gap: 8px;
 	cursor: pointer;
+
+	/* Фон и эффект стекла */
+	background: rgba(20, 20, 20, 0.2);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+
+	/* Скругления и отступы */
+	border-radius: 0 0 14px 14px;
+	padding: 16px 28px 24px;
+
+	/* Плавные переходы для всех эффектов */
+	transition:
+		transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+		background 0.3s ease,
+		box-shadow 0.3s ease;
 }
 
+/* Эффект при наведении (ПК) */
+.scroll-trigger:hover .scroll-trigger-inner {
+	background: rgba(30, 30, 30, 0.6);
+	/* Чуть светлее */
+}
+
+/* Эффект при нажатии (клик или тап) */
+.scroll-trigger:active .scroll-trigger-inner {
+	transform: scale(0.94);
+	/* Пружинистое сжатие */
+	background: rgba(255, 255, 255, 0.08);
+	/* Подсветка изнутри */
+	box-shadow: inset 0 0 20px rgba(var(--accent-rgb), 0.15);
+	/* Свечение акцента */
+
+	/* Ускоряем переход для мгновенного отклика */
+	transition: transform 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Стрелка */
 .scroll-trigger-arrow {
 	color: var(--accent-color);
 	opacity: 0.7;
 	animation: arrowBounce 2s ease-in-out infinite;
-	transition: color 0.3s ease, opacity 0.3s ease;
+	transition: color 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
 }
 
 .scroll-trigger-inner:hover .scroll-trigger-arrow {
 	opacity: 1;
+}
+
+/* Анимация стрелки при нажатии (прыгает вниз) */
+.scroll-trigger:active .scroll-trigger-arrow {
+	transform: translateY(6px) scale(1.1);
+	animation: none;
+	/* Отключаем бесконечную анимацию на момент нажатия */
 }
 
 @keyframes arrowBounce {
@@ -824,6 +1010,7 @@ body::after {
 	position: relative;
 }
 
+/* Кнопка закрытия свитка (крестик) */
 .scroll-close-btn {
 	position: absolute;
 	top: 20px;
@@ -880,7 +1067,7 @@ body::after {
 	padding: 25px 10px 120px;
 	position: relative;
 	z-index: 1;
-	background: rgba(8, 8, 8, 0.1);
+	background: rgba(8, 8, 8, 0.6);
 }
 
 .footer-accent {
@@ -1040,8 +1227,10 @@ body::after {
 		font-size: 10px;
 	}
 
+	/* Заголовок: было 20px, ставим 32px (учитывая новый базовый 52px) */
 	.section-title {
-		font-size: 20px;
+		font-size: 32px;
+		letter-spacing: 0.06em;
 	}
 
 	.title-block {
@@ -1165,8 +1354,9 @@ body::after {
 		--grid-padding: 12px;
 	}
 
+	/* Заголовок: было 24px, ставим 38px */
 	.section-title {
-		font-size: 24px;
+		font-size: 38px;
 	}
 
 	.back-btn {
@@ -1218,8 +1408,9 @@ body::after {
 		--grid-padding: 16px;
 	}
 
+	/* Заголовок: было 28px, ставим 44px */
 	.section-title {
-		font-size: 28px;
+		font-size: 44px;
 	}
 
 	.back-btn {
@@ -1249,8 +1440,9 @@ body::after {
 		--grid-padding: 24px;
 	}
 
+	/* Заголовок: было 32px, ставим 48px */
 	.section-title {
-		font-size: 32px;
+		font-size: 48px;
 	}
 
 	.back-btn {
@@ -1280,8 +1472,9 @@ body::after {
 		--grid-padding: 32px;
 	}
 
+	/* Заголовок: базовый 52px, на этом экране оставляем 52px */
 	.section-title {
-		font-size: 36px;
+		font-size: 52px;
 	}
 
 	.back-btn {
@@ -1311,8 +1504,9 @@ body::after {
 		--grid-padding: 40px;
 	}
 
+	/* Заголовок: увеличиваем до 56px */
 	.section-title {
-		font-size: 40px;
+		font-size: 56px;
 	}
 
 	.bottom-nav-title {
@@ -1334,8 +1528,9 @@ body::after {
 		--grid-padding: 48px;
 	}
 
+	/* Заголовок: 60px */
 	.section-title {
-		font-size: 44px;
+		font-size: 60px;
 	}
 
 	.bottom-nav-title {
@@ -1361,8 +1556,9 @@ body::after {
 		max-width: 1800px;
 	}
 
+	/* Заголовок: 64px */
 	.section-title {
-		font-size: 48px;
+		font-size: 64px;
 	}
 
 	.bottom-nav-title {

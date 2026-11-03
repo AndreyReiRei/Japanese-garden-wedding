@@ -1,100 +1,84 @@
 /* ============================================================
    GALLERY-VIDEO.CSS — Стили для страницы видеоархива
-   ============================================================
-   СОДЕРЖАНИЕ:
-   1.  Основная сетка и карточки видео
-   2.  Горизонтальное видео (Главное)
-   3.  Вертикальные видео (Сетка)
-   4.  Модальное окно (в стиле YouTube)
-   5.  Адаптивность (все @media)
    ============================================================ */
 
 /* ============================================================
-   1. ОСНОВНАЯ СЕТКА И КАРТОЧКИ ВИДЕО
+   1. ОБЩИЕ СТИЛИ КАРТОЧЕК
    ============================================================ */
 
-/* Обертка для главного видео */
 .video-main-wrapper {
 	width: 100%;
 	max-width: 1400px;
-	/* Как в gallery-container */
 	margin: 0 auto 24px;
 	padding: 0 var(--grid-padding);
 }
 
-/* Общая карточка видео */
 .video-card {
 	position: relative;
 	border-radius: var(--radius-md);
 	overflow: hidden;
 	cursor: pointer;
-	background: #000;
+	background: #111;
 	box-shadow: var(--shadow-card);
-	transition: transform 0.4s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
-	transform: translateZ(0);
-	/* Для плавности на мобильных */
+	transition:
+		max-width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+		border-radius 0.45s ease,
+		box-shadow 0.45s ease,
+		transform 0.3s ease;
+	display: flex;
+	flex-direction: column;
 }
 
 .video-card:hover {
-	transform: translateY(-4px) scale(1.02);
 	box-shadow: var(--shadow-card-hover);
+	transform: translateY(-2px);
+}
+
+/* Превью */
+.video-preview {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
 	z-index: 2;
 }
 
-.video-card:active {
-	transform: scale(0.98);
-}
-
-/* Постер (обложка) */
-.video-poster {
+.video-thumb {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 	display: block;
-	transition: filter 0.5s ease;
-	filter: brightness(0.7);
+	transition: transform 0.5s ease, filter 0.5s ease;
+	filter: brightness(0.8);
 }
 
-.video-card:hover .video-poster {
-	filter: brightness(0.9);
+.video-card:hover .video-thumb {
+	transform: scale(1.03);
+	filter: brightness(0.95);
 }
 
-/* Кнопка Play (иконка) */
-.video-play-btn {
+/* Кнопка Play */
+.play-btn {
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	width: 64px;
-	height: 64px;
-	background: rgba(255, 255, 255, 0.15);
-	border: 1px solid rgba(255, 255, 255, 0.3);
-	border-radius: 50%;
+	inset: 0;
+	margin: auto;
+	background: none;
+	border: none;
+	cursor: pointer;
+	transition: transform 0.25s ease;
+	z-index: 3;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: #fff;
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	transition: all 0.3s ease;
-	z-index: 3;
+	width: 100%;
+	height: 100%;
 }
 
-.video-play-btn svg {
-	width: 28px;
-	height: 28px;
-	margin-left: 4px;
-	/* Смещение для визуальной центровки треугольника */
+.video-card:hover .play-btn {
+	transform: scale(1.08);
 }
 
-.video-card:hover .video-play-btn {
-	background: var(--accent-color);
-	border-color: var(--accent-color);
-	transform: translate(-50%, -50%) scale(1.1);
-	box-shadow: 0 0 20px var(--accent-glow);
-}
-
-/* Заголовок на карточке */
+/* Заголовок */
 .video-title-overlay {
 	position: absolute;
 	bottom: 0;
@@ -115,6 +99,13 @@
 	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
+.video-date {
+	font-family: var(--font-body);
+	font-size: 14px;
+	color: rgba(255, 255, 255, 0.7);
+	letter-spacing: 0.1em;
+}
+
 /* ============================================================
    2. ГОРИЗОНТАЛЬНОЕ ВИДЕО (ГЛАВНОЕ)
    ============================================================ */
@@ -124,33 +115,15 @@
 	width: 100%;
 }
 
-.video-card-main .video-play-btn {
-	width: 88px;
-	height: 88px;
-}
-
-.video-card-main .video-play-btn svg {
-	width: 40px;
-	height: 40px;
-}
-
-.video-card-main .video-title {
+.video-card-horizontal .video-title {
 	font-size: 32px;
 	margin-bottom: 4px;
-}
-
-.video-date {
-	font-family: var(--font-body);
-	font-size: 14px;
-	color: rgba(255, 255, 255, 0.7);
-	letter-spacing: 0.1em;
 }
 
 /* ============================================================
    3. ВЕРТИКАЛЬНЫЕ ВИДЕО (СЕТКА)
    ============================================================ */
 
-/* Сетка для вертикальных видео */
 .video-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
@@ -160,129 +133,102 @@
 	padding: 0 var(--grid-padding);
 }
 
-/* Вертикальная карточка */
 .video-card-vertical {
 	aspect-ratio: 9 / 16;
-	/* Пропорции вертикального видео */
 	width: 100%;
-}
-
-.video-card-vertical .video-play-btn {
-	width: 56px;
-	height: 56px;
-}
-
-.video-card-vertical .video-play-btn svg {
-	width: 24px;
-	height: 24px;
+	max-width: 360px;
+	margin: 0 auto;
 }
 
 /* ============================================================
-   4. МОДАЛЬНОЕ ОКНО (В СТИЛЕ YOUTUBE)
+   4. ПЛЕЕР И КНОПКА РАЗВЕРТЫВАНИЯ
    ============================================================ */
 
-.video-modal {
-	position: fixed;
-	inset: 0;
-	z-index: 9999;
-	background: rgba(0, 0, 0, 0.95);
-	backdrop-filter: blur(10px);
-	-webkit-backdrop-filter: blur(10px);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 0.3s ease;
-}
-
-.video-modal.open {
-	opacity: 1;
-	pointer-events: all;
-}
-
-.video-modal-content {
+.video-player {
 	position: relative;
-	width: 90%;
-	max-width: 1200px;
-	background: #000;
-	border-radius: var(--radius-sm);
-	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
-	transform: scale(0.95);
-	transition: transform 0.3s var(--ease-out-expo), max-width 0.3s ease;
-	overflow: hidden;
-}
-
-.video-modal.open .video-modal-content {
-	transform: scale(1);
-}
-
-/* Контейнер для iframe (по умолчанию горизонтальный 16:9) */
-.video-iframe-container {
-	position: relative;
+	flex: 1;
 	width: 100%;
-	padding-bottom: 56.25%;
-	/* 16:9 */
-	height: 0;
-	transition: padding-bottom 0.3s ease;
+	height: 100%;
+	background: #000;
+	z-index: 1;
 }
 
-.video-iframe-container iframe {
-	position: absolute;
-	top: 0;
-	left: 0;
+.video-player iframe {
 	width: 100%;
 	height: 100%;
 	border: none;
+	display: block;
 }
 
-/* Стили для вертикального окна (9:16) */
-.video-modal-content.is-vertical {
-	max-width: 450px;
+/* Скрываем превью, когда играет видео */
+.video-card.is-playing .video-preview {
+	display: none;
 }
 
-.video-modal-content.is-vertical .video-iframe-container {
-	padding-bottom: 177.78%;
-	/* 9:16 */
-}
-
-/* Кнопка закрытия (как на YouTube) */
-.video-modal-close {
+/* Кнопка развернуть/свернуть */
+.expand-btn {
 	position: absolute;
-	top: -50px;
-	/* Выносим над окном */
-	right: 0;
+	top: 14px;
+	right: 14px;
 	width: 40px;
 	height: 40px;
-	background: rgba(255, 255, 255, 0.1);
-	border: none;
 	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.55);
+	border: 1px solid rgba(255, 255, 255, 0.12);
 	color: #fff;
-	font-size: 20px;
-	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.3s ease;
+	cursor: pointer;
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	transition: background 0.25s ease, transform 0.25s ease;
 	z-index: 10;
 }
 
-.video-modal-close:hover {
-	background: rgba(255, 255, 255, 0.2);
-	transform: rotate(90deg);
+.expand-btn:hover {
+	background: rgba(0, 0, 0, 0.75);
+	transform: scale(1.08);
+}
+
+/* СОСТОЯНИЕ "РАЗВЕРНУТО" */
+.video-card-vertical.is-expanded {
+	max-width: 720px;
+	border-radius: var(--radius-sm);
+	z-index: 50;
+}
+
+.video-card-horizontal.is-expanded {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	width: 100%;
+	height: 100vh;
+	max-width: none;
+	margin: 0;
+	border-radius: 0;
+	background: #000;
+}
+
+.video-card-horizontal.is-expanded .expand-btn {
+	top: 20px;
+	right: 20px;
+	width: 50px;
+	height: 50px;
+	background: rgba(232, 64, 64, 0.2);
+	border-color: rgba(232, 64, 64, 0.4);
 }
 
 /* ============================================================
-   5. АДАПТИВНОСТЬ (ВСЕ МЕДИА-ЗАПРОСЫ)
+   5. АДАПТИВНОСТЬ
    ============================================================ */
 
-/* МОБИЛЬНЫЕ (< 481px) */
 @media (width < 481px) {
 	.video-main-wrapper {
 		margin-bottom: 16px;
 	}
 
-	.video-card-main .video-title {
+	.video-card-horizontal .video-title {
 		font-size: 22px;
 	}
 
@@ -290,70 +236,38 @@
 		font-size: 12px;
 	}
 
-	.video-card-main .video-play-btn {
-		width: 60px;
-		height: 60px;
-	}
-
-	.video-card-main .video-play-btn svg {
-		width: 24px;
-		height: 24px;
-	}
-
 	.video-grid {
 		grid-template-columns: 1fr;
-		/* На телефоне вертикальные видео в столбик */
 		gap: 16px;
 	}
 
 	.video-card-vertical {
-		aspect-ratio: 9 / 16;
-		max-width: 320px;
-		/* Чтобы вертикальное видео не было гигантским */
-		margin: 0 auto;
+		max-width: 100%;
 	}
 
 	.video-title {
 		font-size: 16px;
 	}
-
-	.video-modal-content {
-		width: 95%;
-	}
-
-	.video-modal-content.is-vertical {
-		width: 90%;
-		max-width: 350px;
-	}
-
-	.video-modal-close {
-		top: 10px;
-		right: 10px;
-		background: rgba(0, 0, 0, 0.5);
-		z-index: 20;
-	}
 }
 
-/* МОБИЛЬНЫЕ L (481px – 576px) */
 @media (481px <=width < 577px) {
 	.video-grid {
 		grid-template-columns: repeat(2, 1fr);
 		gap: 12px;
 	}
 
-	.video-card-main .video-title {
+	.video-card-horizontal .video-title {
 		font-size: 26px;
 	}
 }
 
-/* БОЛЬШИЕ МОБИЛЬНЫЕ (577px – 768px) */
 @media (577px <=width < 769px) {
 	.video-grid {
 		grid-template-columns: repeat(2, 1fr);
 		gap: 16px;
 	}
 
-	.video-card-main .video-title {
+	.video-card-horizontal .video-title {
 		font-size: 28px;
 	}
 
@@ -362,7 +276,6 @@
 	}
 }
 
-/* ПЛАНШЕТЫ (769px – 992px) */
 @media (769px <=width < 993px) {
 	.video-grid {
 		grid-template-columns: repeat(3, 1fr);
@@ -370,7 +283,6 @@
 	}
 }
 
-/* ДЕСКТОП И ВЫШЕ (993px+) */
 @media (993px <=width) {
 	.video-grid {
 		grid-template-columns: repeat(3, 1fr);

@@ -1,7 +1,6 @@
 /**
  * ============================================================
  * effects.js — Лепестки сакуры, светлячки и плавные переходы
- * Общие эффекты для всех страниц альбома.
  * ============================================================
  */
 
@@ -19,41 +18,133 @@
 	const IS_MOBILE = window.matchMedia( '(max-width: 768px)' ).matches;
 
 	// ============================================================
-	// 1. ИНИЦИАЛИЗАЦИЯ ЭФФЕКТОВ
+	// 1. ПЕРЕМЕННЫЕ СОСТОЯНИЯ
+	// ============================================================
+
+	let isEffectsEnabled = true;
+	let effectsContainer = null;
+	let petalInterval = null;
+	let fireflyInterval = null;
+
+	// Ключ для localStorage
+	const STORAGE_KEY = 'wedding_effects_enabled';
+
+	// ============================================================
+	// 2. ИНИЦИАЛИЗАЦИЯ
 	// ============================================================
 
 	function init() {
-		// --- Инициализация эффектов ---
-		let container = document.getElementById( 'effectsContainer' );
-		if ( !container ) {
-			container = document.createElement( 'div' );
-			container.id = 'effectsContainer';
-			container.style.cssText = `
-                position: fixed;
-                inset: 0;
-                z-index: 5;
-                pointer-events: none;
-                overflow: hidden;
-            `;
-			document.body.appendChild( container );
+		// Проверяем сохраненную настройку (по умолчанию — включено)
+		const savedSetting = localStorage.getItem( STORAGE_KEY );
+		isEffectsEnabled = savedSetting !== 'false';
+
+		// Настраиваем тумблер (если он есть на странице)
+		setupToggle();
+
+		// Если эффекты выключены — не запускаем их
+		if ( !isEffectsEnabled ) {
+			console.log( '🌸 Эффекты отключены пользователем (из памяти)' );
+			initPageTransitions();
+			return;
 		}
 
-		injectStyles();
-		initPetals( container );
-
-		if ( document.getElementById( 'storyToggle' ) ) {
-			initFireflies( container );
-			console.log( '🌸🪲 Эффекты запущены (лепестки + фоновые светлячки)' );
-		} else {
-			console.log( '🌸 Эффекты запущены (только лепестки)' );
-		}
+		// Запускаем эффекты
+		startEffects();
 
 		// --- Запуск плавных переходов ---
 		initPageTransitions();
 	}
 
 	// ============================================================
-	// 2. CSS-АНИМАЦИИ ДЛЯ ЭФФЕКТОВ
+	// 3. НАСТРОЙКА ТУМБЛЕРА
+	// ============================================================
+
+	function setupToggle() {
+		const toggle = document.getElementById( 'effectsToggle' );
+		if ( !toggle ) return;
+
+		// Устанавливаем состояние тумблера в соответствии с настройкой
+		// (checked = true означает "выключено", так как это переключатель отключения)
+		toggle.checked = isEffectsEnabled;
+
+		// Обработчик клика
+		toggle.addEventListener( 'change', () => {
+
+			// Если чекбокс включен (checked), значит эффекты ВКЛЮЧЕНЫ
+			isEffectsEnabled = toggle.checked;
+
+			// Сохраняем в память
+			localStorage.setItem( STORAGE_KEY, isEffectsEnabled );
+
+			// Запускаем или останавливаем эффекты
+			if ( isEffectsEnabled ) {
+				startEffects();
+				console.log( '🌸 Эффекты включены' );
+			} else {
+				stopEffects();
+				console.log( '🌸 Эффекты отключены' );
+			}
+		} );
+	}
+
+	// ============================================================
+	// 4. ЗАПУСК И ОСТАНОВКА ЭФФЕКТОВ
+	// ============================================================
+
+	function startEffects() {
+		// Создаем контейнер, если его нет
+		if ( !effectsContainer ) {
+			effectsContainer = document.getElementById( 'effectsContainer' );
+			if ( !effectsContainer ) {
+				effectsContainer = document.createElement( 'div' );
+				effectsContainer.id = 'effectsContainer';
+				effectsContainer.style.cssText = `
+					position: fixed;
+					inset: 0;
+					z-index: 5;
+					pointer-events: none;
+					overflow: hidden;
+				`;
+				document.body.appendChild( effectsContainer );
+			}
+			// Внедряем CSS (один раз)
+			injectStyles();
+		}
+
+		// Очищаем контейнер перед запуском (чтобы не было дублей)
+		effectsContainer.innerHTML = '';
+
+		// Запускаем лепестки
+		initPetals( effectsContainer );
+
+		// Фоновые светлячки (только на главной, если есть #storyToggle)
+		if ( document.getElementById( 'storyToggle' ) ) {
+			initFireflies( effectsContainer );
+			console.log( '🌸🪲 Эффекты запущены (лепестки + фоновые светлячки)' );
+		} else {
+			console.log( '🌸 Эффекты запущены (только лепестки)' );
+		}
+	}
+
+	function stopEffects() {
+		// Очищаем интервалы
+		if ( petalInterval ) {
+			clearInterval( petalInterval );
+			petalInterval = null;
+		}
+		if ( fireflyInterval ) {
+			clearInterval( fireflyInterval );
+			fireflyInterval = null;
+		}
+
+		// Удаляем все элементы из контейнера
+		if ( effectsContainer ) {
+			effectsContainer.innerHTML = '';
+		}
+	}
+
+	// ============================================================
+	// 5. CSS-АНИМАЦИИ ДЛЯ ЭФФЕКТОВ
 	// ============================================================
 
 	function injectStyles() {
@@ -92,7 +183,7 @@
 	}
 
 	// ============================================================
-	// 3. ЛЕПЕСТКИ САКУРЫ
+	// 6. ЛЕПЕСТКИ САКУРЫ
 	// ============================================================
 
 	function initPetals( container ) {
@@ -148,7 +239,8 @@
 		}
 
 		// Поддержание количества лепестков
-		setInterval( () => {
+		petalInterval = setInterval( () => {
+			if ( !isEffectsEnabled ) return;
 			const petals = container.querySelectorAll( '.petal-wrapper' );
 			if ( petals.length < COUNT + 8 ) {
 				container.appendChild( createPetal() );
@@ -160,7 +252,7 @@
 	}
 
 	// ============================================================
-	// 4. ФОНОВЫЕ СВЕТЛЯЧКИ
+	// 7. ФОНОВЫЕ СВЕТЛЯЧКИ
 	// ============================================================
 
 	function initFireflies( container ) {
@@ -200,23 +292,24 @@
 
 		for ( let i = 0; i < COUNT; i++ ) {
 			setTimeout( () => {
-				container.appendChild( createFirefly() );
+				if ( isEffectsEnabled ) container.appendChild( createFirefly() );
 			}, i * 400 );
 		}
 
-		setInterval( () => {
+		fireflyInterval = setInterval( () => {
+			if ( !isEffectsEnabled ) return;
 			const fireflies = container.querySelectorAll( '.firefly' );
 			fireflies.forEach( f => f.remove() );
 			for ( let i = 0; i < COUNT; i++ ) {
 				setTimeout( () => {
-					container.appendChild( createFirefly() );
+					if ( isEffectsEnabled ) container.appendChild( createFirefly() );
 				}, i * 300 );
 			}
 		}, 30000 );
 	}
 
 	// ============================================================
-	// 5. СВЕТЛЯЧКИ ДЛЯ ОВЕРЛЕЯ / СВИТКА
+	// 8. СВЕТЛЯЧКИ ДЛЯ ОВЕРЛЕЯ / СВИТКА
 	// ============================================================
 
 	window.startOverlayFireflies = function ( el ) {
@@ -287,14 +380,17 @@
 	};
 
 	// ============================================================
-	// 6. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ (ЧЕРНОЕ ЗАТУХАНИЕ)
+	// 9. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ (ЧЕРНОЕ ЗАТУХАНИЕ)
 	// ============================================================
 
 	function initPageTransitions() {
-		// Создаем черный занавес
-		const curtain = document.createElement( 'div' );
-		curtain.id = 'page-curtain';
-		document.body.appendChild( curtain );
+		// Проверяем, есть ли уже занавес (чтобы не дублировать)
+		let curtain = document.getElementById( 'page-curtain' );
+		if ( !curtain ) {
+			curtain = document.createElement( 'div' );
+			curtain.id = 'page-curtain';
+			document.body.appendChild( curtain );
+		}
 
 		// Функция для запуска анимации и перехода
 		function navigateTo( href ) {
@@ -320,14 +416,12 @@
 		} );
 
 		// 2. Перехват кликов по кнопкам на главной (data-section)
-		// Ищем кнопки с атрибутом data-section
 		const navButtons = document.querySelectorAll( 'button[data-section]' );
 		navButtons.forEach( btn => {
 			btn.addEventListener( 'click', ( e ) => {
 				const section = btn.getAttribute( 'data-section' );
 
-				// Формируем путь к странице (например, pages/garden.html)
-				// Замените 'pages/' на вашу реальную папку, где лежат страницы
+				// Формируем путь к странице
 				const href = `pages/${section}.html`;
 
 				e.preventDefault();
