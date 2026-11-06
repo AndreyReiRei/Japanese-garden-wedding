@@ -166,7 +166,6 @@ html {
 	width: 100%;
 	height: 100%;
 	background-color: #0a0a0a;
-	/* НЕ задаем overflow — пусть скроллом управляет браузер */
 }
 
 body {
@@ -178,19 +177,22 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 
 	background-color: transparent;
-	/* УБРАЛИ overflow-x: hidden и overflow-y: auto */
-	/* Теперь скролл — нативный, браузерный. fixed-элементы не дергаются. */
 	position: relative;
 	z-index: 0;
+	overflow-x: hidden;
 }
 
 /* ============================================================
-   4. ФОНОВЫЙ СЛОЙ (ОТДЕЛЬНЫЙ DIV)
+   4. ФОНОВЫЙ СЛОЙ
    ============================================================ */
 
 .page-bg {
 	position: fixed;
-	inset: 0;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	height: 100dvh;
 	z-index: -1;
 	pointer-events: none;
 
@@ -198,8 +200,6 @@ body {
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	/* УБРАЛИ background-attachment: fixed — он не нужен, т.к. сам блок fixed */
-	/* УБРАЛИ transform и will-change — они вызывают дрожание на мобильных */
 }
 
 /* Затемнение + акцентное свечение */
@@ -214,6 +214,8 @@ body {
 		radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.02) 0%, transparent 60%),
 		rgba(8, 8, 8, 0.78);
 }
+
+
 
 /* ============================================================
    5. ШАПКА
@@ -1391,6 +1393,21 @@ body {
 
 	.footer-text {
 		font-size: 21px;
+	}
+}
+
+/* ============================================================
+   МОБИЛКА — убираем fixed, чтобы фон не прыгал
+   ============================================================ */
+
+@media (max-width: 768px) {
+	.page-bg {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		min-height: 100dvh;
 	}
 }
 
