@@ -166,8 +166,8 @@ html {
 	width: 100%;
 	height: 100%;
 	background-color: #0a0a0a;
-	/* УБРАЛИ overflow-y: scroll — он ломал sticky */
-	/* overflow-x: clip; — тоже убрали, если не нужен */
+	/* Убрали overflow-y: scroll — он создает контейнер прокрутки на html, ломая sticky */
+	/* Убрали overflow-x: clip — он тоже может ломать sticky в некоторых браузерах */
 }
 
 body {
@@ -180,13 +180,10 @@ body {
 
 	background-color: transparent;
 	overflow-x: hidden;
-	/* Скрываем горизонтальный скролл */
 	overflow-y: auto;
-	/* Скролл на body */
 	position: relative;
-	/* Создаем контекст для z-index */
 	z-index: 0;
-	/* Чтобы .page-bg с -1 остался внутри */
+	/* Создаем контекст наложения для .page-bg */
 }
 
 /* ============================================================
@@ -203,10 +200,10 @@ body {
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
+	background-attachment: fixed;
+	/* Добавляем это — фон не будет скроллиться */
 
-	transform: translate3d(0, 0, 0);
-	backface-visibility: hidden;
-	will-change: transform;
+	/* Убираем transform и will-change — они вызывают дрожание на мобильных */
 }
 
 /* Затемнение + акцентное свечение */
