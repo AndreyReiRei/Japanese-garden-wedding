@@ -220,8 +220,8 @@ body {
    ============================================================ */
 
 .gallery-header {
-	position: sticky;
-	top: 0;
+	position: relative;
+	top: auto;
 	z-index: 20;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 	padding: 16px 20px;
@@ -1532,10 +1532,4 @@ body {
 	.footer-text {
 		font-size: 32px;
 	}
-}
-
-html,
-body {
-	overflow-x: clip;
-	/* clip не ломает sticky и fixed, в отличие от hidden */
 }
