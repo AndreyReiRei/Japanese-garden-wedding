@@ -124,7 +124,7 @@
 	--btn-glow: rgba(232, 160, 180, 0.4);
 
 	--bg-image: url('../photos/cover/bg-garden.avif');
-	--bg-image: url('../photos/cover/bg-garden-mobile.avif');
+	--bg-image-mobile: url('../photos/cover/bg-garden-mobile.avif');
 }
 
 /*
@@ -141,7 +141,7 @@
 	--btn-glow: rgba(232, 64, 64, 0.4);
 
 	--bg-image: url('../photos/cover/bg-zags.avif');
-	--bg-image: url('../photos/cover/bg-zags-mobile.avif');
+	--bg-image-mobile: url('../photos/cover/bg-zags-mobile.avif');
 }
 
 /*
@@ -158,7 +158,7 @@
 	--btn-glow: rgba(212, 162, 78, 0.4);
 
 	--bg-image: url('../photos/cover/bg-home.avif');
-	--bg-image: url('../photos/cover/bg-home-mobile.avif');
+	--bg-image-mobile: url('../photos/cover/bg-home-mobile.avif');
 }
 
 /* ============================================================
@@ -1409,10 +1409,15 @@ body {
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 100%;
+		height: 100dvh;
 		min-height: 100dvh;
 		background-image: var(--bg-image-mobile);
 		background-position: center top;
+		background-repeat: no-repeat;
+	}
+
+	body {
+		background-color: #0a0a0a;
 	}
 }
 
