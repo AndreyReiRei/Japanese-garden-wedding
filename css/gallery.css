@@ -166,8 +166,7 @@ html {
 	width: 100%;
 	height: 100%;
 	background-color: #0a0a0a;
-	/* Убрали overflow-y: scroll — он создает контейнер прокрутки на html, ломая sticky */
-	/* Убрали overflow-x: clip — он тоже может ломать sticky в некоторых браузерах */
+	/* НЕ задаем overflow — пусть скроллом управляет браузер */
 }
 
 body {
@@ -179,11 +178,10 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 
 	background-color: transparent;
-	overflow-x: hidden;
-	overflow-y: auto;
+	/* УБРАЛИ overflow-x: hidden и overflow-y: auto */
+	/* Теперь скролл — нативный, браузерный. fixed-элементы не дергаются. */
 	position: relative;
 	z-index: 0;
-	/* Создаем контекст наложения для .page-bg */
 }
 
 /* ============================================================
@@ -200,10 +198,8 @@ body {
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	background-attachment: fixed;
-	/* Добавляем это — фон не будет скроллиться */
-
-	/* Убираем transform и will-change — они вызывают дрожание на мобильных */
+	/* УБРАЛИ background-attachment: fixed — он не нужен, т.к. сам блок fixed */
+	/* УБРАЛИ transform и will-change — они вызывают дрожание на мобильных */
 }
 
 /* Затемнение + акцентное свечение */
@@ -1536,4 +1532,10 @@ body {
 	.footer-text {
 		font-size: 32px;
 	}
+}
+
+html,
+body {
+	overflow-x: clip;
+	/* clip не ломает sticky и fixed, в отличие от hidden */
 }
