@@ -41,17 +41,14 @@
 		// Настраиваем тумблер (если он есть на странице)
 		setupToggle();
 
-		// Если эффекты выключены — не запускаем их
-		if ( !isEffectsEnabled ) {
+		// Запускаем или не запускаем эффекты
+		if ( isEffectsEnabled ) {
+			startEffects();
+		} else {
 			console.log( '🌸 Эффекты отключены пользователем (из памяти)' );
-			initPageTransitions();
-			return;
 		}
 
-		// Запускаем эффекты
-		startEffects();
-
-		// --- Запуск плавных переходов ---
+		// Переходы запускаем всегда (не зависят от эффектов)
 		initPageTransitions();
 	}
 
@@ -63,20 +60,14 @@
 		const toggle = document.getElementById( 'effectsToggle' );
 		if ( !toggle ) return;
 
-		// Устанавливаем состояние тумблера в соответствии с настройкой
-		// (checked = true означает "выключено", так как это переключатель отключения)
+		// Устанавливаем состояние: checked = эффекты включены
 		toggle.checked = isEffectsEnabled;
 
 		// Обработчик клика
 		toggle.addEventListener( 'change', () => {
-
-			// Если чекбокс включен (checked), значит эффекты ВКЛЮЧЕНЫ
 			isEffectsEnabled = toggle.checked;
-
-			// Сохраняем в память
 			localStorage.setItem( STORAGE_KEY, isEffectsEnabled );
 
-			// Запускаем или останавливаем эффекты
 			if ( isEffectsEnabled ) {
 				startEffects();
 				console.log( '🌸 Эффекты включены' );
@@ -111,13 +102,13 @@
 			injectStyles();
 		}
 
-		// Очищаем контейнер перед запуском (чтобы не было дублей)
+		// Очищаем контейнер перед запуском
 		effectsContainer.innerHTML = '';
 
 		// Запускаем лепестки
 		initPetals( effectsContainer );
 
-		// Фоновые светлячки (только на главной, если есть #storyToggle)
+		// Фоновые светлячки (только на главной)
 		if ( document.getElementById( 'storyToggle' ) ) {
 			initFireflies( effectsContainer );
 			console.log( '🌸🪲 Эффекты запущены (лепестки + фоновые светлячки)' );
@@ -153,32 +144,27 @@
 		const style = document.createElement( 'style' );
 		style.id = 'effects-styles';
 		style.textContent = `
-            /* Падение вниз (на внешней обертке) */
-            @keyframes petalFall {
-                0%   { transform: translateY(-40px); opacity: 0; }
-                8%   { opacity: 0.8; }
-                50%  { opacity: 0.6; }
-                85%  { opacity: 0.3; }
-                100% { transform: translateY(110vh); opacity: 0; }
-            }
-            
-            /* Покачивание и вращение (на внутреннем элементе) */
-            @keyframes petalSway {
-                0%   { transform: translateX(0px) rotate(0deg); }
-                30%  { transform: translateX(18px) rotate(90deg); }
-                70%  { transform: translateX(-14px) rotate(270deg); }
-                100% { transform: translateX(0px) rotate(420deg); }
-            }
-            
-            /* Светлячки */
-            @keyframes fireflyFloat {
-                0%, 100% { opacity: 0.15; transform: translate(0, 0) scale(0.8); }
-                20%      { opacity: 0.9;  transform: translate(12px, -18px) scale(1.6); }
-                40%      { opacity: 0.25; transform: translate(-8px, -8px) scale(0.6); }
-                60%      { opacity: 0.85; transform: translate(-14px, -22px) scale(1.8); }
-                80%      { opacity: 0.3;  transform: translate(6px, -12px) scale(0.9); }
-            }
-        `;
+			@keyframes petalFall {
+				0%   { transform: translateY(-40px); opacity: 0; }
+				8%   { opacity: 0.8; }
+				50%  { opacity: 0.6; }
+				85%  { opacity: 0.3; }
+				100% { transform: translateY(110vh); opacity: 0; }
+			}
+			@keyframes petalSway {
+				0%   { transform: translateX(0px) rotate(0deg); }
+				30%  { transform: translateX(18px) rotate(90deg); }
+				70%  { transform: translateX(-14px) rotate(270deg); }
+				100% { transform: translateX(0px) rotate(420deg); }
+			}
+			@keyframes fireflyFloat {
+				0%, 100% { opacity: 0.15; transform: translate(0, 0) scale(0.8); }
+				20%      { opacity: 0.9;  transform: translate(12px, -18px) scale(1.6); }
+				40%      { opacity: 0.25; transform: translate(-8px, -8px) scale(0.6); }
+				60%      { opacity: 0.85; transform: translate(-14px, -22px) scale(1.8); }
+				80%      { opacity: 0.3;  transform: translate(6px, -12px) scale(0.9); }
+			}
+		`;
 		document.head.appendChild( style );
 	}
 
@@ -188,7 +174,6 @@
 
 	function initPetals( container ) {
 		function createPetal() {
-			// Внешняя обертка (отвечает за падение)
 			const wrapper = document.createElement( 'div' );
 			wrapper.className = 'petal-wrapper';
 
@@ -208,7 +193,6 @@
 				will-change: transform;
 			`;
 
-			// Внутренний элемент (сам лепесток, отвечает за покачивание)
 			const petal = document.createElement( 'div' );
 			const size = Math.random() * 8 + 5;
 			const op = Math.random() * 0.2 + 0.06;
@@ -240,7 +224,6 @@
 
 		// Поддержание количества лепестков
 		petalInterval = setInterval( () => {
-			if ( !isEffectsEnabled ) return;
 			const petals = container.querySelectorAll( '.petal-wrapper' );
 			if ( petals.length < COUNT + 8 ) {
 				container.appendChild( createPetal() );
@@ -266,25 +249,25 @@
 
 			firefly.className = 'firefly';
 			firefly.style.cssText = `
-                position: absolute;
-                top: ${startY}%;
-                left: ${startX}%;
-                width: ${size}px;
-                height: ${size}px;
-                background: radial-gradient(circle at center,
-                    rgba(255, 220, 170, 0.95) 0%,
-                    rgba(255, 200, 140, 0.7) 35%,
-                    transparent 70%);
-                border-radius: 50%;
-                box-shadow: 
-                    0 0 ${size * 2}px rgba(255, 200, 140, 0.7),
-                    0 0 ${size * 5}px rgba(255, 160, 80, 0.35),
-                    0 0 ${size * 10}px rgba(255, 140, 50, 0.15);
-                animation: fireflyFloat ${dur}s ${delay}s ease-in-out infinite;
-                pointer-events: none;
-                z-index: 0;
-                will-change: transform, opacity;
-            `;
+				position: absolute;
+				top: ${startY}%;
+				left: ${startX}%;
+				width: ${size}px;
+				height: ${size}px;
+				background: radial-gradient(circle at center,
+					rgba(255, 220, 170, 0.95) 0%,
+					rgba(255, 200, 140, 0.7) 35%,
+					transparent 70%);
+				border-radius: 50%;
+				box-shadow: 
+					0 0 ${size * 2}px rgba(255, 200, 140, 0.7),
+					0 0 ${size * 5}px rgba(255, 160, 80, 0.35),
+					0 0 ${size * 10}px rgba(255, 140, 50, 0.15);
+				animation: fireflyFloat ${dur}s ${delay}s ease-in-out infinite;
+				pointer-events: none;
+				z-index: 0;
+				will-change: transform, opacity;
+			`;
 			return firefly;
 		}
 
@@ -292,17 +275,16 @@
 
 		for ( let i = 0; i < COUNT; i++ ) {
 			setTimeout( () => {
-				if ( isEffectsEnabled ) container.appendChild( createFirefly() );
+				container.appendChild( createFirefly() );
 			}, i * 400 );
 		}
 
 		fireflyInterval = setInterval( () => {
-			if ( !isEffectsEnabled ) return;
 			const fireflies = container.querySelectorAll( '.firefly' );
 			fireflies.forEach( f => f.remove() );
 			for ( let i = 0; i < COUNT; i++ ) {
 				setTimeout( () => {
-					if ( isEffectsEnabled ) container.appendChild( createFirefly() );
+					container.appendChild( createFirefly() );
 				}, i * 300 );
 			}
 		}, 30000 );
@@ -328,25 +310,25 @@
 
 			f.className = 'overlay-firefly';
 			f.style.cssText = `
-                position: fixed;
-                top: ${sy}%;
-                left: ${sx}%;
-                width: ${s}px;
-                height: ${s}px;
-                background: radial-gradient(circle at center,
-                    rgba(255, 230, 180, 1) 0%,
-                    rgba(255, 210, 150, 0.8) 30%,
-                    transparent 70%);
-                border-radius: 50%;
-                box-shadow: 
-                    0 0 ${s * 2.5}px rgba(255, 210, 150, 0.8),
-                    0 0 ${s * 6}px rgba(255, 170, 90, 0.4),
-                    0 0 ${s * 12}px rgba(255, 150, 60, 0.2);
-                animation: fireflyFloat ${dur}s ${del}s ease-in-out infinite;
-                pointer-events: none;
-                z-index: 101;
-                will-change: transform, opacity;
-            `;
+				position: fixed;
+				top: ${sy}%;
+				left: ${sx}%;
+				width: ${s}px;
+				height: ${s}px;
+				background: radial-gradient(circle at center,
+					rgba(255, 230, 180, 1) 0%,
+					rgba(255, 210, 150, 0.8) 30%,
+					transparent 70%);
+				border-radius: 50%;
+				box-shadow: 
+					0 0 ${s * 2.5}px rgba(255, 210, 150, 0.8),
+					0 0 ${s * 6}px rgba(255, 170, 90, 0.4),
+					0 0 ${s * 12}px rgba(255, 150, 60, 0.2);
+				animation: fireflyFloat ${dur}s ${del}s ease-in-out infinite;
+				pointer-events: none;
+				z-index: 101;
+				will-change: transform, opacity;
+			`;
 			return f;
 		}
 
@@ -380,11 +362,11 @@
 	};
 
 	// ============================================================
-	// 9. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ (ЧЕРНОЕ ЗАТУХАНИЕ)
+	// 9. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
 	// ============================================================
 
 	function initPageTransitions() {
-		// Проверяем, есть ли уже занавес (чтобы не дублировать)
+		// Проверяем, есть ли уже занавес
 		let curtain = document.getElementById( 'page-curtain' );
 		if ( !curtain ) {
 			curtain = document.createElement( 'div' );
@@ -394,16 +376,14 @@
 
 		// Функция для запуска анимации и перехода
 		function navigateTo( href ) {
-			// Показываем черный занавес
 			curtain.classList.add( 'active' );
-
-			// Ждем окончания анимации (0.6 секунды) и переходим
 			setTimeout( () => {
 				window.location.href = href;
 			}, 600 );
 		}
 
 		// 1. Перехват кликов по обычным ссылкам <a>
+		// (все ссылки, кроме якорей, target="_blank", mailto и tel)
 		const links = document.querySelectorAll( 'a[href]:not([target="_blank"]):not([href^="#"])' );
 		links.forEach( link => {
 			link.addEventListener( 'click', ( e ) => {
@@ -417,17 +397,43 @@
 
 		// 2. Перехват кликов по кнопкам на главной (data-section)
 		const navButtons = document.querySelectorAll( 'button[data-section]' );
+
+		// Если на странице нет таких кнопок — выходим (не выполняем лишний код)
+		if ( navButtons.length === 0 ) return;
+
 		navButtons.forEach( btn => {
 			btn.addEventListener( 'click', ( e ) => {
 				const section = btn.getAttribute( 'data-section' );
 
-				// Формируем путь к странице
-				const href = `pages/${section}.html`;
+				// Формируем путь в зависимости от раздела
+				let href = '';
+
+				if ( section === 'video' ) {
+					// Страница видео лежит в корне (рядом с index.html) или в папке html/
+					// Проверьте свой реальный путь!
+					href = 'html/video.html';
+				} else {
+					// Остальные разделы (garden, zags, home) лежат в папке pages/
+					href = `pages/${section}.html`;
+				}
 
 				e.preventDefault();
 				navigateTo( href );
 			} );
 		} );
 	}
+
+	// ============================================================
+	// 10. ПУБЛИЧНЫЕ ФУНКЦИИ ДЛЯ ВНЕШНЕГО МИРА
+	// ============================================================
+
+	/**
+	 * Проверяет, включены ли эффекты.
+	 * Возвращает true, если эффекты активны, и false, если отключены.
+	 * Используется в scroll.js, чтобы не запускать светлячков, если они отключены.
+	 */
+	window.areEffectsEnabled = function () {
+		return isEffectsEnabled;
+	};
 
 } )();

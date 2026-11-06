@@ -159,10 +159,17 @@
 }
 
 /* ============================================================
-   3. БАЗОВЫЕ СТИЛИ
+   3. БАЗОВЫЕ СТИЛИ + ФОН
    ============================================================ */
 
-html,
+html {
+	width: 100%;
+	height: 100%;
+	background-color: #0a0a0a;
+	/* УБРАЛИ overflow-y: scroll — он ломал sticky */
+	/* overflow-x: clip; — тоже убрали, если не нужен */
+}
+
 body {
 	width: 100%;
 	min-height: 100vh;
@@ -170,23 +177,26 @@ body {
 	font-family: var(--font-display);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	overflow-y: auto;
+
+	background-color: transparent;
 	overflow-x: hidden;
-	/* background-color: #000; */
+	/* Скрываем горизонтальный скролл */
+	overflow-y: auto;
+	/* Скролл на body */
+	position: relative;
+	/* Создаем контекст для z-index */
+	z-index: 0;
+	/* Чтобы .page-bg с -1 остался внутри */
 }
 
 /* ============================================================
-   4. ФОНОВЫЕ СЛОИ ПОВЕРХ ИЗОБРАЖЕНИЯ
+   4. ФОНОВЫЙ СЛОЙ (ОТДЕЛЬНЫЙ DIV)
    ============================================================ */
 
-/*
- * 4.1. СТАТИЧНЫЙ ФОН
- */
-body::before {
-	content: '';
+.page-bg {
 	position: fixed;
 	inset: 0;
-	z-index: -2;
+	z-index: -1;
 	pointer-events: none;
 
 	background-image: var(--bg-image);
@@ -194,28 +204,22 @@ body::before {
 	background-position: center;
 	background-repeat: no-repeat;
 
-	transform: translateZ(0);
+	transform: translate3d(0, 0, 0);
+	backface-visibility: hidden;
 	will-change: transform;
 }
 
-/*
- * 4.2. АКЦЕНТНОЕ СВЕЧЕНИЕ РАЗДЕЛА
- */
-body::after {
+/* Затемнение + акцентное свечение */
+.page-bg::after {
 	content: '';
-	position: fixed;
+	position: absolute;
 	inset: 0;
-	z-index: -1;
-	pointer-events: none;
-
-	transform: translateZ(0);
-	will-change: transform;
 
 	background:
 		radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.01) 0%, transparent 50%),
 		radial-gradient(ellipse at 50% 100%, rgba(var(--accent-rgb), 0.07) 0%, rgba(var(--accent-rgb), 0.04) 35%, transparent 65%),
 		radial-gradient(ellipse at 50% 50%, rgba(var(--accent-rgb), 0.02) 0%, transparent 60%),
-		rgba(8, 8, 8, 0.8);
+		rgba(8, 8, 8, 0.78);
 }
 
 /* ============================================================
@@ -293,7 +297,7 @@ body::after {
 		0 0 8px var(--accent-glow),
 		0 0 16px var(--accent-glow);
 	z-index: 1;
-	animation: headerDot 4s ease-in-out infinite;
+	animation: headerDot 20s ease-in-out infinite;
 }
 
 @keyframes headerDot {
@@ -327,15 +331,15 @@ body::after {
    ============================================================ */
 
 /*
- * 6.1. ВЕРХНЯЯ КНОПКА «НАЗАД»
+ * 6.1. ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ КНОПОК (Назад и Нижние)
  */
-.back-btn {
+.back-btn,
+.animated-btn {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 10px;
-	width: 140px;
 	padding: 12px 24px;
 	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
 	color: var(--btn-text);
@@ -355,31 +359,16 @@ body::after {
 }
 
 /*
- * 6.2. НИЖНИЕ КНОПКИ
+ * 6.2. СПЕЦИФИЧНЫЕ РАЗМЕРЫ
  */
+.back-btn {
+	width: 140px;
+	/* Фиксированная для шапки */
+}
+
 .animated-btn {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	gap: 10px;
 	min-width: 200px;
-	padding: 12px 24px;
-	background: linear-gradient(-30deg, var(--btn-bg-dark) 50%, var(--btn-bg) 50%);
-	color: var(--btn-text);
-	font-family: var(--font-body);
-	font-size: 14px;
-	font-weight: 500;
-	letter-spacing: 0.04em;
-	text-decoration: none;
-	border: none;
-	border-radius: var(--radius-sm);
-	cursor: pointer;
-	overflow: hidden;
-	white-space: nowrap;
-	box-shadow: var(--shadow-card);
-	transition: all 0.4s var(--ease-out-expo);
-	flex-shrink: 0;
+	/* Минимальная для нижних */
 }
 
 /*
@@ -430,18 +419,9 @@ body::after {
 	width: 100%;
 	height: 2px;
 	background: linear-gradient(to left, transparent, var(--btn-line-color));
-	animation: btnLineX 4s linear infinite;
+	animation: btnLineX 20s linear infinite;
 }
 
-.back-btn .btn-line:nth-child(2),
-.animated-btn .btn-line:nth-child(2) {
-	top: 0;
-	right: 0;
-	width: 2px;
-	height: 100%;
-	background: linear-gradient(to top, transparent, var(--btn-line-color));
-	animation: btnLineY 4s linear -1s infinite;
-}
 
 .back-btn .btn-line:nth-child(3),
 .animated-btn .btn-line:nth-child(3) {
@@ -450,18 +430,9 @@ body::after {
 	width: 100%;
 	height: 2px;
 	background: linear-gradient(to right, transparent, var(--btn-line-color));
-	animation: btnLineX 4s linear -2s infinite reverse;
+	animation: btnLineX 20s linear -2s infinite reverse;
 }
 
-.back-btn .btn-line:nth-child(4),
-.animated-btn .btn-line:nth-child(4) {
-	top: 0;
-	left: 0;
-	width: 2px;
-	height: 100%;
-	background: linear-gradient(to bottom, transparent, var(--btn-line-color));
-	animation: btnLineY 4s linear -3s infinite reverse;
-}
 
 /*
  * 6.5. СТРЕЛКА В КНОПКЕ
@@ -529,7 +500,7 @@ body::after {
 	font-size: 24px;
 	line-height: 1;
 	transition: transform 0.5s var(--ease-out-back);
-	animation: iconPulse 3s ease-in-out infinite;
+	animation: iconPulse 5s ease-in-out infinite;
 }
 
 .animated-btn:hover .bottom-nav-home-icon {
@@ -739,18 +710,18 @@ body::after {
 	pointer-events: none;
 	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
 	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
-	animation: reflectionPulse 4s ease-in-out infinite;
+	animation: reflectionPulse 10s ease-in-out infinite;
 }
 
 @keyframes reflectionPulse {
 
 	0%,
 	100% {
-		opacity: 0.15;
+		opacity: 0.1;
 	}
 
 	50% {
-		opacity: 0.5;
+		opacity: 0.7;
 	}
 }
 
@@ -947,7 +918,7 @@ body::after {
 
 	/* Скругления и отступы */
 	border-radius: 0 0 14px 14px;
-	padding: 16px 28px 24px;
+	/* padding: 16px 28px 24px; */
 
 	/* Плавные переходы для всех эффектов */
 	transition:
@@ -978,8 +949,8 @@ body::after {
 /* Стрелка */
 .scroll-trigger-arrow {
 	color: var(--accent-color);
-	opacity: 0.7;
-	animation: arrowBounce 2s ease-in-out infinite;
+	opacity: 0.8;
+	animation: arrowBounce 3s ease-in-out infinite;
 	transition: color 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
 }
 
@@ -1096,7 +1067,7 @@ body::after {
 		0 0 12px var(--accent-glow-strong),
 		0 0 24px var(--accent-glow),
 		0 0 36px var(--accent-glow);
-	animation: footerDot 3s ease-in-out infinite;
+	animation: footerDot 20s ease-in-out infinite;
 }
 
 @keyframes footerDot {
@@ -1154,7 +1125,7 @@ body::after {
 	pointer-events: none;
 	-webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
 	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35) 0%, transparent 100%);
-	animation: footerReflectionPulse 5s ease-in-out infinite;
+	animation: footerReflectionPulse 10s ease-in-out infinite;
 }
 
 @keyframes footerReflectionPulse {
@@ -1165,7 +1136,7 @@ body::after {
 	}
 
 	50% {
-		opacity: 0.45;
+		opacity: 0.7;
 	}
 }
 

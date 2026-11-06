@@ -277,7 +277,7 @@
 	border-radius: 50%;
 	background: var(--accent-color, #E84040);
 	box-shadow: 0 0 8px var(--accent-glow, rgba(232, 64, 64, 0.4));
-	animation: dotLeft 2s ease-in-out infinite;
+	animation: dotLeft 5s ease-in-out infinite;
 }
 
 .scroll-divider-line:last-child::after {
@@ -290,7 +290,7 @@
 	border-radius: 50%;
 	background: var(--accent-color, #E84040);
 	box-shadow: 0 0 8px var(--accent-glow, rgba(232, 64, 64, 0.4));
-	animation: dotRight 2s ease-in-out infinite;
+	animation: dotRight 5s ease-in-out infinite;
 }
 
 .scroll-divider-diamond {
@@ -506,9 +506,6 @@
    ============================================================ */
 
 @media (width < 481px) {
-	.scroll-trigger {
-		padding: 8px var(--grid-padding, 8px) 0;
-	}
 
 	.scroll-trigger-inner {
 		padding: 12px 16px 18px;

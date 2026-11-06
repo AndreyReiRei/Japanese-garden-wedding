@@ -10,6 +10,7 @@
  *   - Заполняет заголовок из переданных данных.
  *   - Запускает светлячков (position: fixed) при открытии.
  *   - Удаляет светлячков при закрытии.
+ *   - НЕ запускает светлячков, если эффекты отключены пользователем.
  * 
  * ИСПОЛЬЗОВАНИЕ:
  *   initScroll( {
@@ -22,7 +23,7 @@
  *   } );
  * 
  * ЗАВИСИМОСТИ:
- *   - effects.js (startOverlayFireflies / stopOverlayFireflies)
+ *   - effects.js (startOverlayFireflies / stopOverlayFireflies / areEffectsEnabled)
  *   - scroll.css
  * 
  * ВАЖНО:
@@ -59,7 +60,7 @@ function initScroll( config ) {
 	const scrollBlock = document.getElementById( 'scrollBlock' );
 	const scrollTrigger = document.getElementById( 'scrollTrigger' );
 	const collapseBtn = document.getElementById( 'scrollCollapseBtn' );
-	const closeBtnTop = document.getElementById( 'scrollCloseBtnTop' ); // Новая кнопка закрытия сверху
+	const closeBtnTop = document.getElementById( 'scrollCloseBtnTop' );
 
 	if ( !scrollBlock ) {
 		console.error( 'initScroll: не найден #scrollBlock' );
@@ -71,7 +72,6 @@ function initScroll( config ) {
 
 	// ============================================================
 	// 3. ЗАПОЛНЕНИЕ ЗАГОЛОВКА
-	// Текст истории уже находится в HTML.
 	// ============================================================
 
 	if ( titleEl ) {
@@ -100,11 +100,22 @@ function initScroll( config ) {
 		/*
 		 * Запускаем светлячков на весь экран.
 		 * Они position: fixed — видны всегда, даже при скролле.
-		 * Добавляются в document.body, удаляются при закрытии.
+		 * 
+		 * ВАЖНО: Проверяем, включены ли эффекты.
+		 * Если пользователь отключил их тумблером — светлячки не создаем.
 		 */
 		if ( typeof window.startOverlayFireflies === 'function' ) {
 			setTimeout( () => {
-				firefliesCtrl = window.startOverlayFireflies( document.body );
+				// Проверяем состояние эффектов (функция из effects.js)
+				const effectsAllowed = typeof window.areEffectsEnabled === 'function'
+					? window.areEffectsEnabled()
+					: true; // Если функции нет — считаем, что эффекты включены
+
+				if ( effectsAllowed ) {
+					firefliesCtrl = window.startOverlayFireflies( document.body );
+				} else {
+					console.log( '🌸 Светлячки в свитке пропущены (эффекты выключены)' );
+				}
 			}, 400 );
 		}
 
@@ -123,7 +134,6 @@ function initScroll( config ) {
 	function collapse() {
 		/*
 		 * Останавливаем и удаляем светлячков.
-		 * Они полностью удаляются из DOM.
 		 */
 		if ( firefliesCtrl ) {
 			window.stopOverlayFireflies( firefliesCtrl );
