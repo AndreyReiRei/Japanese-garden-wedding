@@ -112,6 +112,12 @@ function openSlider( config ) {
 			.slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
 				opacity: 0;
 			}
+
+			/* Скрытие счетчика */
+			.slider-counter.hidden {
+				opacity: 0;
+				pointer-events: none;
+			}
 		`;
 		document.head.appendChild( style );
 	}
@@ -514,7 +520,46 @@ function openSlider( config ) {
 		}
 	}, 1500 );
 
-	// 7. СЧЁТЧИК
+	// 7. ЛОГИКА СКРЫТИЯ СЧЕТЧИКА
+	const counterEl = document.getElementById( 'sliderCounter' );
+	let counterTimeout = null;
+
+	function hideCounter() {
+		if ( counterEl ) {
+			counterEl.classList.add( 'hidden' );
+		}
+	}
+
+	function showCounter() {
+		if ( counterEl ) {
+			counterEl.classList.remove( 'hidden' );
+		}
+
+		// Сбрасываем старый таймер
+		if ( counterTimeout ) {
+			clearTimeout( counterTimeout );
+		}
+
+		// Запускаем новый таймер на 2 секунды
+		counterTimeout = setTimeout( hideCounter, 2000 );
+	}
+
+	// Запускаем таймер при открытии слайдера
+	showCounter();
+
+	// Показываем счетчик при движении мыши (ПК)
+	overlay.addEventListener( 'mousemove', showCounter );
+
+	// Показываем счетчик при касании (мобильные)
+	overlay.addEventListener( 'touchstart', showCounter, { passive: true } );
+
+	// Показываем счетчик при клике на кнопки навигации
+	const prevBtn = overlay.querySelector( '.swiper-button-prev' );
+	const nextBtn = overlay.querySelector( '.swiper-button-next' );
+	if ( prevBtn ) prevBtn.addEventListener( 'click', showCounter );
+	if ( nextBtn ) nextBtn.addEventListener( 'click', showCounter );
+
+	// 8. СЧЁТЧИК
 	function updateCounter( index, total ) {
 		const counter = document.getElementById( 'sliderCounter' );
 		if ( counter ) {
@@ -522,7 +567,7 @@ function openSlider( config ) {
 		}
 	}
 
-	// 8. ЗУМ
+	// 9. ЗУМ
 	const ZOOM_STEPS = [1, 2, 4, 8];
 
 	function getNextZoomStep( currentScale ) {
@@ -597,7 +642,7 @@ function openSlider( config ) {
 			hint.classList.add( 'visible' );
 			clearTimeout( hint._timeout );
 			if ( !isZoomed ) {
-				hint._timeout = setTimeout( () => hint.classList.remove( 'visible' ), 3000 );
+				hint._timeout = setTimeout( () => hint.classList.remove( 'visible' ), 2000 );
 			}
 		}
 
@@ -610,7 +655,7 @@ function openSlider( config ) {
 		}
 	}
 
-	// 9. ЗАКРЫТИЕ
+	// 10. ЗАКРЫТИЕ
 	function closeSlider() {
 		overlay.classList.remove( 'open' );
 		setTimeout( () => {
@@ -646,7 +691,7 @@ function openSlider( config ) {
 		}
 	} );
 
-	// 10. ЗАПУСК
+	// 11. ЗАПУСК
 	updateZoomUI();
 	if ( window.navigator?.vibrate ) window.navigator.vibrate( 10 );
 	console.log( `📸 Слайдер открыт с миниатюрами: ${startIndex + 1} / ${photos.length}` );

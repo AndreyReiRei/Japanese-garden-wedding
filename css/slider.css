@@ -1,25 +1,5 @@
 /* ============================================================
    SLIDER.CSS — Полноэкранный слайдер на Swiper
-   Современная японская эстетика с микро-взаимодействиями
-   ============================================================
-   
-   СОДЕРЖАНИЕ:
-   1.  Сброс стилей и CSS-переменные
-   2.  Контейнер слайдера (фон, оверлей)
-   3.  Swiper-контейнер и полоска миниатюр
-   4.  Слайд
-   5.  Обёртка и изображение
-   6.  Подпись
-   7.  Кнопки действий (Скачать / Поделиться / Полный экран)
-   8.  Навигационные стрелки
-   9.  Пагинация (точки)
-   10. Кнопка закрытия
-   11. Счётчик фото
-   12. Подсказка о зуме
-   13. Кнопки зума +/−
-   14. Зум (состояния и эффекты)
-   15. Полноэкранный режим
-   16. Адаптивность (все @media)
    ============================================================ */
 
 /* ============================================================
@@ -113,7 +93,6 @@ body:has(.slider-overlay.open) {
    3. SWIPER-КОНТЕЙНЕР И ПОЛОСКА МИНИАТЮР
    ============================================================ */
 
-/* Главный контейнер (флекс-колонка: фото сверху, миниатюры снизу) */
 .slider-container {
 	width: 100%;
 	height: 100%;
@@ -124,19 +103,15 @@ body:has(.slider-overlay.open) {
 	overflow: hidden;
 }
 
-/* Основной слайдер */
 .swiper-main {
 	width: 100%;
 	height: calc(100% - 80px);
-	/* Место под миниатюры */
 	flex: 1 1 auto;
 	min-height: 0;
 	overflow: hidden;
 	transition: height 0.3s ease;
-	/* Для полноэкранного режима */
 }
 
-/* Полоска миниатюр */
 .swiper-thumbs {
 	height: 80px;
 	flex: 0 0 80px;
@@ -150,14 +125,12 @@ body:has(.slider-overlay.open) {
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 	z-index: 10;
 	transition: opacity 0.3s ease;
-	/* Для полноэкранного режима */
 }
 
 .swiper-wrapper {
 	align-items: center;
 }
 
-/* Слайд миниатюры */
 .thumb-slide {
 	width: 64px !important;
 	height: 64px !important;
@@ -301,7 +274,7 @@ body:has(.slider-overlay.open) {
 }
 
 /* ============================================================
-   7. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться / Полный экран)
+   7. КНОПКИ ДЕЙСТВИЙ
    ============================================================ */
 
 .slider-actions {
@@ -312,7 +285,6 @@ body:has(.slider-overlay.open) {
 	gap: 12px;
 	z-index: 1001;
 	transition: opacity 0.3s ease;
-	/* Для полноэкранного режима */
 }
 
 .slider-action-btn {
@@ -474,22 +446,17 @@ body:has(.slider-overlay.open) {
 .slider-counter {
 	position: absolute;
 	bottom: 100px;
-	/* Подняли выше полоски миниатюр (80px + отступ) */
+	/* Подняли выше полоски миниатюр */
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 10;
 
 	font-family: 'Inter', sans-serif;
 	font-size: 13px;
-	/* Чуть увеличили */
 	font-weight: 600;
-	/* Сделали жирнее */
 	letter-spacing: 0.15em;
-
-	/* Увеличили контраст: почти белый с легкой прозрачностью */
 	color: rgba(255, 255, 255, 0.85);
 
-	/* Добавили подложку для читаемости на любом фоне */
 	background: rgba(0, 0, 0, 0.45);
 	padding: 6px 16px;
 	border-radius: 100px;
@@ -500,6 +467,19 @@ body:has(.slider-overlay.open) {
 	pointer-events: none;
 	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 	transition: opacity 0.3s ease, bottom 0.3s ease;
+}
+
+/* Состояние "скрыт" для счетчика */
+.slider-counter.hidden {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.5s ease;
+}
+
+/* Состояние "виден" (по умолчанию) */
+.slider-counter {
+	/* ... существующие стили ... */
+	transition: opacity 0.5s ease, bottom 0.3s ease;
 }
 
 /* ============================================================
@@ -698,7 +678,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
    15. ПОЛНОЭКРАННЫЙ РЕЖИМ
    ============================================================ */
 
-/* 1. Скрываем миниатюры, подписи, пагинацию и зум-контролы */
 .slider-overlay.is-fullscreen .swiper-thumbs,
 .slider-overlay.is-fullscreen .swiper-pagination,
 .slider-overlay.is-fullscreen .slider-zoom-controls,
@@ -711,27 +690,22 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* 2. Кнопка закрытия слайдера (крестик) — скрываем */
 .slider-overlay.is-fullscreen .slider-close {
 	opacity: 0;
 	pointer-events: none;
 }
 
-/* 3. Основной слайдер на весь экран */
 .slider-overlay.is-fullscreen .swiper-main {
 	height: 100% !important;
 	transition: height 0.3s ease;
 }
 
-/* 4. Убираем скругления у фото */
 .slider-overlay.is-fullscreen .swiper-slide,
 .slider-overlay.is-fullscreen .swiper-zoom-container {
 	border-radius: 0 !important;
 	transition: border-radius 0.3s ease;
 }
 
-/* 5. Кнопка выхода из полноэкранного режима — она видна всегда, 
-      чтобы пользователь мог вернуться к альбому */
 .slider-overlay.is-fullscreen .slider-actions {
 	opacity: 1;
 	visibility: visible;
@@ -739,7 +713,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	transition: opacity 0.3s ease;
 }
 
-/* 6. Стрелки навигации — появляются только при наведении на экран */
 .slider-overlay.is-fullscreen .swiper-button-prev,
 .slider-overlay.is-fullscreen .swiper-button-next {
 	opacity: 0;
@@ -756,7 +729,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	opacity: 1;
 }
 
-/* На тачскринах (телефонах) стрелки не нужны, свайп работает */
 @media (hover: none) {
 
 	.slider-overlay.is-fullscreen:hover .swiper-button-prev,
@@ -803,7 +775,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	.swiper-button-prev,
 	.swiper-button-next {
 		display: none;
-		/* Скрываем стрелки на мобильных */
 	}
 
 	.slider-actions {
@@ -832,7 +803,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 
 	.slider-counter {
 		bottom: 75px;
-		/* На мобильных миниатюры 60px + отступ */
 		font-size: 11px;
 		padding: 4px 12px;
 	}
