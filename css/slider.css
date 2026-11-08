@@ -840,12 +840,11 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	.slider-zoom-hint {
 		font-size: 10px;
 		padding: 5px 12px;
-		top: 14px;
 		top: 50px;
 		left: 50%;
 		right: auto;
 		transform: translateX(-50%) translateY(-6px);
-		max-width: calc(100%-24px);
+		max-width: calc(100% - 24px);
 		white-space: nowrap;
 		z-index: 9;
 	}
@@ -902,6 +901,25 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 		font-size: 19px;
 		left: 22px;
 		bottom: 22px;
+	}
+}
+
+@media (width < 769px) {
+	.slider-zoom-hint {
+		font-size: 10px;
+		padding: 5px 12px;
+		top: 58px;
+		left: 50%;
+		right: auto;
+		transform: translateX(-50%) translateY(-6px);
+		max-width: calc(100% - 24px);
+		white-space: nowrap;
+		z-index: 9;
+	}
+
+	.slider-zoom-hint.visible {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
 	}
 }
 
