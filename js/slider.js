@@ -278,9 +278,12 @@ function openSlider( config ) {
 		slidesPerView: 1.5,
 		centeredSlides: true,
 		initialSlide: startIndex,
-		speed: 900,
+		speed: 650,
 		spaceBetween: 40,
 		watchSlidesProgress: true,
+		resistanceRatio: 0.6,
+		followFinger: true,
+		threshold: 8,
 
 		thumbs: {
 			swiper: thumbsInstance,
@@ -301,8 +304,9 @@ function openSlider( config ) {
 		},
 
 		mousewheel: {
-			thresholdDelta: 50,
-			sensitivity: 1,
+			thresholdDelta: 40,
+			sensitivity: 0.8,
+			forceToAxis: true,
 		},
 
 		keyboard: {
@@ -388,38 +392,41 @@ function openSlider( config ) {
 		fullscreenBtn.addEventListener( 'click', () => {
 			const isFullscreen = overlay.classList.toggle( 'is-fullscreen' );
 
-			if ( isFullscreen ) {
-				fullscreenBtn.innerHTML = `
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>
-					</svg>
-				`;
-			} else {
-				fullscreenBtn.innerHTML = `
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
-					</svg>
-				`;
-			}
+			fullscreenBtn.innerHTML = isFullscreen
+				? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>`
+				: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
 
-			// Меняем параметры Swiper в зависимости от режима
 			if ( isFullscreen ) {
 				swiperInstance.params.slidesPerView = 1;
-				swiperInstance.params.centeredSlides = false;
+				swiperInstance.params.centeredSlides = true;
 				swiperInstance.params.spaceBetween = 0;
 			} else {
-				swiperInstance.params.slidesPerView = 1.5;
+				const w = window.innerWidth;
+				if ( w < 481 ) {
+					swiperInstance.params.slidesPerView = 1.1;
+					swiperInstance.params.spaceBetween = 12;
+				} else if ( w < 769 ) {
+					swiperInstance.params.slidesPerView = 1.2;
+					swiperInstance.params.spaceBetween = 20;
+				} else if ( w < 993 ) {
+					swiperInstance.params.slidesPerView = 1.4;
+					swiperInstance.params.spaceBetween = 30;
+				} else {
+					swiperInstance.params.slidesPerView = 1.5;
+					swiperInstance.params.spaceBetween = 40;
+				}
 				swiperInstance.params.centeredSlides = true;
-				swiperInstance.params.spaceBetween = 40;
 			}
 
-			swiperInstance.update();
-
-			setTimeout( () => {
-				if ( swiperInstance ) {
+			requestAnimationFrame( () => {
+				requestAnimationFrame( () => {
+					if ( !swiperInstance || swiperInstance.destroyed ) return;
 					swiperInstance.updateSize();
-				}
-			}, 300 );
+					swiperInstance.updateSlides();
+					swiperInstance.update();
+					swiperInstance.slideTo( swiperInstance.activeIndex, 0 );
+				} );
+			} );
 		} );
 	}
 
