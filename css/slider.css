@@ -841,6 +841,13 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 		font-size: 10px;
 		padding: 5px 12px;
 		top: 14px;
+		top: 50px;
+		left: 50%;
+		right: auto;
+		transform: translateX(-50%) translateY(-6px);
+		max-width: calc(100%-24px);
+		white-space: nowrap;
+		z-index: 9;
 	}
 
 	.slider-zoom-controls {

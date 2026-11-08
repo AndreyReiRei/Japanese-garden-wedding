@@ -389,12 +389,31 @@ function openSlider( config ) {
 	const fullscreenBtn = document.getElementById( 'sliderFullscreen' );
 
 	if ( fullscreenBtn ) {
+		const iconExpand = `
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+   <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+  </svg>
+ `;
+
+		const iconCollapse = `
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+   <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"></path>
+  </svg>
+ `;
+
 		fullscreenBtn.addEventListener( 'click', () => {
 			const isFullscreen = overlay.classList.toggle( 'is-fullscreen' );
 
-			fullscreenBtn.innerHTML = isFullscreen
-				? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>`
-				: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>`;
+			// Иконка
+			fullscreenBtn.innerHTML = isFullscreen ? iconCollapse : iconExpand;
+			fullscreenBtn.setAttribute(
+				'title',
+				isFullscreen ? 'Выйти из полного экрана' : 'Полный экран'
+			);
+			fullscreenBtn.setAttribute(
+				'aria-label',
+				isFullscreen ? 'Выйти из полного экрана' : 'Полный экран'
+			);
 
 			if ( isFullscreen ) {
 				swiperInstance.params.slidesPerView = 1;
