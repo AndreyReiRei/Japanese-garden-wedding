@@ -128,22 +128,31 @@ function openSlider( config ) {
 	overlay.setAttribute( 'data-theme', theme );
 
 	const slidesHTML = photos.map( ( photo, i ) => {
-		const fullSrc = photo.srcFull || photo.src;
-		return `
-        <div class="swiper-slide">
-            <div class="swiper-zoom-container">
-                <img 
-                    src="${fullSrc}" 
-                    alt="${photo.alt || ''}" 
-                    data-index="${i}"
-                    loading="lazy"
-                    decoding="async" 
-                    draggable="false"
-                >
-            </div>
-            ${photo.alt ? `<p class="slide-caption">${photo.alt}</p>` : ''}
-        </div>
-    `;
+		const thumbSrc = photo.src || photo.srcFull || '';
+		const fullSrc = photo.srcFull || photo.src || '';
+		const altText = ( photo.alt || '' ).replace( /"/g, '&quot;' );
+
+		const captionHTML = photo.alt
+			? '<p class="slide-caption">' + altText + '</p>'
+			: '';
+
+		return (
+			'<div class="swiper-slide">' +
+			'<div class="swiper-zoom-container">' +
+			'<img' +
+			' src="' + thumbSrc + '"' +
+			' data-full="' + fullSrc + '"' +
+			' alt="' + altText + '"' +
+			' data-index="' + i + '"' +
+			' decoding="async"' +
+			' draggable="false"' +
+			' class="slide-image is-thumb"' +
+			'>' +
+			'<div class="slide-skeleton" aria-hidden="true"></div>' +
+			'</div>' +
+			captionHTML +
+			'</div>'
+		);
 	} ).join( '' );
 
 	const thumbsHTML = photos.map( ( photo, i ) => {
@@ -240,22 +249,58 @@ function openSlider( config ) {
 		const activeSlide = swiperInstance.slides[swiperInstance.activeIndex];
 		if ( !activeSlide ) return;
 
-		const img = activeSlide.querySelector( 'img' );
+		const img = activeSlide.querySelector( 'img.slide-image' );
 		if ( !img ) return;
 
-		if ( img.complete && img.naturalWidth > 0 ) return;
+		const fullSrc = img.getAttribute( 'data-full' );
+		const skeleton = activeSlide.querySelector( '.slide-skeleton' );
 
+		// Уже полное фото
+		if ( img.dataset.fullLoaded === '1' ) {
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			return;
+		}
+
+		// Показываем скелетон, пока full не пришёл
+		if ( skeleton ) skeleton.classList.add( 'visible' );
+
+		// Глобальный лоадер — только если очень долго
 		loaderTimer = setTimeout( () => {
 			if ( loaderEl ) loaderEl.classList.add( 'visible' );
-		}, 1000 );
+		}, 800 );
 
-		const onLoad = () => {
+		const finish = () => {
 			if ( loaderTimer ) clearTimeout( loaderTimer );
 			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			img.classList.remove( 'is-thumb' );
+			img.classList.add( 'is-full' );
+			img.dataset.fullLoaded = '1';
 		};
 
-		img.addEventListener( 'load', onLoad, { once: true } );
-		img.addEventListener( 'error', onLoad, { once: true } );
+		// Full уже = текущий src (нет отдельного full)
+		if ( !fullSrc || fullSrc === img.src ) {
+			finish();
+			return;
+		}
+
+		const probe = new Image();
+		probe.decoding = 'async';
+
+		probe.onload = () => {
+			img.src = fullSrc;
+			// небольшая пауза, чтобы браузер сменил кадр
+			requestAnimationFrame( finish );
+		};
+
+		probe.onerror = () => {
+			// оставляем thumb, просто убираем скелетон
+			if ( loaderTimer ) clearTimeout( loaderTimer );
+			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+		};
+
+		probe.src = fullSrc;
 	}
 	// ----------------------------------------------------
 
@@ -284,12 +329,12 @@ function openSlider( config ) {
 		slidesPerView: 1.5,
 		centeredSlides: true,
 		initialSlide: startIndex,
-		speed: 650,
+		speed: 480,
 		spaceBetween: 40,
 		watchSlidesProgress: true,
-		resistanceRatio: 0.6,
+		resistanceRatio: 0.75,
 		followFinger: true,
-		threshold: 8,
+		threshold: 5,
 
 		thumbs: {
 			swiper: thumbsInstance,
