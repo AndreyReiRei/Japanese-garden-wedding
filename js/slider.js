@@ -246,7 +246,8 @@ function openSlider( config ) {
 
 		if ( !swiperInstance ) return;
 
-		const activeSlide = swiperInstance.slides[swiperInstance.activeIndex];
+		const activeIndex = swiperInstance.activeIndex;
+		const activeSlide = swiperInstance.slides[activeIndex];
 		if ( !activeSlide ) return;
 
 		const img = activeSlide.querySelector( 'img.slide-image' );
@@ -255,31 +256,39 @@ function openSlider( config ) {
 		const fullSrc = img.getAttribute( 'data-full' );
 		const skeleton = activeSlide.querySelector( '.slide-skeleton' );
 
-		// Уже полное фото
+		// Уже полное — ничего не трогаем (главное против моргания при свайпе назад)
 		if ( img.dataset.fullLoaded === '1' ) {
 			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			preloadNeighbors( activeIndex );
 			return;
 		}
 
-		// Показываем скелетон, пока full не пришёл
-		if ( skeleton ) skeleton.classList.add( 'visible' );
+		// Скелетон только если full реально долго не приходит
+		let skeletonTimer = setTimeout( () => {
+			if ( skeleton && img.dataset.fullLoaded !== '1' ) {
+				skeleton.classList.add( 'visible' );
+			}
+		}, 200 );
 
-		// Глобальный лоадер — только если очень долго
 		loaderTimer = setTimeout( () => {
-			if ( loaderEl ) loaderEl.classList.add( 'visible' );
-		}, 800 );
+			if ( loaderEl && img.dataset.fullLoaded !== '1' ) {
+				loaderEl.classList.add( 'visible' );
+			}
+		}, 900 );
 
 		const finish = () => {
+			clearTimeout( skeletonTimer );
 			if ( loaderTimer ) clearTimeout( loaderTimer );
 			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
 			if ( skeleton ) skeleton.classList.remove( 'visible' );
 			img.classList.remove( 'is-thumb' );
 			img.classList.add( 'is-full' );
 			img.dataset.fullLoaded = '1';
+			preloadNeighbors( activeIndex );
 		};
 
-		// Full уже = текущий src (нет отдельного full)
-		if ( !fullSrc || fullSrc === img.src ) {
+		// Нет отдельного full
+		if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) {
 			finish();
 			return;
 		}
@@ -288,19 +297,61 @@ function openSlider( config ) {
 		probe.decoding = 'async';
 
 		probe.onload = () => {
-			img.src = fullSrc;
-			// небольшая пауза, чтобы браузер сменил кадр
-			requestAnimationFrame( finish );
+			const apply = () => {
+				// Меняем src только один раз, когда full уже в памяти браузера
+				if ( img.getAttribute( 'src' ) !== fullSrc ) {
+					img.src = fullSrc;
+				}
+				finish();
+			};
+
+			// decode() снижает кадр «пустой картинки» при подмене
+			if ( typeof probe.decode === 'function' ) {
+				probe.decode().then( apply ).catch( apply );
+			} else {
+				apply();
+			}
 		};
 
 		probe.onerror = () => {
-			// оставляем thumb, просто убираем скелетон
+			clearTimeout( skeletonTimer );
 			if ( loaderTimer ) clearTimeout( loaderTimer );
 			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
 			if ( skeleton ) skeleton.classList.remove( 'visible' );
 		};
 
 		probe.src = fullSrc;
+	}
+
+	/** Тихо качаем full у соседей, чтобы свайп не ждал */
+	function preloadNeighbors( index ) {
+		const indexes = [index - 1, index + 1, index + 2];
+
+		indexes.forEach( i => {
+			if ( i < 0 || i >= photos.length ) return;
+
+			const slide = swiperInstance.slides[i];
+			if ( !slide ) return;
+
+			const img = slide.querySelector( 'img.slide-image' );
+			if ( !img || img.dataset.fullLoaded === '1' ) return;
+
+			const fullSrc = img.getAttribute( 'data-full' );
+			if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) return;
+
+			const probe = new Image();
+			probe.decoding = 'async';
+			probe.onload = () => {
+				if ( img.dataset.fullLoaded === '1' ) return;
+				img.src = fullSrc;
+				img.classList.remove( 'is-thumb' );
+				img.classList.add( 'is-full' );
+				img.dataset.fullLoaded = '1';
+				const sk = slide.querySelector( '.slide-skeleton' );
+				if ( sk ) sk.classList.remove( 'visible' );
+			};
+			probe.src = fullSrc;
+		} );
 	}
 	// ----------------------------------------------------
 
