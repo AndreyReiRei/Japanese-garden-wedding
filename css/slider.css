@@ -262,10 +262,6 @@ body:has(.slider-overlay.open) {
 	}
 }
 
-.slide-image.is-thumb {
-	/* thumb до подмены на full */
-}
-
 .slide-image.is-full {
 	transition: filter 0.35s ease;
 }
