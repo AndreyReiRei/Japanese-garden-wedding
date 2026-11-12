@@ -301,54 +301,44 @@
 	} );
 
 	// ============================================================
-	// 5. НАВИГАЦИЯ МЕЖДУ РАЗДЕЛАМИ
-	// Кнопки в верхней части обложки: Сад | ЗАГС | Дом.
-	// При клике — переход на соответствующую страницу.
+	// 5. НАВИГАЦИЯ МЕЖДУ РАЗДЕЛАМИ (только UI)
+	// ============================================================
+	// Кнопки вверху обложки: Сад | ЗАГС | Дом | Видео.
+	//
+	// Здесь делаем ТОЛЬКО:
+	//   • запоминаем activeSection
+	//   • подсвечиваем .active
+	//   • лёгкую вибрацию на телефоне
+	//
+	// Сам переход на страницу (prefetch + занавес #page-curtain +
+	// location.href) выполняет effects.js → initPageTransitions().
+	// Если снова вызвать location.href здесь — будет двойной переход.
 	// ============================================================
 
-	/**
-	 * Карта переходов: какой data-section ведёт на какую страницу.
-	 * Если нужно изменить URL — меняем здесь.
-	 */
-	const SECTION_PAGES = {
-		garden: 'pages/garden.html',
-		zags: 'pages/zags.html',
-		home: 'pages/home.html',
-		video: 'pages/video.html'
-	};
-
-	/**
-	 * Обработчик клика по кнопке навигации.
-	 * Подсвечивает активную кнопку и переходит на страницу раздела.
-	 */
 	navItems.forEach( item => {
 		item.addEventListener( 'click', function () {
 			const section = this.getAttribute( 'data-section' );
 
-			// Обновляем активный раздел
+			// Нет data-section — ничего не делаем
+			if ( !section ) return;
+
+			// Текущий выбранный раздел
 			activeSection = section;
+
+			// Подсветка: active только у нажатой кнопки
 			navItems.forEach( n => {
 				const isActive = n.getAttribute( 'data-section' ) === section;
 				n.classList.toggle( 'active', isActive );
 			} );
 
-			// Тактильный отклик
+			// Тактильный отклик (если браузер умеет)
 			if ( window.navigator?.vibrate ) {
 				window.navigator.vibrate( 15 );
 			}
 
-			// Переход на страницу раздела
-			const targetPage = SECTION_PAGES[section];
-			if ( targetPage ) {
-				console.log( `📍 Переход в раздел: ${section} → ${targetPage}` );
-
-				// Небольшая задержка для анимации нажатия
-				setTimeout( () => {
-					window.location.href = targetPage;
-				}, 150 );
-			} else {
-				console.warn( `⚠️ Неизвестный раздел: ${section}` );
-			}
+			// Переход НЕ делаем здесь.
+			// effects.js сам поймает клик по button[data-section]
+			// и выполнит navigateTo(...).
 		} );
 	} );
 

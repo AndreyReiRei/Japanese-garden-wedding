@@ -402,33 +402,52 @@ body {
 }
 
 /*
- * 6.4. БЕГУЩАЯ ОБВОДКА — 4 линии
+ * 6.4. ПУЛЬСИРУЮЩАЯ ОБВОДКА — 2 линии
  */
 .back-btn .btn-line,
 .animated-btn .btn-line {
 	position: absolute;
 	border-radius: 2px;
+	/* Убираем старую анимацию движения */
 }
 
+/* Верхняя линия */
 .back-btn .btn-line:nth-child(1),
 .animated-btn .btn-line:nth-child(1) {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height: 2px;
-	background: linear-gradient(to left, transparent, var(--btn-line-color));
-	animation: btnLineX 20s linear infinite;
+	height: 1px;
+	/* Сделали чуть тоньше для элегантности */
+	background: linear-gradient(to right, transparent, var(--btn-line-color), transparent);
+	animation: btnPulse 6s ease-in-out infinite;
 }
 
-
+/* Нижняя линия */
 .back-btn .btn-line:nth-child(3),
 .animated-btn .btn-line:nth-child(3) {
 	bottom: 0;
 	left: 0;
 	width: 100%;
-	height: 2px;
-	background: linear-gradient(to right, transparent, var(--btn-line-color));
-	animation: btnLineX 20s linear -2s infinite reverse;
+	height: 1px;
+	background: linear-gradient(to right, transparent, var(--btn-line-color), transparent);
+	/* Задержка, чтобы они пульсировали в противофазе (или можно убрать задержку для синхронности) */
+	animation: btnPulse 6s ease-in-out -3s infinite;
+}
+
+/* Анимация легкой пульсации (изменение прозрачности) */
+@keyframes btnPulse {
+
+	0%,
+	100% {
+		opacity: 0.2;
+		/* Тускнеет */
+	}
+
+	50% {
+		opacity: 1;
+		/* Загорается */
+	}
 }
 
 
@@ -562,7 +581,6 @@ body {
 	align-items: center;
 	justify-content: flex-end;
 	width: 140px;
-	/* Такая же ширина, как у старого счетчика */
 	flex-shrink: 0;
 }
 
@@ -895,90 +913,143 @@ body {
    10. СВИТОК — ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
    ============================================================ */
 
-/* Принудительно убираем нижнюю линию у блока "История этого дня" */
-.scroll-block,
-.scroll-trigger,
-.scroll-trigger-inner {
-	border-bottom: none !important;
+/* Контейнер для кнопки — центрируем её */
+.scroll-trigger {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	padding: 20px 0;
+	cursor: pointer;
 }
 
+/* Кнопка «История этого дня» */
 .scroll-trigger-inner {
-	display: flex;
-	flex-direction: column;
+	position: relative;
+	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 8px;
-	cursor: pointer;
+	gap: 12px;
 
-	/* Фон и эффект стекла */
-	background: rgba(20, 20, 20, 0.2);
-	backdrop-filter: blur(8px);
-	-webkit-backdrop-filter: blur(8px);
+	/* Фон: легкий градиент для эффекта стекла */
+	background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(20, 20, 20, 0.3) 100%);
 
-	/* Скругления и отступы */
-	border-radius: 0 0 14px 14px;
-	/* padding: 16px 28px 24px; */
+	/* Рамка: градиентная (эмуляция через border-image или псевдоэлемент) */
+	border: 1px solid transparent;
+	border-radius: 0 0 16px 16px;
 
-	/* Плавные переходы для всех эффектов */
-	transition:
-		transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-		background 0.3s ease,
-		box-shadow 0.3s ease;
+	/* Отступы */
+	padding: 14px 44px;
+
+	color: var(--white);
+	font-family: var(--font-display);
+	font-size: 20px;
+	font-weight: 500;
+	letter-spacing: 0.05em;
+
+	/* Эффект стекла */
+	backdrop-filter: blur(20px) saturate(1.2);
+	-webkit-backdrop-filter: blur(20px) saturate(1.2);
+
+	text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+	transition: all 0.5s var(--ease-out-expo);
+
+	max-width: 90vw;
+
+	/* Мягкая пульсация свечения */
+	animation: btnGlowPulse 5s ease-in-out infinite;
 }
 
-/* Эффект при наведении (ПК) */
-.scroll-trigger:hover .scroll-trigger-inner {
-	background: rgba(30, 30, 30, 0.6);
-	/* Чуть светлее */
+/* Псевдоэлемент для градиентной рамки */
+.scroll-trigger-inner::before {
+	content: '';
+	position: absolute;
+	inset: -1px;
+	border-radius: 0 0 16px 16px;
+	padding: 1px;
+	background: linear-gradient(135deg,
+			rgba(var(--accent-rgb), 0.1) 0%,
+			rgba(var(--accent-rgb), 0.6) 50%,
+			rgba(var(--accent-rgb), 0.1) 100%);
+	-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+	-webkit-mask-composite: xor;
+	mask-composite: exclude;
+	pointer-events: none;
+	opacity: 0.6;
+	transition: opacity 0.5s ease;
 }
 
-/* Эффект при нажатии (клик или тап) */
-.scroll-trigger:active .scroll-trigger-inner {
-	transform: scale(0.94);
-	/* Пружинистое сжатие */
-	background: rgba(255, 255, 255, 0.08);
-	/* Подсветка изнутри */
-	box-shadow: inset 0 0 20px rgba(var(--accent-rgb), 0.15);
-	/* Свечение акцента */
-
-	/* Ускоряем переход для мгновенного отклика */
-	transition: transform 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
-}
-
-/* Стрелка */
-.scroll-trigger-arrow {
-	color: var(--accent-color);
-	opacity: 0.8;
-	animation: arrowBounce 3s ease-in-out infinite;
-	transition: color 0.3s ease, opacity 0.3s ease, transform 0.2s ease;
-}
-
-.scroll-trigger-inner:hover .scroll-trigger-arrow {
-	opacity: 1;
-}
-
-/* Анимация стрелки при нажатии (прыгает вниз) */
-.scroll-trigger:active .scroll-trigger-arrow {
-	transform: translateY(6px) scale(1.1);
-	animation: none;
-	/* Отключаем бесконечную анимацию на момент нажатия */
-}
-
-@keyframes arrowBounce {
+/* Анимация пульсации свечения */
+@keyframes btnGlowPulse {
 
 	0%,
 	100% {
-		transform: translateY(0);
+		box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.05), inset 0 0 10px rgba(var(--accent-rgb), 0.02);
 	}
 
 	50% {
-		transform: translateY(6px);
+		box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.15), inset 0 0 15px rgba(var(--accent-rgb), 0.05);
 	}
+}
+
+/* При наведении: усиление градиентной рамки и свечения */
+.scroll-trigger-inner:hover {
+	background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.08) 0%, rgba(0, 0, 0, 0.3) 100%);
+	animation: none;
+	box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.2);
+}
+
+.scroll-trigger-inner:hover::before {
+	opacity: 1;
+}
+
+/* При нажатии */
+.scroll-trigger:active .scroll-trigger-inner {
+	transform: scale(0.96);
+	transition: transform 0.12s ease;
+}
+
+/* Стрелочка: плавное парение (увеличение/уменьшение) */
+.scroll-trigger-arrow {
+	display: flex;
+	align-items: center;
+	transition: transform 0.3s ease;
+	flex-shrink: 0;
+	color: var(--accent-color);
+	opacity: 0.9;
+	width: 20px;
+	height: 20px;
+	animation: arrowFloat 3s ease-in-out infinite;
+}
+
+/* Анимация "дыхания" стрелки */
+@keyframes arrowFloat {
+
+	0%,
+	100% {
+		transform: scale(1) translateY(0);
+		opacity: 0.7;
+	}
+
+	50% {
+		transform: scale(1.15) translateY(2px);
+		opacity: 1;
+	}
+}
+
+/* Убираем анимацию стрелки при наведении (чтобы не отвлекать) */
+.scroll-trigger-inner:hover .scroll-trigger-arrow {
+	animation: none;
+	transform: scale(1.1);
 }
 
 .scroll-paper {
 	position: relative;
 }
+
+/* ============================================================
+   10.1 Крестик
+   ============================================================ */
 
 /* Кнопка закрытия свитка (крестик) */
 .scroll-close-btn {
@@ -990,12 +1061,10 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
 	background: rgba(0, 0, 0, 0.05);
 	border: 1px solid rgba(0, 0, 0, 0.1);
 	border-radius: 50%;
 	color: var(--accent-color);
-
 	cursor: pointer;
 	z-index: 10;
 	transition: all 0.3s ease;

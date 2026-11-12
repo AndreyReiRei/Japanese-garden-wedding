@@ -170,6 +170,16 @@ body {
 	user-select: none;
 	-webkit-user-select: none;
 	touch-action: manipulation;
+
+	/* плавный уход на другую страницу */
+	transition: opacity 0.18s ease, filter 0.18s ease;
+}
+
+/* Состояние перед переходом в раздел */
+body.page-exit {
+	opacity: 0;
+	filter: blur(4px);
+	pointer-events: none;
 }
 
 /* 
@@ -620,9 +630,9 @@ body::before {
 	mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, transparent 100%);
 
 	/*
-     * АНИМАЦИЯ ПУЛЬСАЦИИ — 4 секунды
+     * АНИМАЦИЯ ПУЛЬСАЦИИ 
      */
-	animation: dateReflectionPulse 4s ease-in-out infinite;
+	animation: dateReflectionPulse 8s ease-in-out infinite;
 }
 
 @keyframes dateReflectionPulse {
@@ -633,7 +643,7 @@ body::before {
 	}
 
 	50% {
-		opacity: 0.5;
+		opacity: 0.7;
 	}
 }
 
@@ -679,7 +689,7 @@ body::before {
 	/*
      * АНИМАЦИЯ ПУЛЬСАЦИИ — 5 секунд
      */
-	animation: namesReflectionPulse 5s ease-in-out infinite;
+	animation: namesReflectionPulse 8s ease-in-out infinite;
 }
 
 @keyframes namesReflectionPulse {
@@ -690,7 +700,7 @@ body::before {
 	}
 
 	50% {
-		opacity: 0.5;
+		opacity: 0.7;
 	}
 }
 
@@ -756,7 +766,7 @@ body::before {
 	/*
      * АНИМАЦИЯ ПУЛЬСАЦИИ — 6 секунд
      */
-	animation: locationReflectionPulse 6s ease-in-out infinite;
+	animation: locationReflectionPulse 8s ease-in-out infinite;
 }
 
 @keyframes locationReflectionPulse {

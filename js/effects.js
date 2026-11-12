@@ -361,66 +361,153 @@
 		if ( ctrl.fireflies ) ctrl.fireflies.forEach( f => f.remove() );
 	};
 
-	// ============================================================
-	// 9. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
-	// ============================================================
-
+	/**
+ * ============================================================
+ * 9. ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ + PREFETCH
+ * ============================================================
+ * 1) Показывает занавес (#page-curtain) перед уходом
+ * 2) Prefetch HTML соседних страниц (быстрее клик)
+ * 3) Перехватывает <a> и кнопки [data-section] на обложке
+ *
+ * ВАЖНО: это ЕДИНСТВЕННЫЙ обработчик переходов.
+ * В main.js не дублируйте location.href по тем же кнопкам.
+ * ============================================================
+ */
 	function initPageTransitions() {
-		// Проверяем, есть ли уже занавес
+
+		// ----------------------------------------------------------
+		// 1. ЗАНАВЕС
+		// Тёмный слой поверх страницы. Класс .active запускает
+		// CSS-анимацию. Если элемента ещё нет — создаём.
+		// ----------------------------------------------------------
 		let curtain = document.getElementById( 'page-curtain' );
+
 		if ( !curtain ) {
 			curtain = document.createElement( 'div' );
 			curtain.id = 'page-curtain';
 			document.body.appendChild( curtain );
 		}
 
-		// Функция для запуска анимации и перехода
+		// ----------------------------------------------------------
+		// 2. PREFETCH
+		// Браузер заранее качает HTML, но не открывает его.
+		// Set — чтобы один и тот же URL не prefetch'ить дважды.
+		// ----------------------------------------------------------
+		const prefetched = new Set();
+
+		/**
+		 * Ставит в <head> тег <link rel="prefetch">
+		 * @param {string} url — путь к странице
+		 */
+		function prefetch( url ) {
+			if ( !url ) return;
+			if ( prefetched.has( url ) ) return;
+			if ( url.startsWith( '#' ) ) return;
+			if ( url.startsWith( 'mailto:' ) ) return;
+			if ( url.startsWith( 'tel:' ) ) return;
+
+			prefetched.add( url );
+
+			const link = document.createElement( 'link' );
+			link.rel = 'prefetch';
+			link.href = url;
+			link.as = 'document';
+			document.head.appendChild( link );
+		}
+
+		/**
+		 * Анимация занавеса → переход на url
+		 * 600ms должно совпадать с длительностью CSS у #page-curtain
+		 */
 		function navigateTo( href ) {
-			curtain.classList.add( 'active' );
+			prefetch( href );                 // догружаем, если ещё не успели
+			curtain.classList.add( 'active' ); // показываем занавес
+
 			setTimeout( () => {
 				window.location.href = href;
 			}, 600 );
 		}
 
-		// 1. Перехват кликов по обычным ссылкам <a>
-		// (все ссылки, кроме якорей, target="_blank", mailto и tel)
-		const links = document.querySelectorAll( 'a[href]:not([target="_blank"]):not([href^="#"])' );
+		// ----------------------------------------------------------
+		// 3. ОБЫЧНЫЕ ССЫЛКИ <a>
+		// «На главную», «Следующий раздел» и т.п. на pages/*
+		// ----------------------------------------------------------
+		const links = document.querySelectorAll(
+			'a[href]:not([target="_blank"]):not([href^="#"])'
+		);
+
 		links.forEach( link => {
+			const href = link.getAttribute( 'href' );
+
+			if ( !href ) return;
+			if ( href.startsWith( 'mailto:' ) ) return;
+			if ( href.startsWith( 'tel:' ) ) return;
+
+			// Навели / коснулись — начинаем качать страницу
+			link.addEventListener( 'mouseenter', () => prefetch( href ), { passive: true } );
+			link.addEventListener( 'touchstart', () => prefetch( href ), { passive: true } );
+
+			// Клик — занавес и переход
 			link.addEventListener( 'click', ( e ) => {
-				const href = link.getAttribute( 'href' );
-				if ( href && !href.startsWith( 'mailto:' ) && !href.startsWith( 'tel:' ) ) {
-					e.preventDefault();
-					navigateTo( href );
-				}
-			} );
-		} );
-
-		// 2. Перехват кликов по кнопкам на главной (data-section)
-		const navButtons = document.querySelectorAll( 'button[data-section]' );
-
-		// Если на странице нет таких кнопок — выходим (не выполняем лишний код)
-		if ( navButtons.length === 0 ) return;
-
-		navButtons.forEach( btn => {
-			btn.addEventListener( 'click', ( e ) => {
-				const section = btn.getAttribute( 'data-section' );
-
-				// Формируем путь в зависимости от раздела
-				let href = '';
-
-				if ( section === 'video' ) {
-					// Страница видео лежит в корне (рядом с index.html) или в папке html/
-					// Проверьте свой реальный путь!
-					href = 'html/video.html';
-				} else {
-					// Остальные разделы (garden, zags, home) лежат в папке pages/
-					href = `pages/${section}.html`;
-				}
+				// Ctrl/Cmd/Shift/Alt + клик = новая вкладка, не мешаем
+				if ( e.metaKey || e.ctrlKey || e.shiftKey || e.altKey ) return;
 
 				e.preventDefault();
 				navigateTo( href );
 			} );
 		} );
+
+		// ----------------------------------------------------------
+		// 4. КНОПКИ ОБЛОЖКИ [data-section]
+		// Сад / ЗАГС / Дом / Видео на главной
+		// ----------------------------------------------------------
+		const navButtons = document.querySelectorAll( 'button[data-section]' );
+
+		// На страницах разделов таких кнопок нет — выходим из этого куска,
+		// но prefetch ссылок (блок 3) и фоновый prefetch (блок 5) уже настроены
+		if ( navButtons.length > 0 ) {
+
+			// Карта: data-section → реальный путь
+			const SECTION_PAGES = {
+				garden: 'pages/garden.html',
+				zags: 'pages/zags.html',
+				home: 'pages/home.html',
+				video: 'pages/video.html'
+			};
+
+			navButtons.forEach( btn => {
+				const section = btn.getAttribute( 'data-section' );
+				const href = SECTION_PAGES[section];
+				if ( !href ) return;
+
+				btn.addEventListener( 'mouseenter', () => prefetch( href ), { passive: true } );
+				btn.addEventListener( 'touchstart', () => prefetch( href ), { passive: true } );
+
+				btn.addEventListener( 'click', ( e ) => {
+					e.preventDefault();
+					navigateTo( href );
+				} );
+			} );
+		}
+
+		// ----------------------------------------------------------
+		// 5. ФОНОВЫЙ PREFETCH СОСЕДЕЙ
+		// Только внутри /pages/ — подтягиваем главную и другие разделы
+		// ----------------------------------------------------------
+		if ( location.pathname.includes( '/pages/' ) ) {
+			const neighbors = [
+				'../index.html',
+				'garden.html',
+				'zags.html',
+				'home.html',
+				'video.html'
+			];
+
+			neighbors.forEach( ( url, i ) => {
+				// По очереди, с небольшой задержкой после загрузки страницы
+				setTimeout( () => prefetch( url ), 800 + i * 150 );
+			} );
+		}
 	}
 
 	// ============================================================
