@@ -1079,21 +1079,95 @@ body {
 	transform: scale(0.95);
 }
 
+
 /* ============================================================
-   11. НИЖНЯЯ НАВИГАЦИЯ — КОНТЕЙНЕР
+   11. НИЖНЯЯ НАВИГАЦИЯ ПО РАЗДЕЛАМ (Сад / ЗАГС / Дом / Видео)
    ============================================================ */
 
 .section-bottom-nav {
 	display: flex;
+	align-items: center;
 	justify-content: center;
-	align-items: stretch;
-	gap: 16px;
-	padding: 48px 20px 24px;
+	gap: 12px;
+	padding: 40px 16px 28px;
 	position: relative;
 	z-index: 1;
-	max-width: 900px;
+	max-width: 640px;
 	margin: 0 auto;
-	flex-wrap: nowrap;
+}
+
+/* Кнопка «на обложку» */
+.section-nav-home {
+	flex: 0 0 auto;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	color: rgba(255, 255, 255, 0.7);
+	background: rgba(0, 0, 0, 0.45);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	font-size: 18px;
+	transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+
+.section-nav-home:hover {
+	color: var(--accent-color-light);
+	border-color: var(--accent-color);
+	background: rgba(0, 0, 0, 0.65);
+}
+
+/* Плашка с табами */
+.section-nav-tabs {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 5px;
+	border-radius: 100px;
+	background: rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+}
+
+.section-nav-tab {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 14px;
+	border-radius: 100px;
+	text-decoration: none;
+	color: rgba(255, 255, 255, 0.55);
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: 0.02em;
+	transition: color 0.25s ease, background 0.25s ease;
+	white-space: nowrap;
+}
+
+.section-nav-tab:hover {
+	color: rgba(255, 255, 255, 0.9);
+	background: rgba(255, 255, 255, 0.06);
+}
+
+.section-nav-tab.is-active {
+	color: #fff;
+	background: rgba(var(--accent-rgb), 0.25);
+	box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.35);
+}
+
+.section-nav-icon {
+	font-size: 14px;
+	line-height: 1;
+}
+
+.section-nav-label {
+	line-height: 1;
 }
 
 /* ============================================================
@@ -1286,10 +1360,24 @@ body {
 	}
 
 	.section-bottom-nav {
-		flex-direction: column;
-		align-items: center;
-		gap: 10px;
-		padding: 28px 14px 14px;
+		padding: 28px 12px 20px;
+		gap: 8px;
+	}
+
+	.section-nav-home {
+		width: 40px;
+		height: 40px;
+		font-size: 16px;
+	}
+
+	.section-nav-tab {
+		padding: 9px 11px;
+		font-size: 12px;
+		gap: 4px;
+	}
+
+	.section-nav-icon {
+		font-size: 13px;
 	}
 
 	.bottom-nav-title {

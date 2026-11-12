@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<title>Бракосочетание — Андрей & Татьяна</title>
 
 	<!-- ============================================ -->
@@ -261,39 +261,27 @@
 	</section>
 
 	<!-- Нижняя навигация -->
-	<nav class="section-bottom-nav">
-		<a href="garden.html" class="animated-btn bottom-nav-prev-btn">
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="arrow arrow-left">←</span>
-			<span class="bottom-nav-content">
-				<span class="bottom-nav-label">Предыдущий</span>
-				<span class="bottom-nav-title">Японский сад</span>
-			</span>
-		</a>
+	<nav class="section-bottom-nav" aria-label="Разделы альбома">
+		<a href="../index.html" class="section-nav-home" title="На обложку">⟡</a>
 
-		<a href="../index.html" class="animated-btn bottom-nav-home-btn">
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="bottom-nav-home-icon">⟡</span>
-			<span>Главная</span>
-		</a>
-
-		<a href="home.html" class="animated-btn bottom-nav-next-btn">
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="bottom-nav-content">
-				<span class="bottom-nav-label">Следующий</span>
-				<span class="bottom-nav-title">Купеческий дом</span>
-			</span>
-			<span class="arrow arrow-right">→</span>
-		</a>
+		<div class="section-nav-tabs">
+			<a href="garden.html" class="section-nav-tab">
+				<span class="section-nav-icon">⛩️</span>
+				<span class="section-nav-label">Сад</span>
+			</a>
+			<a href="zags.html" class="section-nav-tab is-active" aria-current="page">
+				<span class="section-nav-icon">💍</span>
+				<span class="section-nav-label">ЗАГС</span>
+			</a>
+			<a href="home.html" class="section-nav-tab">
+				<span class="section-nav-icon">🏮</span>
+				<span class="section-nav-label">Дом</span>
+			</a>
+			<a href="video.html" class="section-nav-tab">
+				<span class="section-nav-icon">📹</span>
+				<span class="section-nav-label">Видео</span>
+			</a>
+		</div>
 	</nav>
 
 	<!-- Подвал -->

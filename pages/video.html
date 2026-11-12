@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 	<title>Видеоархив — Андрей & Татьяна</title>
 
 	<!-- FAVICON -->
@@ -174,18 +174,27 @@
 	</main>
 
 	<!-- Нижняя навигация -->
-	<nav class="section-bottom-nav">
-		<a href="../index.html" class="animated-btn">
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="btn-line"></span>
-			<span class="bottom-nav-home-icon">⟡</span>
-			<span class="bottom-nav-content">
-				<span class="bottom-nav-label">На главную</span>
-				<span class="bottom-nav-title">Обложка</span>
-			</span>
-		</a>
+	<nav class="section-bottom-nav" aria-label="Разделы альбома">
+		<a href="../index.html" class="section-nav-home" title="На обложку">⟡</a>
+
+		<div class="section-nav-tabs">
+			<a href="garden.html" class="section-nav-tab">
+				<span class="section-nav-icon">⛩️</span>
+				<span class="section-nav-label">Сад</span>
+			</a>
+			<a href="zags.html" class="section-nav-tab">
+				<span class="section-nav-icon">💍</span>
+				<span class="section-nav-label">ЗАГС</span>
+			</a>
+			<a href="home.html" class="section-nav-tab">
+				<span class="section-nav-icon">🏮</span>
+				<span class="section-nav-label">Дом</span>
+			</a>
+			<a href="video.html" class="section-nav-tab is-active" aria-current="page">
+				<span class="section-nav-icon">📹</span>
+				<span class="section-nav-label">Видео</span>
+			</a>
+		</div>
 	</nav>
 
 	<!-- Подвал -->
