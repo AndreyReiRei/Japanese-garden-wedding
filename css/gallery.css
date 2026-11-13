@@ -971,9 +971,13 @@ body {
 			rgba(var(--accent-rgb), 0.1) 0%,
 			rgba(var(--accent-rgb), 0.6) 50%,
 			rgba(var(--accent-rgb), 0.1) 100%);
+
+	/* Современный способ: маска вырезает внутреннюю область */
 	-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	-webkit-mask-composite: xor;
 	mask-composite: exclude;
+
 	pointer-events: none;
 	opacity: 0.6;
 	transition: opacity 0.5s ease;
@@ -1350,7 +1354,6 @@ body {
 		font-size: 10px;
 	}
 
-	/* Заголовок: было 20px, ставим 32px (учитывая новый базовый 52px) */
 	.section-title {
 		font-size: 32px;
 		letter-spacing: 0.06em;
@@ -1369,25 +1372,42 @@ body {
 		gap: 6px;
 	}
 
+	/* Нижняя навигация: компактный режим для узких экранов */
 	.section-bottom-nav {
-		padding: 28px 12px 20px;
+		padding: 24px 10px 16px;
 		gap: 8px;
+		max-width: 100%;
 	}
 
+	/* Кнопка "Домик" — уменьшаем */
 	.section-nav-home {
-		width: 40px;
-		height: 40px;
+		width: 36px;
+		height: 36px;
 		font-size: 16px;
+		border-radius: 50%;
 	}
 
+	/* Плашка с табами — уменьшаем отступы */
+	.section-nav-tabs {
+		gap: 2px;
+		padding: 4px;
+		border-radius: 100px;
+	}
+
+	/* Табы — уменьшаем текст и иконки */
 	.section-nav-tab {
-		padding: 9px 11px;
-		font-size: 12px;
-		gap: 4px;
+		padding: 8px 10px;
+		font-size: 11px;
+		gap: 3px;
+		border-radius: 100px;
 	}
 
 	.section-nav-icon {
-		font-size: 13px;
+		font-size: 12px;
+	}
+
+	.section-nav-label {
+		line-height: 1;
 	}
 
 	.bottom-nav-title {
@@ -1441,8 +1461,9 @@ body {
 
 	/* --- Адаптив новых элементов --- */
 	.gallery-section+.gallery-section {
-		margin-top: 30px;
-		padding-top: 24px;
+		margin-top: 16px;
+		/* Уменьшили отступ (было 30px) */
+		padding-top: 16px;
 	}
 
 	.gallery-load-more-wrapper {
@@ -1491,7 +1512,6 @@ body {
 		--grid-padding: 12px;
 	}
 
-	/* Заголовок: было 24px, ставим 38px */
 	.section-title {
 		font-size: 38px;
 	}
@@ -1512,6 +1532,33 @@ body {
 	.animated-btn {
 		padding: 11px 20px;
 		font-size: 13px;
+	}
+
+	/* Навигация: чуть крупнее, но ещё компактная */
+	.section-bottom-nav {
+		padding: 28px 12px 18px;
+		gap: 12px;
+	}
+
+	.section-nav-home {
+		width: 44px;
+		height: 44px;
+		font-size: 18px;
+	}
+
+	.section-nav-tabs {
+		gap: 3px;
+		padding: 5px;
+	}
+
+	.section-nav-tab {
+		padding: 10px 14px;
+		font-size: 12px;
+		gap: 4px;
+	}
+
+	.section-nav-icon {
+		font-size: 14px;
 	}
 
 	.bottom-nav-title {
@@ -1545,7 +1592,6 @@ body {
 		--grid-padding: 16px;
 	}
 
-	/* Заголовок: было 28px, ставим 44px */
 	.section-title {
 		font-size: 44px;
 	}
@@ -1599,7 +1645,6 @@ body {
 		--grid-padding: 24px;
 	}
 
-	/* Заголовок: было 32px, ставим 48px */
 	.section-title {
 		font-size: 48px;
 	}
@@ -1619,6 +1664,23 @@ body {
 	.footer-text {
 		font-size: 23px;
 	}
+
+	/* Навигация на планшетах — стандартный размер */
+	.section-nav-home {
+		width: 52px;
+		height: 52px;
+		font-size: 22px;
+	}
+
+	.section-nav-tab {
+		padding: 12px 18px;
+		font-size: 14px;
+		gap: 6px;
+	}
+
+	.section-nav-icon {
+		font-size: 16px;
+	}
 }
 
 /*
@@ -1631,7 +1693,6 @@ body {
 		--grid-padding: 32px;
 	}
 
-	/* Заголовок: базовый 52px, на этом экране оставляем 52px */
 	.section-title {
 		font-size: 52px;
 	}
@@ -1663,7 +1724,6 @@ body {
 		--grid-padding: 40px;
 	}
 
-	/* Заголовок: увеличиваем до 56px */
 	.section-title {
 		font-size: 56px;
 	}
@@ -1687,13 +1747,17 @@ body {
 		--grid-padding: 48px;
 	}
 
-	/* Заголовок: 60px */
 	.section-title {
 		font-size: 60px;
 	}
 
 	.bottom-nav-title {
 		font-size: 22px;
+	}
+
+	/* Увеличили подпись на фото */
+	.gallery-caption {
+		font-size: 16px;
 	}
 
 	.footer-text {
@@ -1715,13 +1779,17 @@ body {
 		max-width: 1800px;
 	}
 
-	/* Заголовок: 64px */
 	.section-title {
 		font-size: 64px;
 	}
 
 	.bottom-nav-title {
 		font-size: 24px;
+	}
+
+	/* Увеличили кнопку "Показать все" */
+	.gallery-load-more .bottom-nav-title {
+		font-size: 20px;
 	}
 
 	.footer-text {
