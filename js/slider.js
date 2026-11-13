@@ -102,18 +102,33 @@ function openSlider( config ) {
 			}
 
 			/* Убираем скругления */
-			.slider-overlay.is-fullscreen .swiper-slide,
-			.slider-overlay.is-fullscreen .swiper-zoom-container {
-				border-radius: 0 !important;
-				transition: border-radius 0.3s ease;
-			}
+   .slider-overlay.is-fullscreen .swiper-slide,
+   .slider-overlay.is-fullscreen .swiper-zoom-container {
+    border-radius: 0 !important;
+    transition: border-radius 0.3s ease;
+   }
 
-			/* Прячем соседние слайды */
-			.slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
-				opacity: 0;
-			}
+   /* Fullscreen: соседние слайды видны — свайп влево/вправо, без исчезновения */
+   .slider-overlay.is-fullscreen .swiper-slide {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: border-radius 0.3s ease;
+   }
 
-			/* Скрытие счетчика */
+   .slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
+    opacity: 1 !important;
+   }
+
+   .slider-overlay.is-fullscreen .swiper-zoom-container {
+    transform: none !important;
+   }
+
+   .slider-overlay.is-fullscreen .swiper-slide img {
+    filter: none;
+    transition: none;
+   }
+
+   /* Скрытие счетчика */
 			.slider-counter.hidden {
 				opacity: 0;
 				pointer-events: none;
@@ -128,6 +143,7 @@ function openSlider( config ) {
 	overlay.setAttribute( 'data-theme', theme );
 
 	const slidesHTML = photos.map( ( photo, i ) => {
+		const thumbSrc = photo.src || photo.srcFull || '';
 		const fullSrc = photo.srcFull || photo.src || '';
 		const altText = ( photo.alt || '' ).replace( /"/g, '&quot;' );
 
@@ -139,12 +155,15 @@ function openSlider( config ) {
 			'<div class="swiper-slide">' +
 			'<div class="swiper-zoom-container">' +
 			'<img' +
-			' src="' + fullSrc + '"' +
+			' src="' + thumbSrc + '"' +
+			' data-full="' + fullSrc + '"' +
 			' alt="' + altText + '"' +
 			' data-index="' + i + '"' +
 			' decoding="async"' +
 			' draggable="false"' +
+			' class="slide-image is-thumb"' +
 			'>' +
+			'<div class="slide-skeleton" aria-hidden="true"></div>' +
 			'</div>' +
 			captionHTML +
 			'</div>'
@@ -230,20 +249,10 @@ function openSlider( config ) {
 	const swiperThumbsEl = overlay.querySelector( '.swiper-thumbs' );
 	const loaderEl = overlay.querySelector( '#sliderLoader' );
 
-	// ============================================================
-	// ЛОАДЕР
-	// Только индикатор загрузки. src картинки НЕ меняем
-	// (в слайде сразу full — так нет моргания при свайпе/fullscreen).
-	// ============================================================
+	// --- ПЕРЕМЕННЫЕ ДЛЯ ЛОАДЕРА ---
 	let loaderTimer = null;
 
-	/**
-	 * Проверяет, загрузилось ли фото активного слайда.
-	 * Если ещё нет — через 400ms показывает #sliderLoader.
-	 * Когда load/error — прячет лоадер.
-	 */
 	function checkCurrentImageLoaded() {
-		// Сбрасываем предыдущий таймер, если слайд сменили быстро
 		if ( loaderTimer ) {
 			clearTimeout( loaderTimer );
 			loaderTimer = null;
@@ -252,35 +261,115 @@ function openSlider( config ) {
 
 		if ( !swiperInstance ) return;
 
-		const activeSlide = swiperInstance.slides[swiperInstance.activeIndex];
+		const activeIndex = swiperInstance.activeIndex;
+		const activeSlide = swiperInstance.slides[activeIndex];
 		if ( !activeSlide ) return;
 
-		// Обычный img внутри слайда (без .slide-image / skeleton)
-		const img = activeSlide.querySelector( 'img' );
+		const img = activeSlide.querySelector( 'img.slide-image' );
 		if ( !img ) return;
 
-		// Уже в памяти браузера — лоадер не нужен
-		if ( img.complete && img.naturalWidth > 0 ) return;
+		const fullSrc = img.getAttribute( 'data-full' );
+		const skeleton = activeSlide.querySelector( '.slide-skeleton' );
 
-		// Показать лоадер только если full реально долго не приходит
-		loaderTimer = setTimeout( () => {
-			if ( loaderEl ) loaderEl.classList.add( 'visible' );
-		}, 400 );
+		// Уже полное — ничего не трогаем (главное против моргания при свайпе назад)
+		if ( img.dataset.fullLoaded === '1' ) {
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			preloadNeighbors( activeIndex );
+			return;
+		}
 
-		const hideLoader = () => {
-			if ( loaderTimer ) {
-				clearTimeout( loaderTimer );
-				loaderTimer = null;
+		// Скелетон только если full реально долго не приходит
+		let skeletonTimer = setTimeout( () => {
+			if ( skeleton && img.dataset.fullLoaded !== '1' ) {
+				skeleton.classList.add( 'visible' );
 			}
+		}, 200 );
+
+		loaderTimer = setTimeout( () => {
+			if ( loaderEl && img.dataset.fullLoaded !== '1' ) {
+				loaderEl.classList.add( 'visible' );
+			}
+		}, 900 );
+
+		const finish = () => {
+			clearTimeout( skeletonTimer );
+			if ( loaderTimer ) clearTimeout( loaderTimer );
 			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			img.classList.remove( 'is-thumb' );
+			img.classList.add( 'is-full' );
+			img.dataset.fullLoaded = '1';
+			preloadNeighbors( activeIndex );
 		};
 
-		img.addEventListener( 'load', hideLoader, { once: true } );
-		img.addEventListener( 'error', hideLoader, { once: true } );
+		// Нет отдельного full
+		if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) {
+			finish();
+			return;
+		}
+
+		const probe = new Image();
+		probe.decoding = 'async';
+
+		probe.onload = () => {
+			const apply = () => {
+				// Меняем src только один раз, когда full уже в памяти браузера
+				if ( img.getAttribute( 'src' ) !== fullSrc ) {
+					img.src = fullSrc;
+				}
+				finish();
+			};
+
+			// decode() снижает кадр «пустой картинки» при подмене
+			if ( typeof probe.decode === 'function' ) {
+				probe.decode().then( apply ).catch( apply );
+			} else {
+				apply();
+			}
+		};
+
+		probe.onerror = () => {
+			clearTimeout( skeletonTimer );
+			if ( loaderTimer ) clearTimeout( loaderTimer );
+			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+		};
+
+		probe.src = fullSrc;
+	}
+
+	/** Тихо качаем full у соседей, чтобы свайп не ждал */
+	function preloadNeighbors( index ) {
+		const indexes = [index - 1, index + 1, index + 2];
+
+		indexes.forEach( i => {
+			if ( i < 0 || i >= photos.length ) return;
+
+			const slide = swiperInstance.slides[i];
+			if ( !slide ) return;
+
+			const img = slide.querySelector( 'img.slide-image' );
+			if ( !img || img.dataset.fullLoaded === '1' ) return;
+
+			const fullSrc = img.getAttribute( 'data-full' );
+			if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) return;
+
+			const probe = new Image();
+			probe.decoding = 'async';
+			probe.onload = () => {
+				if ( img.dataset.fullLoaded === '1' ) return;
+				img.src = fullSrc;
+				img.classList.remove( 'is-thumb' );
+				img.classList.add( 'is-full' );
+				img.dataset.fullLoaded = '1';
+				const sk = slide.querySelector( '.slide-skeleton' );
+				if ( sk ) sk.classList.remove( 'visible' );
+			};
+			probe.src = fullSrc;
+		} );
 	}
 	// ----------------------------------------------------
 
-	// Прячем слайдер до первой отрисовки (чтобы не мелькал пустой)
 	swiperMainEl.style.visibility = 'hidden';
 	swiperMainEl.style.opacity = '0';
 	swiperMainEl.style.transition = 'opacity 0.3s ease';

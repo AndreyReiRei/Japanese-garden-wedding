@@ -231,7 +231,36 @@ body:has(.slider-overlay.open) {
 	filter: grayscale(0) brightness(0.95);
 }
 
+/* Скелетон, пока качается full */
+.slide-skeleton {
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.25s ease;
+	background: linear-gradient(110deg,
+			rgba(255, 255, 255, 0.03) 25%,
+			rgba(255, 255, 255, 0.08) 37%,
+			rgba(255, 255, 255, 0.03) 63%);
+	background-size: 200% 100%;
+	animation: slideSkeleton 1.2s ease-in-out infinite;
+	z-index: 1;
+}
 
+.slide-skeleton.visible {
+	opacity: 1;
+}
+
+@keyframes slideSkeleton {
+	0% {
+		background-position: 200% 0;
+	}
+
+	100% {
+		background-position: -200% 0;
+	}
+}
 
 .slide-image.is-full {
 	transition: filter 0.35s ease;
@@ -711,6 +740,25 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 .slider-overlay.is-fullscreen .swiper-zoom-container {
 	border-radius: 0 !important;
 	transition: border-radius 0.3s ease;
+}
+
+/* Fullscreen: свайп как обычно, без пропадания кадра */
+.slider-overlay.is-fullscreen .swiper-slide {
+	opacity: 1 !important;
+	transform: none !important;
+}
+
+.slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
+	opacity: 1 !important;
+}
+
+.slider-overlay.is-fullscreen .swiper-zoom-container {
+	transform: none !important;
+}
+
+.slider-overlay.is-fullscreen .swiper-slide img {
+	filter: none;
+	transition: none;
 }
 
 .slider-overlay.is-fullscreen .slider-actions {
