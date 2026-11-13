@@ -101,14 +101,14 @@ function openSlider( config ) {
 				opacity: 0.6;
 			}
 
-			/* Убираем скругления */
+/* Убираем скругления */
    .slider-overlay.is-fullscreen .swiper-slide,
    .slider-overlay.is-fullscreen .swiper-zoom-container {
     border-radius: 0 !important;
     transition: border-radius 0.3s ease;
    }
 
-   /* Fullscreen: соседние слайды видны — свайп влево/вправо, без исчезновения */
+   /* Fullscreen: соседние слайды видны — свайп влево/вправо */
    .slider-overlay.is-fullscreen .swiper-slide {
     opacity: 1 !important;
     transform: none !important;
@@ -119,8 +119,17 @@ function openSlider( config ) {
     opacity: 1 !important;
    }
 
-   .slider-overlay.is-fullscreen .swiper-zoom-container {
+   /*
+    * Zoom-container:
+    * без зума — убираем scale(1.15),
+    * с зумом — НЕ трогаем transform, иначе нельзя двигать фото
+    */
+   .slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-zoomed) .swiper-zoom-container {
     transform: none !important;
+   }
+
+   .slider-overlay.is-fullscreen .swiper-slide-zoomed .swiper-zoom-container {
+    overflow: visible;
    }
 
    .slider-overlay.is-fullscreen .swiper-slide img {
