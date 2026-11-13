@@ -128,7 +128,6 @@ function openSlider( config ) {
 	overlay.setAttribute( 'data-theme', theme );
 
 	const slidesHTML = photos.map( ( photo, i ) => {
-		const thumbSrc = photo.src || photo.srcFull || '';
 		const fullSrc = photo.srcFull || photo.src || '';
 		const altText = ( photo.alt || '' ).replace( /"/g, '&quot;' );
 
@@ -140,15 +139,12 @@ function openSlider( config ) {
 			'<div class="swiper-slide">' +
 			'<div class="swiper-zoom-container">' +
 			'<img' +
-			' src="' + thumbSrc + '"' +
-			' data-full="' + fullSrc + '"' +
+			' src="' + fullSrc + '"' +
 			' alt="' + altText + '"' +
 			' data-index="' + i + '"' +
 			' decoding="async"' +
 			' draggable="false"' +
-			' class="slide-image is-thumb"' +
 			'>' +
-			'<div class="slide-skeleton" aria-hidden="true"></div>' +
 			'</div>' +
 			captionHTML +
 			'</div>'
@@ -234,7 +230,7 @@ function openSlider( config ) {
 	const swiperThumbsEl = overlay.querySelector( '.swiper-thumbs' );
 	const loaderEl = overlay.querySelector( '#sliderLoader' );
 
-	// --- ПЕРЕМЕННЫЕ ДЛЯ ЛОАДЕРА ---
+	// --- ЛОАДЕР (только индикатор, src не меняем) ---
 	let loaderTimer = null;
 
 	function checkCurrentImageLoaded() {
@@ -246,82 +242,32 @@ function openSlider( config ) {
 
 		if ( !swiperInstance ) return;
 
-		const activeIndex = swiperInstance.activeIndex;
-		const activeSlide = swiperInstance.slides[activeIndex];
+		const activeSlide = swiperInstance.slides[swiperInstance.activeIndex];
 		if ( !activeSlide ) return;
 
-		const img = activeSlide.querySelector( 'img.slide-image' );
+		const img = activeSlide.querySelector( 'img' );
 		if ( !img ) return;
 
-		const fullSrc = img.getAttribute( 'data-full' );
-		const skeleton = activeSlide.querySelector( '.slide-skeleton' );
+		// Уже загружено — лоадер не нужен
+		if ( img.complete && img.naturalWidth > 0 ) return;
 
-		// Уже полное — ничего не трогаем (главное против моргания при свайпе назад)
-		if ( img.dataset.fullLoaded === '1' ) {
-			if ( skeleton ) skeleton.classList.remove( 'visible' );
-			preloadNeighbors( activeIndex );
-			return;
-		}
-
-		// Скелетон только если full реально долго не приходит
-		let skeletonTimer = setTimeout( () => {
-			if ( skeleton && img.dataset.fullLoaded !== '1' ) {
-				skeleton.classList.add( 'visible' );
-			}
-		}, 200 );
-
+		// Показать лоадер, если full долго не приходит
 		loaderTimer = setTimeout( () => {
-			if ( loaderEl && img.dataset.fullLoaded !== '1' ) {
-				loaderEl.classList.add( 'visible' );
+			if ( loaderEl ) loaderEl.classList.add( 'visible' );
+		}, 400 );
+
+		const hideLoader = () => {
+			if ( loaderTimer ) {
+				clearTimeout( loaderTimer );
+				loaderTimer = null;
 			}
-		}, 900 );
-
-		const finish = () => {
-			clearTimeout( skeletonTimer );
-			if ( loaderTimer ) clearTimeout( loaderTimer );
 			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
-			if ( skeleton ) skeleton.classList.remove( 'visible' );
-			img.classList.remove( 'is-thumb' );
-			img.classList.add( 'is-full' );
-			img.dataset.fullLoaded = '1';
-			preloadNeighbors( activeIndex );
 		};
 
-		// Нет отдельного full
-		if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) {
-			finish();
-			return;
-		}
-
-		const probe = new Image();
-		probe.decoding = 'async';
-
-		probe.onload = () => {
-			const apply = () => {
-				// Меняем src только один раз, когда full уже в памяти браузера
-				if ( img.getAttribute( 'src' ) !== fullSrc ) {
-					img.src = fullSrc;
-				}
-				finish();
-			};
-
-			// decode() снижает кадр «пустой картинки» при подмене
-			if ( typeof probe.decode === 'function' ) {
-				probe.decode().then( apply ).catch( apply );
-			} else {
-				apply();
-			}
-		};
-
-		probe.onerror = () => {
-			clearTimeout( skeletonTimer );
-			if ( loaderTimer ) clearTimeout( loaderTimer );
-			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
-			if ( skeleton ) skeleton.classList.remove( 'visible' );
-		};
-
-		probe.src = fullSrc;
+		img.addEventListener( 'load', hideLoader, { once: true } );
+		img.addEventListener( 'error', hideLoader, { once: true } );
 	}
+	// ----------------------------------------------------
 
 	/** Тихо качаем full у соседей, чтобы свайп не ждал */
 	function preloadNeighbors( index ) {
