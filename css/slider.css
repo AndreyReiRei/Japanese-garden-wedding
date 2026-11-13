@@ -242,10 +242,6 @@ body:has(.slider-overlay.open) {
 	filter: grayscale(0) brightness(0.95);
 }
 
-.swiper-slide-active img {
-	filter: grayscale(0) brightness(0.95);
-}
-
 /* Скелетон, пока качается full */
 .slide-skeleton {
 	position: absolute;
