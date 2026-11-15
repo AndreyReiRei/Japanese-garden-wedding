@@ -87,7 +87,7 @@ function initGallery( config ) {
 
 		// Задержка анимации (каскадный эффект).
 		// Ограничиваем задержку для больших списков, чтобы не ждать долго.
-		item.style.transitionDelay = `${( index % 5 ) * 0.08}s`;
+		item.style.transitionDelay = `${( index % 10 ) * 0.08}s`;
 
 		// --- Изображение ---
 		const img = document.createElement( 'img' );
@@ -240,9 +240,14 @@ function initGallery( config ) {
 			newItems.push( item );
 		} );
 
-		// Анимация появления
+		// Анимация появления:
+		// Двойной requestAnimationFrame позволяет браузеру отрисовать
+		// элементы с opacity: 0, и только потом добавить visible.
+		// Это гарантирует плавную анимацию даже для только что созданных элементов.
 		requestAnimationFrame( () => {
-			newItems.forEach( item => item.classList.add( 'visible' ) );
+			requestAnimationFrame( () => {
+				newItems.forEach( item => item.classList.add( 'visible' ) );
+			} );
 		} );
 
 		// Считаем высоты

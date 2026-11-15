@@ -296,49 +296,6 @@ body:has(.slider-overlay.open) {
 }
 
 /* ============================================================
-   7. ПОДПИСЬ К ФОТО
-   ============================================================ */
-
-.swiper-slide .slide-caption {
-	position: absolute;
-	left: 28px;
-	bottom: 28px;
-	z-index: 2;
-	font-family: 'Cormorant Garamond', serif;
-	font-size: 22px;
-	font-weight: 400;
-	letter-spacing: 0.04em;
-	color: var(--slider-text-muted);
-	user-select: none;
-	transform: translateY(12px);
-	opacity: 0;
-	transition: all 0.6s var(--ease-out-expo);
-}
-
-.swiper-slide-active .slide-caption {
-	color: var(--slider-text);
-	transform: translateY(0);
-	opacity: 1;
-	text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 0, 0, 0.3);
-}
-
-/* Затемнение под подписью */
-.swiper-slide::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.55) 0%, transparent 40%);
-	pointer-events: none;
-	z-index: 1;
-	opacity: 0;
-	transition: opacity 0.6s var(--ease-out-expo);
-}
-
-.swiper-slide-active::after {
-	opacity: 1;
-}
-
-/* ============================================================
    8. КНОПКИ ДЕЙСТВИЙ
    ============================================================ */
 
@@ -691,12 +648,6 @@ body:has(.slider-overlay.open) {
 	}
 }
 
-.swiper-slide-zoomed .slide-caption {
-	opacity: 0 !important;
-	pointer-events: none;
-	transition: opacity 0.2s ease;
-}
-
 .swiper-slide-zoomed::after {
 	opacity: 0 !important;
 }
@@ -738,7 +689,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 .slider-overlay.is-fullscreen .slider-zoom-controls,
 .slider-overlay.is-fullscreen .slider-zoom-hint,
 .slider-overlay.is-fullscreen .slider-counter,
-.slider-overlay.is-fullscreen .slide-caption,
 .slider-overlay.is-fullscreen .slider-close {
 	opacity: 0;
 	visibility: hidden;
@@ -845,11 +795,7 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 		border-radius: 12px;
 	}
 
-	.swiper-slide .slide-caption {
-		font-size: 15px;
-		left: 14px;
-		bottom: 14px;
-	}
+
 
 	.swiper-button-prev,
 	.swiper-button-next {
@@ -928,12 +874,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	.swiper-zoom-container {
 		border-radius: 16px;
 	}
-
-	.swiper-slide .slide-caption {
-		font-size: 17px;
-		left: 18px;
-		bottom: 18px;
-	}
 }
 
 /* Большие мобильные (577px – 768px) */
@@ -944,12 +884,6 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 
 	.swiper-zoom-container {
 		border-radius: 20px;
-	}
-
-	.swiper-slide .slide-caption {
-		font-size: 19px;
-		left: 22px;
-		bottom: 22px;
 	}
 }
 
@@ -962,39 +896,11 @@ body:has(.swiper-slide-zoomed)::-webkit-scrollbar {
 	.swiper-zoom-container {
 		border-radius: 28px;
 	}
-
-	.swiper-slide .slide-caption {
-		font-size: 22px;
-	}
-}
-
-/* Десктоп (993px – 1200px) */
-@media (993px <=width < 1201px) {
-	.swiper-slide .slide-caption {
-		font-size: 24px;
-		left: 32px;
-		bottom: 32px;
-	}
-}
-
-/* Большой десктоп (1201px – 1441px) */
-@media (1201px <=width < 1441px) {
-	.swiper-slide .slide-caption {
-		font-size: 26px;
-		left: 36px;
-		bottom: 36px;
-	}
 }
 
 /* Ультраширокие (≥ 1441px) */
 @media (width >=1441px) {
 	.swiper-main {
 		max-height: 1000px;
-	}
-
-	.swiper-slide .slide-caption {
-		font-size: 28px;
-		left: 40px;
-		bottom: 40px;
 	}
 }
