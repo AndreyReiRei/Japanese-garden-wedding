@@ -2,6 +2,16 @@
  * ============================================================
  * slider.js — Полноэкранный слайдер на Swiper
  * ============================================================
+ * 
+ * ЛОГИКА РАБОТЫ:
+ *   1. Создается оверлей и HTML-структура.
+ *   2. Инициализируется Swiper (сначала миниатюры, потом основной).
+ *   3. Картинки сначала грузятся как "thumb" (легкие).
+ *   4. При активации слайда в фоне грузится "full" (тяжелая версия).
+ *   5. Если full грузится долго — показывается скелетон/лоадер.
+ *   6. При ошибке загрузки (битая ссылка) слайд помечается как error, 
+ *      чтобы не пытаться загрузить его снова и не вешать лоадер.
+ * ============================================================
  */
 
 let swiperInstance = null;
@@ -12,16 +22,20 @@ function openSlider( config ) {
 
 	const { photos, startIndex = 0, theme = 'garden' } = config;
 
+	// ============================================================
 	// 1. ЗАЩИТА ОТ ДУБЛИРОВАНИЯ
+	// ============================================================
 	if ( document.querySelector( '.slider-overlay' ) ) return;
 	if ( !photos || !photos.length ) return;
 
-	// 2. ВНЕДРЕНИЕ CSS (ЛОАДЕР + ПОЛНОЭКРАННЫЙ РЕЖИМ)
+	// ============================================================
+	// 2. ВНЕДРЕНИЕ CSS (ЛОАДЕР + ПОЛНОЭКРАННЫЙ РЕЖИМ + СКЕЛЕТОН)
+	// ============================================================
 	if ( !document.getElementById( 'slider-loader-styles' ) ) {
 		const style = document.createElement( 'style' );
 		style.id = 'slider-loader-styles';
 		style.textContent = `
-			/* Лоадер */
+			/* Лоадер (крутилка) */
 			.slider-loader {
 				position: absolute;
 				top: 50%;
@@ -72,7 +86,7 @@ function openSlider( config ) {
 				transition: opacity 0.3s ease, visibility 0.3s ease;
 			}
 
-			/* Скрываем миниатюры и убираем место под них */
+			/* Скрываем миниатюры в полноэкранном режиме */
 			.slider-overlay.is-fullscreen .swiper-thumbs {
 				display: none !important;
 			}
@@ -101,43 +115,39 @@ function openSlider( config ) {
 				opacity: 0.6;
 			}
 
-/* Убираем скругления */
-   .slider-overlay.is-fullscreen .swiper-slide,
-   .slider-overlay.is-fullscreen .swiper-zoom-container {
-    border-radius: 0 !important;
-    transition: border-radius 0.3s ease;
-   }
+			/* Убираем скругления */
+			.slider-overlay.is-fullscreen .swiper-slide,
+			.slider-overlay.is-fullscreen .swiper-zoom-container {
+				border-radius: 0 !important;
+				transition: border-radius 0.3s ease;
+			}
 
-   /* Fullscreen: соседние слайды видны — свайп влево/вправо */
-   .slider-overlay.is-fullscreen .swiper-slide {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: border-radius 0.3s ease;
-   }
+			/* Соседние слайды видны для свайпа */
+			.slider-overlay.is-fullscreen .swiper-slide {
+				opacity: 1 !important;
+				transform: none !important;
+				transition: border-radius 0.3s ease;
+			}
 
-   .slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
-    opacity: 1 !important;
-   }
+			.slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-active) {
+				opacity: 1 !important;
+			}
 
-   /*
-    * Zoom-container:
-    * без зума — убираем scale(1.15),
-    * с зумом — НЕ трогаем transform, иначе нельзя двигать фото
-    */
-   .slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-zoomed) .swiper-zoom-container {
-    transform: none !important;
-   }
+			/* Если нет зума — убираем scale */
+			.slider-overlay.is-fullscreen .swiper-slide:not(.swiper-slide-zoomed) .swiper-zoom-container {
+				transform: none !important;
+			}
 
-   .slider-overlay.is-fullscreen .swiper-slide-zoomed .swiper-zoom-container {
-    overflow: visible;
-   }
+			.slider-overlay.is-fullscreen .swiper-slide-zoomed .swiper-zoom-container {
+				overflow: visible;
+			}
 
-   .slider-overlay.is-fullscreen .swiper-slide img {
-    filter: none;
-    transition: none;
-   }
+			.slider-overlay.is-fullscreen .swiper-slide img {
+				filter: none;
+				transition: none;
+			}
 
-   /* Скрытие счетчика */
+			/* Скрытие счетчика */
 			.slider-counter.hidden {
 				opacity: 0;
 				pointer-events: none;
@@ -146,11 +156,14 @@ function openSlider( config ) {
 		document.head.appendChild( style );
 	}
 
+	// ============================================================
 	// 3. ПОСТРОЕНИЕ HTML
+	// ============================================================
 	const overlay = document.createElement( 'div' );
 	overlay.className = 'slider-overlay';
 	overlay.setAttribute( 'data-theme', theme );
 
+	// Генерируем слайды. Сначала ставим thumb, а в data-full кладем полный путь.
 	const slidesHTML = photos.map( ( photo, i ) => {
 		const thumbSrc = photo.src || photo.srcFull || '';
 		const fullSrc = photo.srcFull || photo.src || '';
@@ -253,13 +266,81 @@ function openSlider( config ) {
 
 	requestAnimationFrame( () => overlay.classList.add( 'open' ) );
 
-	// 4. ИНИЦИАЛИЗАЦИЯ SWIPER
+	// ============================================================
+	// 4. ПЕРЕМЕННЫЕ И ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+	// ============================================================
 	const swiperMainEl = overlay.querySelector( '.swiper-main' );
 	const swiperThumbsEl = overlay.querySelector( '.swiper-thumbs' );
 	const loaderEl = overlay.querySelector( '#sliderLoader' );
 
-	// --- ПЕРЕМЕННЫЕ ДЛЯ ЛОАДЕРА ---
 	let loaderTimer = null;
+
+	// --- 4.1. Показ/скрытие слайдера ---
+	function refreshSwiper() {
+		if ( !swiperInstance || swiperInstance.destroyed ) return;
+		swiperInstance.updateSize();
+		swiperInstance.updateSlides();
+		swiperInstance.update();
+		swiperInstance.slideTo( startIndex, 0 );
+
+		if ( thumbsInstance && !thumbsInstance.destroyed ) {
+			thumbsInstance.updateSize();
+			thumbsInstance.updateSlides();
+			thumbsInstance.update();
+			thumbsInstance.slideTo( startIndex, 0 );
+		}
+	}
+
+	function showSwiper() {
+		if ( swiperMainEl ) {
+			swiperMainEl.style.visibility = 'visible';
+			swiperMainEl.style.opacity = '1';
+		}
+		if ( swiperThumbsEl ) {
+			swiperThumbsEl.style.opacity = '1';
+		}
+	}
+
+	// --- 4.2. Умная загрузка full-версий ---
+	function preloadNeighbors( index ) {
+		// Грузим только следующие 2 фото, чтобы не тратить трафик впустую
+		const indexes = [index + 1, index + 2];
+
+		indexes.forEach( i => {
+			if ( i < 0 || i >= photos.length ) return;
+
+			const slide = swiperInstance.slides[i];
+			if ( !slide ) return;
+
+			const img = slide.querySelector( 'img.slide-image' );
+			if ( !img || img.dataset.fullLoaded === '1' || img.dataset.fullLoaded === 'error' ) return;
+
+			const fullSrc = img.getAttribute( 'data-full' );
+			if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) return;
+
+			const probe = new Image();
+			probe.decoding = 'async';
+
+			probe.onload = () => {
+				if ( img.dataset.fullLoaded === '1' || img.dataset.fullLoaded === 'error' ) return;
+				img.src = fullSrc;
+				img.classList.remove( 'is-thumb' );
+				img.classList.add( 'is-full' );
+				img.dataset.fullLoaded = '1';
+				const sk = slide.querySelector( '.slide-skeleton' );
+				if ( sk ) sk.classList.remove( 'visible' );
+			};
+
+			// КРИТИЧНО: Если соседнее фото битое — помечаем и убираем скелетон
+			probe.onerror = () => {
+				img.dataset.fullLoaded = 'error';
+				const sk = slide.querySelector( '.slide-skeleton' );
+				if ( sk ) sk.classList.remove( 'visible' );
+			};
+
+			probe.src = fullSrc;
+		} );
+	}
 
 	function checkCurrentImageLoaded() {
 		if ( loaderTimer ) {
@@ -280,22 +361,29 @@ function openSlider( config ) {
 		const fullSrc = img.getAttribute( 'data-full' );
 		const skeleton = activeSlide.querySelector( '.slide-skeleton' );
 
-		// Уже полное — ничего не трогаем (главное против моргания при свайпе назад)
-		if ( img.dataset.fullLoaded === '1' ) {
+		// КРИТИЧНО: Если фото уже загружено ИЛИ была ошибка — не грузим снова
+		if ( img.dataset.fullLoaded === '1' || img.dataset.fullLoaded === 'error' ) {
 			if ( skeleton ) skeleton.classList.remove( 'visible' );
-			preloadNeighbors( activeIndex );
+			if ( img.dataset.fullLoaded === '1' ) preloadNeighbors( activeIndex );
 			return;
 		}
 
-		// Скелетон только если full реально долго не приходит
+		// Если нет отдельного full — сразу убираем скелетон
+		if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) {
+			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			img.dataset.fullLoaded = '1';
+			return;
+		}
+
+		// Показываем скелетон через 200 мс, лоадер — через 900 мс (если грузится долго)
 		let skeletonTimer = setTimeout( () => {
-			if ( skeleton && img.dataset.fullLoaded !== '1' ) {
+			if ( skeleton && img.dataset.fullLoaded !== '1' && img.dataset.fullLoaded !== 'error' ) {
 				skeleton.classList.add( 'visible' );
 			}
 		}, 200 );
 
 		loaderTimer = setTimeout( () => {
-			if ( loaderEl && img.dataset.fullLoaded !== '1' ) {
+			if ( loaderEl && img.dataset.fullLoaded !== '1' && img.dataset.fullLoaded !== 'error' ) {
 				loaderEl.classList.add( 'visible' );
 			}
 		}, 900 );
@@ -311,25 +399,16 @@ function openSlider( config ) {
 			preloadNeighbors( activeIndex );
 		};
 
-		// Нет отдельного full
-		if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) {
-			finish();
-			return;
-		}
-
 		const probe = new Image();
 		probe.decoding = 'async';
 
 		probe.onload = () => {
 			const apply = () => {
-				// Меняем src только один раз, когда full уже в памяти браузера
 				if ( img.getAttribute( 'src' ) !== fullSrc ) {
 					img.src = fullSrc;
 				}
 				finish();
 			};
-
-			// decode() снижает кадр «пустой картинки» при подмене
 			if ( typeof probe.decode === 'function' ) {
 				probe.decode().then( apply ).catch( apply );
 			} else {
@@ -337,48 +416,57 @@ function openSlider( config ) {
 			}
 		};
 
+		// КРИТИЧНО: Если основное фото битое — отключаем лоадеры и запоминаем ошибку
 		probe.onerror = () => {
 			clearTimeout( skeletonTimer );
 			if ( loaderTimer ) clearTimeout( loaderTimer );
 			if ( loaderEl ) loaderEl.classList.remove( 'visible' );
 			if ( skeleton ) skeleton.classList.remove( 'visible' );
+			img.dataset.fullLoaded = 'error';
+			console.warn( 'Ошибка загрузки full изображения:', fullSrc );
 		};
 
 		probe.src = fullSrc;
 	}
 
-	/** Тихо качаем full у соседей, чтобы свайп не ждал */
-	function preloadNeighbors( index ) {
-		const indexes = [index - 1, index + 1, index + 2];
-
-		indexes.forEach( i => {
-			if ( i < 0 || i >= photos.length ) return;
-
-			const slide = swiperInstance.slides[i];
-			if ( !slide ) return;
-
-			const img = slide.querySelector( 'img.slide-image' );
-			if ( !img || img.dataset.fullLoaded === '1' ) return;
-
-			const fullSrc = img.getAttribute( 'data-full' );
-			if ( !fullSrc || fullSrc === img.getAttribute( 'src' ) ) return;
-
-			const probe = new Image();
-			probe.decoding = 'async';
-			probe.onload = () => {
-				if ( img.dataset.fullLoaded === '1' ) return;
-				img.src = fullSrc;
-				img.classList.remove( 'is-thumb' );
-				img.classList.add( 'is-full' );
-				img.dataset.fullLoaded = '1';
-				const sk = slide.querySelector( '.slide-skeleton' );
-				if ( sk ) sk.classList.remove( 'visible' );
-			};
-			probe.src = fullSrc;
-		} );
+	// --- 4.3. Счетчик и подсказки ---
+	function updateCounter( index, total ) {
+		const counter = document.getElementById( 'sliderCounter' );
+		if ( counter ) {
+			counter.textContent = `${index + 1} / ${total || photos.length}`;
+		}
 	}
-	// ----------------------------------------------------
 
+	function updateZoomUI( currentScale ) {
+		const hint = document.getElementById( 'sliderZoomHint' );
+		const zoomLevel = document.getElementById( 'zoomLevel' );
+		const zoomControls = document.getElementById( 'sliderZoomControls' );
+
+		const scale = currentScale || ( swiperInstance?.zoom?.scale || 1 );
+		const isZoomed = scale > 1.05;
+
+		if ( hint ) {
+			hint.textContent = isZoomed ? 'Двойной тап — уменьшить' : 'Двойной тап — увеличить';
+			hint.classList.add( 'visible' );
+			clearTimeout( hint._timeout );
+			// Подсказка исчезает через 2 секунды (синхронно со счетчиком)
+			if ( !isZoomed ) {
+				hint._timeout = setTimeout( () => hint.classList.remove( 'visible' ), 2000 );
+			}
+		}
+
+		if ( zoomLevel ) {
+			zoomLevel.textContent = `${Math.round( scale * 10 ) / 10}×`;
+		}
+
+		if ( zoomControls ) {
+			zoomControls.classList.toggle( 'visible', isZoomed );
+		}
+	}
+
+	// ============================================================
+	// 5. ИНИЦИАЛИЗАЦИЯ SWIPER
+	// ============================================================
 	swiperMainEl.style.visibility = 'hidden';
 	swiperMainEl.style.opacity = '0';
 	swiperMainEl.style.transition = 'opacity 0.3s ease';
@@ -386,7 +474,7 @@ function openSlider( config ) {
 	swiperThumbsEl.style.opacity = '0';
 	swiperThumbsEl.style.transition = 'opacity 0.3s ease';
 
-	// 4.1. Миниатюры
+	// 5.1. Миниатюры
 	thumbsInstance = new Swiper( swiperThumbsEl, {
 		spaceBetween: 8,
 		slidesPerView: 'auto',
@@ -398,7 +486,7 @@ function openSlider( config ) {
 		},
 	} );
 
-	// 4.2. Основной слайдер
+	// 5.2. Основной слайдер
 	swiperInstance = new Swiper( swiperMainEl, {
 		grabCursor: true,
 		slidesPerView: 1.5,
@@ -460,9 +548,12 @@ function openSlider( config ) {
 		},
 	} );
 
+	// Первичная проверка для стартового слайда
 	checkCurrentImageLoaded();
 
-	// 5. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться / Полный экран)
+	// ============================================================
+	// 6. КНОПКИ ДЕЙСТВИЙ (Скачать / Поделиться / Полный экран)
+	// ============================================================
 	function updateActionButtons( index ) {
 		const photo = photos[index];
 		if ( !photo ) return;
@@ -530,16 +621,9 @@ function openSlider( config ) {
 		fullscreenBtn.addEventListener( 'click', () => {
 			const isFullscreen = overlay.classList.toggle( 'is-fullscreen' );
 
-			// Иконка
 			fullscreenBtn.innerHTML = isFullscreen ? iconCollapse : iconExpand;
-			fullscreenBtn.setAttribute(
-				'title',
-				isFullscreen ? 'Выйти из полного экрана' : 'Полный экран'
-			);
-			fullscreenBtn.setAttribute(
-				'aria-label',
-				isFullscreen ? 'Выйти из полного экрана' : 'Полный экран'
-			);
+			fullscreenBtn.setAttribute( 'title', isFullscreen ? 'Выйти из полного экрана' : 'Полный экран' );
+			fullscreenBtn.setAttribute( 'aria-label', isFullscreen ? 'Выйти из полного экрана' : 'Полный экран' );
 
 			if ( isFullscreen ) {
 				swiperInstance.params.slidesPerView = 1;
@@ -575,32 +659,9 @@ function openSlider( config ) {
 		} );
 	}
 
-	// 6. ЦЕНТРИРОВАНИЕ И ПОКАЗ
-	function refreshSwiper() {
-		if ( !swiperInstance || swiperInstance.destroyed ) return;
-		swiperInstance.updateSize();
-		swiperInstance.updateSlides();
-		swiperInstance.update();
-		swiperInstance.slideTo( startIndex, 0 );
-
-		if ( thumbsInstance && !thumbsInstance.destroyed ) {
-			thumbsInstance.updateSize();
-			thumbsInstance.updateSlides();
-			thumbsInstance.update();
-			thumbsInstance.slideTo( startIndex, 0 );
-		}
-	}
-
-	function showSwiper() {
-		if ( swiperMainEl ) {
-			swiperMainEl.style.visibility = 'visible';
-			swiperMainEl.style.opacity = '1';
-		}
-		if ( swiperThumbsEl ) {
-			swiperThumbsEl.style.opacity = '1';
-		}
-	}
-
+	// ============================================================
+	// 7. ПЕРВОНАЧАЛЬНЫЙ ПОКАЗ (Ждем загрузки thumb)
+	// ============================================================
 	const allSliderImages = overlay.querySelectorAll( '.swiper-main img[data-index]' );
 	const totalImages = allSliderImages.length;
 	let loadedCount = 0;
@@ -640,54 +701,36 @@ function openSlider( config ) {
 		}
 	}, 1500 );
 
-	// 7. ЛОГИКА СКРЫТИЯ СЧЕТЧИКА
+	// ============================================================
+	// 8. СЧЕТЧИК (Скрытие/Показ)
+	// ============================================================
 	const counterEl = document.getElementById( 'sliderCounter' );
 	let counterTimeout = null;
 
 	function hideCounter() {
-		if ( counterEl ) {
-			counterEl.classList.add( 'hidden' );
-		}
+		if ( counterEl ) counterEl.classList.add( 'hidden' );
 	}
 
 	function showCounter() {
-		if ( counterEl ) {
-			counterEl.classList.remove( 'hidden' );
-		}
+		if ( counterEl ) counterEl.classList.remove( 'hidden' );
 
-		// Сбрасываем старый таймер
-		if ( counterTimeout ) {
-			clearTimeout( counterTimeout );
-		}
-
-		// Запускаем новый таймер на 2 секунды
-		counterTimeout = setTimeout( hideCounter, 2000 );
+		if ( counterTimeout ) clearTimeout( counterTimeout );
+		counterTimeout = setTimeout( hideCounter, 2000 ); // Исчезает через 2 секунды
 	}
 
-	// Запускаем таймер при открытии слайдера
 	showCounter();
 
-	// Показываем счетчик при движении мыши (ПК)
 	overlay.addEventListener( 'mousemove', showCounter );
-
-	// Показываем счетчик при касании (мобильные)
 	overlay.addEventListener( 'touchstart', showCounter, { passive: true } );
 
-	// Показываем счетчик при клике на кнопки навигации
 	const prevBtn = overlay.querySelector( '.swiper-button-prev' );
 	const nextBtn = overlay.querySelector( '.swiper-button-next' );
 	if ( prevBtn ) prevBtn.addEventListener( 'click', showCounter );
 	if ( nextBtn ) nextBtn.addEventListener( 'click', showCounter );
 
-	// 8. СЧЁТЧИК
-	function updateCounter( index, total ) {
-		const counter = document.getElementById( 'sliderCounter' );
-		if ( counter ) {
-			counter.textContent = `${index + 1} / ${total || photos.length}`;
-		}
-	}
-
-	// 9. ЗУМ
+	// ============================================================
+	// 9. ЗУМ (Кнопки и двойной тап)
+	// ============================================================
 	const ZOOM_STEPS = [1, 2, 4, 8];
 
 	function getNextZoomStep( currentScale ) {
@@ -749,33 +792,9 @@ function openSlider( config ) {
 		if ( window.navigator?.vibrate ) window.navigator.vibrate( 5 );
 	} );
 
-	function updateZoomUI( currentScale ) {
-		const hint = document.getElementById( 'sliderZoomHint' );
-		const zoomLevel = document.getElementById( 'zoomLevel' );
-		const zoomControls = document.getElementById( 'sliderZoomControls' );
-
-		const scale = currentScale || ( swiperInstance?.zoom?.scale || 1 );
-		const isZoomed = scale > 1.05;
-
-		if ( hint ) {
-			hint.textContent = isZoomed ? 'Двойной тап — уменьшить' : 'Двойной тап — увеличить';
-			hint.classList.add( 'visible' );
-			clearTimeout( hint._timeout );
-			if ( !isZoomed ) {
-				hint._timeout = setTimeout( () => hint.classList.remove( 'visible' ), 2000 );
-			}
-		}
-
-		if ( zoomLevel ) {
-			zoomLevel.textContent = `${Math.round( scale * 10 ) / 10}×`;
-		}
-
-		if ( zoomControls ) {
-			zoomControls.classList.toggle( 'visible', isZoomed );
-		}
-	}
-
+	// ============================================================
 	// 10. ЗАКРЫТИЕ
+	// ============================================================
 	function closeSlider() {
 		overlay.classList.remove( 'open' );
 		setTimeout( () => {
@@ -811,7 +830,9 @@ function openSlider( config ) {
 		}
 	} );
 
+	// ============================================================
 	// 11. ЗАПУСК
+	// ============================================================
 	updateZoomUI();
 	if ( window.navigator?.vibrate ) window.navigator.vibrate( 10 );
 	console.log( `📸 Слайдер открыт с миниатюрами: ${startIndex + 1} / ${photos.length}` );

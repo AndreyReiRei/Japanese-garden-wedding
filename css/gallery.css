@@ -4,18 +4,19 @@
    СОДЕРЖАНИЕ:
    1.  Сброс и базовые переменные
    2.  Темы разделов (garden / zags / home)
-   3.  Базовые стили (html, body)
-   4.  Фоновые слои (изображение, фильтр)
+   3.  Базовые стили (html, body) + фон
+   4.  Фоновый слой (page-bg)
    5.  Шапка
-   6.  Кнопки — единый стиль (назад + нижняя навигация + "показать все")
-   7.  Заголовок раздела
-   8.  Счётчик фото
-   9.  Галерея — Masonry-сетка + параллакс
-   10. Свиток (кнопки управления, стрелка)
-   11. Нижняя навигация — контейнер
-   12. Подвал
-   13. Плавные переходы между страницами
-   14. Адаптивность по брейкпоинтам (все @media здесь)
+   6.  Кнопки — единый стиль (назад + нижняя навигация + «показать все»)
+   7.  Тумблер управления эффектами
+   8.  Кнопка «Наверх»
+   9.  Заголовок раздела
+   10. Галерея — Masonry-сетка + параллакс
+   11. Свиток (кнопка, крестик, стрелка)
+   12. Нижняя навигация по разделам
+   13. Подвал
+   14. Плавные переходы между страницами
+   15. Адаптивность по брейкпоинтам (все @media)
    ============================================================ */
 
 /* ============================================================
@@ -30,18 +31,14 @@
 }
 
 :root {
-	/*
-     * БАЗОВЫЕ ЦВЕТА
-     */
+	/* Базовые цвета */
 	--bg-fallback: #0a0a0a;
 	--bg-surface: #0c0c0c;
 	--white: #F5F1EC;
 	--text-primary: rgba(255, 255, 255, 0.88);
 	--text-tertiary: rgba(255, 255, 255, 0.8);
 
-	/*
-     * ТЕНИ
-     */
+	/* Тени */
 	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
 	--shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
 	--shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
@@ -50,15 +47,11 @@
 		0 20px 56px rgba(0, 0, 0, 0.75),
 		0 0 0 1px rgba(255, 255, 255, 0.04);
 
-	/*
-     * СКРУГЛЕНИЯ
-     */
+	/* Скругления */
 	--radius-sm: 8px;
 	--radius-md: 12px;
 
-	/*
-     * АНИМАЦИЯ
-     */
+	/* Анимация */
 	--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 	--ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
 	--transition-fast: 0.2s ease;
@@ -66,19 +59,14 @@
 	--transition-slow: 0.6s var(--ease-out-expo);
 	--transition-spring: 0.5s var(--ease-out-back);
 
-	/*
-     * АКЦЕНТНЫЕ ЦВЕТА (по умолчанию — красный / ЗАГС)
-     */
+	/* Акцентные цвета (по умолчанию — красный / ЗАГС) */
 	--accent-color: #E84040;
 	--accent-color-light: #FF6B6B;
 	--accent-glow: rgba(232, 64, 64, 0.4);
 	--accent-glow-strong: rgba(232, 64, 64, 0.6);
 	--accent-rgb: 232, 64, 64;
 
-	/*
-     * ЦВЕТА ДЛЯ ВСЕХ КНОПОК (ЕДИНЫЙ СТИЛЬ)
-     * Полупрозрачное темное стекло.
-     */
+	/* Цвета для всех кнопок (единый стиль) */
 	--btn-bg: rgba(30, 30, 30, 0.6);
 	--btn-bg-dark: rgba(15, 15, 15, 0.8);
 	--btn-text: #ffffff;
@@ -86,21 +74,15 @@
 	--btn-glow: rgba(255, 255, 255, 0.1);
 	--btn-hover-overlay: rgba(255, 255, 255, 0.05);
 
-	/*
-     * ФОНОВОЕ ИЗОБРАЖЕНИЕ
-     */
+	/* Фоновое изображение */
 	--bg-image: none;
 
-	/*
-     * СЕТКА MASONRY
-     */
+	/* Сетка Masonry */
 	--masonry-columns: 3;
 	--masonry-gap: 12px;
 	--grid-padding: 20px;
 
-	/*
-     * ТИПОГРАФИКА
-     */
+	/* Типографика */
 	--font-display: 'Cormorant Garamond', 'Zen Old Mincho', 'Noto Serif JP', serif;
 	--font-japanese: 'Zen Old Mincho', 'Noto Serif JP', serif;
 	--font-body: 'Inter', system-ui, -apple-system, sans-serif;
@@ -110,9 +92,7 @@
    2. ТЕМЫ РАЗДЕЛОВ
    ============================================================ */
 
-/*
- * ЯПОНСКИЙ САД — розовый сакуры + тёмно-красный
- */
+/* Японский сад — розовый сакуры + тёмно-красный */
 [data-theme="garden"] {
 	--accent-color: #E8A0B4;
 	--accent-color-light: #F0C4D3;
@@ -127,9 +107,7 @@
 	--bg-image-mobile: url('../photos/cover/bg-garden-mobile.avif');
 }
 
-/*
- * ЗАГС — киноварь
- */
+/* ЗАГС — киноварь */
 [data-theme="zags"] {
 	--accent-color: #E84040;
 	--accent-color-light: #FF6B6B;
@@ -144,9 +122,7 @@
 	--bg-image-mobile: url('../photos/cover/bg-zags-mobile.avif');
 }
 
-/*
- * КУПЕЧЕСКИЙ ДОМ — тёплый янтарь
- */
+/* Купеческий дом — тёплый янтарь */
 [data-theme="home"] {
 	--accent-color: #D4A24E;
 	--accent-color-light: #E8C880;
@@ -218,8 +194,6 @@ body {
 		rgba(8, 8, 8, 0.78);
 }
 
-
-
 /* ============================================================
    5. ШАПКА
    ============================================================ */
@@ -232,26 +206,19 @@ body {
 	padding: 16px 20px;
 
 	background: rgba(8, 8, 8, 0.6);
-	/* Сделали чуть плотнее, чтобы текст под ней не просвечивал */
 	backdrop-filter: blur(5px);
-	/* <--- Добавили эффект матового стекла */
 	-webkit-backdrop-filter: blur(10px);
 }
 
-/* Остальные блоки на странице  */
+/* Шапки внутри секций галереи (не липнут) */
 .gallery-section .gallery-header {
 	position: relative;
 	top: auto;
 	z-index: 1;
 	background: transparent;
-	/* Убираем фон */
 	backdrop-filter: none;
-	/* Убираем размытие */
 	-webkit-backdrop-filter: none;
 	border-bottom: none;
-	/* Если не нужна линия снизу */
-
-
 }
 
 .header-inner {
@@ -328,9 +295,7 @@ body {
    6. КНОПКИ — ЕДИНЫЙ СТИЛЬ
    ============================================================ */
 
-/*
- * 6.1. ОБЩИЕ СТИЛИ ДЛЯ ВСЕХ КНОПОК (Назад и Нижние)
- */
+/* 6.1. Общие стили для всех кнопок (Назад и Нижние) */
 .back-btn,
 .animated-btn {
 	position: relative;
@@ -356,22 +321,16 @@ body {
 	flex-shrink: 0;
 }
 
-/*
- * 6.2. СПЕЦИФИЧНЫЕ РАЗМЕРЫ
- */
+/* 6.2. Специфичные размеры */
 .back-btn {
 	width: 140px;
-	/* Фиксированная для шапки */
 }
 
 .animated-btn {
 	min-width: 200px;
-	/* Минимальная для нижних */
 }
 
-/*
- * 6.3. ЗАТЕМНЕНИЕ ПРИ HOVER
- */
+/* 6.3. Затемнение при hover */
 .back-btn::after,
 .animated-btn::after {
 	content: '';
@@ -401,14 +360,11 @@ body {
 	transition: transform 0.12s ease;
 }
 
-/*
- * 6.4. ПУЛЬСИРУЮЩАЯ ОБВОДКА — 2 линии
- */
+/* 6.4. Пульсирующая обводка — 2 линии */
 .back-btn .btn-line,
 .animated-btn .btn-line {
 	position: absolute;
 	border-radius: 2px;
-	/* Убираем старую анимацию движения */
 }
 
 /* Верхняя линия */
@@ -418,7 +374,6 @@ body {
 	left: 0;
 	width: 100%;
 	height: 1px;
-	/* Сделали чуть тоньше для элегантности */
 	background: linear-gradient(to right, transparent, var(--btn-line-color), transparent);
 	animation: btnPulse 6s ease-in-out infinite;
 }
@@ -431,29 +386,22 @@ body {
 	width: 100%;
 	height: 1px;
 	background: linear-gradient(to right, transparent, var(--btn-line-color), transparent);
-	/* Задержка, чтобы они пульсировали в противофазе (или можно убрать задержку для синхронности) */
 	animation: btnPulse 6s ease-in-out -3s infinite;
 }
 
-/* Анимация легкой пульсации (изменение прозрачности) */
 @keyframes btnPulse {
 
 	0%,
 	100% {
 		opacity: 0.2;
-		/* Тускнеет */
 	}
 
 	50% {
 		opacity: 1;
-		/* Загорается */
 	}
 }
 
-
-/*
- * 6.5. СТРЕЛКА В КНОПКЕ
- */
+/* 6.5. Стрелка в кнопке */
 .back-arrow,
 .animated-btn .arrow {
 	font-size: 15px;
@@ -479,9 +427,7 @@ body {
 	transform: translateX(-5px);
 }
 
-/*
- * 6.6. ТЕКСТ ВНУТРИ КНОПКИ
- */
+/* 6.6. Текст внутри кнопки */
 .bottom-nav-content {
 	display: flex;
 	flex-direction: column;
@@ -510,9 +456,7 @@ body {
 	text-align: center;
 }
 
-/*
- * 6.7. ИКОНКА «ОБЛОЖКА» — с пульсацией
- */
+/* 6.7. Иконка «Обложка» — с пульсацией */
 .bottom-nav-home-icon {
 	font-size: 24px;
 	line-height: 1;
@@ -539,32 +483,7 @@ body {
 	}
 }
 
-/*
- * 6.8. АНИМАЦИИ ОБВОДКИ
- */
-@keyframes btnLineX {
-	0% {
-		transform: translateX(100%);
-	}
-
-	100% {
-		transform: translateX(-100%);
-	}
-}
-
-@keyframes btnLineY {
-	0% {
-		transform: translateY(100%);
-	}
-
-	100% {
-		transform: translateY(-100%);
-	}
-}
-
-/*
- * 6.9. ОБЕРТКА ДЛЯ КНОПКИ «ПОКАЗАТЬ ВСЕ»
- */
+/* 6.8. Обертка для кнопки «Показать все» */
 .gallery-load-more-wrapper {
 	display: flex;
 	justify-content: center;
@@ -573,7 +492,7 @@ body {
 }
 
 /* ============================================================
-   ТУМБЛЕР УПРАВЛЕНИЯ ЭФФЕКТАМИ
+   7. ТУМБЛЕР УПРАВЛЕНИЯ ЭФФЕКТАМИ
    ============================================================ */
 
 .effects-toggle-wrapper {
@@ -623,15 +542,11 @@ body {
 	left: 4px;
 	bottom: 3px;
 	background-color: rgba(255, 255, 255, 0.5);
-	/* Серый кружок */
 	border-radius: 50%;
 	transition: .4s var(--ease-out-expo);
 }
 
-/* 
- * СОСТОЯНИЕ "ВКЛЮЧЕНО" (чекбокс отмечен)
- * Эффекты работают — тумблер становится акцентным, кружок едет вправо.
- */
+/* Состояние «включено»: тумблер становится акцентным */
 .effects-toggle input:checked+.effects-toggle-slider {
 	background-color: rgba(var(--accent-rgb), 0.2);
 	border-color: var(--accent-color);
@@ -643,31 +558,64 @@ body {
 	box-shadow: 0 0 8px var(--accent-glow);
 }
 
-/* На мобильных делаем тумблер чуть меньше */
-@media (width < 481px) {
-	.effects-toggle-wrapper {
-		width: auto;
-	}
+/* ============================================================
+   8. КНОПКА «НАВЕРХ» (SCROLL TO TOP)
+   ============================================================ */
 
-	.effects-toggle {
-		width: 36px;
-		height: 20px;
-	}
+.scroll-to-top {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
 
-	.effects-toggle-slider::before {
-		height: 12px;
-		width: 12px;
-		left: 3px;
-		bottom: 3px;
-	}
+	background: rgba(0, 0, 0, 0.45);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 
-	.effects-toggle input:checked+.effects-toggle-slider::before {
-		transform: translateX(16px);
-	}
+	color: var(--accent-color);
+	cursor: pointer;
+	z-index: 100;
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(20px);
+	transition: all 0.4s var(--ease-out-expo);
+}
+
+.scroll-to-top.visible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+.scroll-to-top:hover {
+	background: rgba(var(--accent-rgb), 0.15);
+	border-color: var(--accent-color);
+	box-shadow: 0 0 30px rgba(var(--accent-rgb), 0.25);
+	transform: translateY(-4px);
+}
+
+.scroll-to-top:active {
+	transform: scale(0.92);
+}
+
+.scroll-to-top svg {
+	transition: transform 0.3s ease;
+}
+
+.scroll-to-top:hover svg {
+	transform: translateY(-2px);
 }
 
 /* ============================================================
-   7. ЗАГОЛОВОК РАЗДЕЛА
+   9. ЗАГОЛОВОК РАЗДЕЛА
    ============================================================ */
 
 .title-block {
@@ -677,14 +625,10 @@ body {
 }
 
 .section-title {
-	/* 1. Увеличиваем размер (было 28px) */
 	font-size: 52px;
-
-	/* 2. Делаем шрифт более выразительным */
 	font-weight: 600;
 	letter-spacing: 0.08em;
 
-	/* 3. Создаем градиентный текст (от белого к акцентному цвету темы) */
 	background: linear-gradient(135deg, #ffffff 0%, var(--accent-color) 100%);
 	-webkit-background-clip: text;
 	background-clip: text;
@@ -693,17 +637,13 @@ body {
 	margin-bottom: 8px;
 	line-height: 1.1;
 
-	/* 4. Добавляем свечение через drop-shadow (text-shadow не работает с градиентом) */
 	filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 20px var(--accent-glow));
 
 	position: relative;
 	display: inline-block;
-	/* Важно для корректного отображения градиента и отражения */
 }
 
-/* 
- * Отражение (сохраняем логику, но адаптируем под градиент)
- */
+/* Отражение (сохраняем логику, но адаптируем под градиент) */
 .section-title::after {
 	content: attr(data-text);
 	position: absolute;
@@ -712,12 +652,10 @@ body {
 	right: 0;
 	transform: scaleY(-1);
 
-	/* Для отражения используем сплошной цвет, чтобы не было багов с прозрачностью */
 	color: var(--white);
 	-webkit-text-fill-color: var(--white);
 	background: none;
 	background-clip: border-box;
-	/* Убрали -webkit-префикс */
 
 	font-size: inherit;
 	font-weight: inherit;
@@ -743,23 +681,7 @@ body {
 }
 
 /* ============================================================
-   8. СЧЁТЧИК ФОТО
-   ============================================================ */
-
-.photo-counter {
-	font-family: var(--font-body);
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--text-tertiary);
-	letter-spacing: 0.1em;
-	white-space: nowrap;
-	width: 140px;
-	text-align: right;
-	flex-shrink: 0;
-}
-
-/* ============================================================
-   9. ГАЛЕРЕЯ — MASONRY-СЕТКА + ПАРАЛЛАКС
+   10. ГАЛЕРЕЯ — MASONRY-СЕТКА + ПАРАЛЛАКС
    ============================================================ */
 
 .gallery-container {
@@ -770,14 +692,11 @@ body {
 	padding: var(--grid-padding);
 }
 
-/* Стало: убираем линию и сокращаем отступ */
+/* Разделитель между секциями галереи */
 .gallery-section+.gallery-section {
 	margin-top: 20px;
-	/* Было 60px, стало 20px */
 	border-top: none;
-	/* Убираем линию */
 	padding-top: 0;
-	/* Убираем внутренний отступ сверху */
 }
 
 .gallery-grid {
@@ -802,15 +721,32 @@ body {
 	background: rgba(255, 255, 255, 0.01);
 	box-shadow: var(--shadow-card);
 
+	/* 
+	 * Начальное состояние: 
+	 * сдвиг вниз на 30px + полная прозрачность 
+	 */
 	transform: translateY(30px) translateZ(0);
-	opacity: 1;
-	transition: transform 0.5s var(--ease-out-expo), box-shadow 0.4s var(--ease-out-expo);
+	opacity: 0;
+
+	/* 
+	 * Плавные переходы:
+	 * - transform: 1s (медленный выезд)
+	 * - opacity: 1.2s (еще более медленное проявление)
+	 */
+	transition:
+		transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+		opacity 1.2s ease,
+		box-shadow 0.4s var(--ease-out-expo);
+
+	will-change: transform, opacity;
 }
 
 .gallery-item.visible {
 	transform: translateY(0) translateZ(0);
+	opacity: 1;
 }
 
+/* Рамка фото */
 .gallery-item::after {
 	content: '';
 	position: absolute;
@@ -822,6 +758,7 @@ body {
 	transition: all 0.5s var(--ease-out-expo);
 }
 
+/* Уголки в японском стиле */
 .gallery-item::before {
 	content: '';
 	position: absolute;
@@ -884,6 +821,7 @@ body {
 	filter: brightness(1.02);
 }
 
+/* Подпись на фото */
 .gallery-caption {
 	position: absolute;
 	bottom: 0;
@@ -910,7 +848,7 @@ body {
 }
 
 /* ============================================================
-   10. СВИТОК — ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
+   11. СВИТОК — ЭЛЕМЕНТЫ УПРАВЛЕНИЯ
    ============================================================ */
 
 /* Контейнер для кнопки — центрируем её */
@@ -931,14 +869,10 @@ body {
 	justify-content: center;
 	gap: 12px;
 
-	/* Фон: легкий градиент для эффекта стекла */
 	background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(20, 20, 20, 0.3) 100%);
-
-	/* Рамка: градиентная (эмуляция через border-image или псевдоэлемент) */
 	border: 1px solid transparent;
 	border-radius: 0 0 16px 16px;
 
-	/* Отступы */
 	padding: 14px 44px;
 
 	color: var(--white);
@@ -947,7 +881,6 @@ body {
 	font-weight: 500;
 	letter-spacing: 0.05em;
 
-	/* Эффект стекла */
 	backdrop-filter: blur(20px) saturate(1.2);
 	-webkit-backdrop-filter: blur(20px) saturate(1.2);
 
@@ -956,7 +889,6 @@ body {
 
 	max-width: 90vw;
 
-	/* Мягкая пульсация свечения */
 	animation: btnGlowPulse 5s ease-in-out infinite;
 }
 
@@ -972,7 +904,6 @@ body {
 			rgba(var(--accent-rgb), 0.6) 50%,
 			rgba(var(--accent-rgb), 0.1) 100%);
 
-	/* Современный способ: маска вырезает внутреннюю область */
 	-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
 	-webkit-mask-composite: xor;
@@ -983,7 +914,6 @@ body {
 	transition: opacity 0.5s ease;
 }
 
-/* Анимация пульсации свечения */
 @keyframes btnGlowPulse {
 
 	0%,
@@ -996,7 +926,6 @@ body {
 	}
 }
 
-/* При наведении: усиление градиентной рамки и свечения */
 .scroll-trigger-inner:hover {
 	background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.08) 0%, rgba(0, 0, 0, 0.3) 100%);
 	animation: none;
@@ -1007,13 +936,12 @@ body {
 	opacity: 1;
 }
 
-/* При нажатии */
 .scroll-trigger:active .scroll-trigger-inner {
 	transform: scale(0.96);
 	transition: transform 0.12s ease;
 }
 
-/* Стрелочка: плавное парение (увеличение/уменьшение) */
+/* Стрелочка: плавное парение */
 .scroll-trigger-arrow {
 	display: flex;
 	align-items: center;
@@ -1026,7 +954,6 @@ body {
 	animation: arrowFloat 3s ease-in-out infinite;
 }
 
-/* Анимация "дыхания" стрелки */
 @keyframes arrowFloat {
 
 	0%,
@@ -1041,7 +968,6 @@ body {
 	}
 }
 
-/* Убираем анимацию стрелки при наведении (чтобы не отвлекать) */
 .scroll-trigger-inner:hover .scroll-trigger-arrow {
 	animation: none;
 	transform: scale(1.1);
@@ -1050,10 +976,6 @@ body {
 .scroll-paper {
 	position: relative;
 }
-
-/* ============================================================
-   10.1 Крестик
-   ============================================================ */
 
 /* Кнопка закрытия свитка (крестик) */
 .scroll-close-btn {
@@ -1083,9 +1005,8 @@ body {
 	transform: scale(0.95);
 }
 
-
 /* ============================================================
-   11. НИЖНЯЯ НАВИГАЦИЯ ПО РАЗДЕЛАМ (Сад / ЗАГС / Дом / Видео)
+   12. НИЖНЯЯ НАВИГАЦИЯ ПО РАЗДЕЛАМ (Сад / ЗАГС / Дом / Видео)
    ============================================================ */
 
 .section-bottom-nav {
@@ -1093,12 +1014,10 @@ body {
 	align-items: center;
 	justify-content: center;
 	gap: 16px;
-	/* Увеличили отступ между домиком и табами */
 	padding: 48px 20px 32px;
 	position: relative;
 	z-index: 1;
 	max-width: 800px;
-	/* Сделали контейнер шире */
 	margin: 0 auto;
 }
 
@@ -1106,7 +1025,6 @@ body {
 .section-nav-home {
 	flex: 0 0 auto;
 	width: 56px;
-	/* Увеличили размер */
 	height: 56px;
 	border-radius: 50%;
 	display: flex;
@@ -1119,7 +1037,6 @@ body {
 	backdrop-filter: blur(12px);
 	-webkit-backdrop-filter: blur(12px);
 	font-size: 24px;
-	/* Увеличили иконку */
 	transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
 }
 
@@ -1149,13 +1066,11 @@ body {
 	align-items: center;
 	gap: 8px;
 	padding: 14px 24px;
-	/* Увеличили отступы */
 	border-radius: 100px;
 	text-decoration: none;
 	color: rgba(255, 255, 255, 0.55);
 	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 15px;
-	/* Увеличили шрифт */
 	font-weight: 500;
 	letter-spacing: 0.02em;
 	transition: color 0.25s ease, background 0.25s ease, transform 0.2s ease;
@@ -1176,7 +1091,6 @@ body {
 
 .section-nav-icon {
 	font-size: 18px;
-	/* Увеличили иконку */
 	line-height: 1;
 }
 
@@ -1185,7 +1099,7 @@ body {
 }
 
 /* ============================================================
-   12. ПОДВАЛ
+   13. ПОДВАЛ
    ============================================================ */
 
 .section-footer {
@@ -1297,7 +1211,7 @@ body {
 }
 
 /* ============================================================
-   13. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
+   14. ПЛАВНЫЕ ПЕРЕХОДЫ МЕЖДУ СТРАНИЦАМИ
    ============================================================ */
 
 #page-curtain {
@@ -1315,7 +1229,7 @@ body {
 }
 
 /* ============================================================
-   14. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
+   15. АДАПТИВНОСТЬ ПО БРЕЙКПОИНТАМ
    ============================================================ */
 
 /*
@@ -1348,12 +1262,6 @@ body {
 		display: none;
 	}
 
-	.photo-counter {
-		width: auto;
-		min-width: 0;
-		font-size: 10px;
-	}
-
 	.section-title {
 		font-size: 32px;
 		letter-spacing: 0.06em;
@@ -1372,14 +1280,47 @@ body {
 		gap: 6px;
 	}
 
-	/* Нижняя навигация: компактный режим для узких экранов */
+	/* Тумблер — уменьшаем */
+	.effects-toggle-wrapper {
+		width: auto;
+	}
+
+	.effects-toggle {
+		width: 36px;
+		height: 20px;
+	}
+
+	.effects-toggle-slider::before {
+		height: 12px;
+		width: 12px;
+		left: 3px;
+		bottom: 3px;
+	}
+
+	.effects-toggle input:checked+.effects-toggle-slider::before {
+		transform: translateX(16px);
+	}
+
+	/* Кнопка «Наверх» — уменьшаем */
+	.scroll-to-top {
+		bottom: 20px;
+		right: 20px;
+		width: 44px;
+		height: 44px;
+	}
+
+	.scroll-to-top svg {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* Нижняя навигация — компактный режим */
 	.section-bottom-nav {
 		padding: 24px 10px 16px;
 		gap: 8px;
 		max-width: 100%;
 	}
 
-	/* Кнопка "Домик" — уменьшаем */
 	.section-nav-home {
 		width: 36px;
 		height: 36px;
@@ -1387,14 +1328,12 @@ body {
 		border-radius: 50%;
 	}
 
-	/* Плашка с табами — уменьшаем отступы */
 	.section-nav-tabs {
 		gap: 2px;
 		padding: 4px;
 		border-radius: 100px;
 	}
 
-	/* Табы — уменьшаем текст и иконки */
 	.section-nav-tab {
 		padding: 8px 10px;
 		font-size: 11px;
@@ -1404,10 +1343,6 @@ body {
 
 	.section-nav-icon {
 		font-size: 12px;
-	}
-
-	.section-nav-label {
-		line-height: 1;
 	}
 
 	.bottom-nav-title {
@@ -1459,10 +1394,8 @@ body {
 		}
 	}
 
-	/* --- Адаптив новых элементов --- */
 	.gallery-section+.gallery-section {
 		margin-top: 16px;
-		/* Уменьшили отступ (было 30px) */
 		padding-top: 16px;
 	}
 
@@ -1523,18 +1456,11 @@ body {
 		font-size: 12px;
 	}
 
-	.photo-counter {
-		width: auto;
-		min-width: 0;
-		font-size: 11px;
-	}
-
 	.animated-btn {
 		padding: 11px 20px;
 		font-size: 13px;
 	}
 
-	/* Навигация: чуть крупнее, но ещё компактная */
 	.section-bottom-nav {
 		padding: 28px 12px 18px;
 		gap: 12px;
@@ -1569,7 +1495,6 @@ body {
 		font-size: 19px;
 	}
 
-	/* --- Адаптив новых элементов --- */
 	.gallery-load-more-wrapper {
 		padding: 24px 0 8px;
 	}
@@ -1600,10 +1525,6 @@ body {
 		width: 120px;
 	}
 
-	.photo-counter {
-		width: 120px;
-	}
-
 	.bottom-nav-title {
 		font-size: 16px;
 	}
@@ -1613,10 +1534,10 @@ body {
 	}
 }
 
-/* ============================================================
-   МОБИЛКА — убираем fixed, чтобы фон не прыгал
-   ============================================================ */
-
+/*
+ * ФИКС ФОНА ДЛЯ МОБИЛЬНЫХ (до 768px)
+ * Убираем position: fixed, чтобы фон не «прыгал» при скролле.
+ */
 @media (max-width: 768px) {
 	.page-bg {
 		position: absolute;
@@ -1653,10 +1574,6 @@ body {
 		width: 130px;
 	}
 
-	.photo-counter {
-		width: 130px;
-	}
-
 	.bottom-nav-title {
 		font-size: 18px;
 	}
@@ -1665,7 +1582,6 @@ body {
 		font-size: 23px;
 	}
 
-	/* Навигация на планшетах — стандартный размер */
 	.section-nav-home {
 		width: 52px;
 		height: 52px;
@@ -1698,10 +1614,6 @@ body {
 	}
 
 	.back-btn {
-		width: 140px;
-	}
-
-	.photo-counter {
 		width: 140px;
 	}
 
@@ -1755,7 +1667,6 @@ body {
 		font-size: 22px;
 	}
 
-	/* Увеличили подпись на фото */
 	.gallery-caption {
 		font-size: 16px;
 	}
@@ -1787,7 +1698,6 @@ body {
 		font-size: 24px;
 	}
 
-	/* Увеличили кнопку "Показать все" */
 	.gallery-load-more .bottom-nav-title {
 		font-size: 20px;
 	}

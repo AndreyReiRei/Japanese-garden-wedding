@@ -7,13 +7,13 @@
  *   Строит адаптивную сетку фотографий.
  *   При клике на фото — открывает полноэкранный слайдер (slider.js).
  *   Поддерживает ленивую подгрузку (кнопка "Показать все").
- *   Поддерживает адаптивные изображения (srcset: маленькие для сетки, большие для лайтбокса).
+ *   Поддерживает адаптивные изображения (thumb для сетки, full для слайдера).
+ *   Управляет кнопкой «Наверх» (плавный скролл).
  * 
  * ИСПОЛЬЗОВАНИЕ:
  *   initGallery({
  *       section: 'garden',           // Идентификатор раздела (для темы слайдера)
  *       gridId: 'galleryGridA',      // ID контейнера сетки (по умолчанию 'galleryGrid')
- *       counterId: 'photoCounterA',  // ID счетчика (по умолчанию 'photoCounter')
  *       initialCount: 15,            // Сколько фото показать сразу (0 = все)
  *       photos: [                    // Массив фото
  *           { 
@@ -41,9 +41,8 @@ function initGallery( config ) {
 	const {
 		section,        // 'garden' | 'zags' | 'home'
 		photos,         // Массив объектов фото
-		gridId = 'galleryGrid',       // ID сетки
-		counterId = 'photoCounter',   // ID счетчика
-		initialCount = 15             // Сколько показывать сразу
+		gridId = 'galleryGrid', // ID сетки
+		initialCount = 15       // Сколько показывать сразу
 	} = config;
 
 	// Защита: если нет секции или фото — выходим
@@ -57,7 +56,6 @@ function initGallery( config ) {
 	// ============================================================
 
 	const galleryGrid = document.getElementById( gridId );
-	const photoCounter = document.getElementById( counterId );
 
 	// Если сетки нет на странице — выходим
 	if ( !galleryGrid ) {
@@ -75,17 +73,7 @@ function initGallery( config ) {
 	let isRenderedAll = showAll;
 
 	// ============================================================
-	// 3. УТИЛИТА: ОБНОВЛЕНИЕ СЧЁТЧИКА ФОТО
-	// ============================================================
-
-	function updateCounter() {
-		if ( photoCounter ) {
-			photoCounter.textContent = `${photos.length} фото`;
-		}
-	}
-
-	// ============================================================
-	// 4. ФАБРИКА: СОЗДАНИЕ ОДНОГО ЭЛЕМЕНТА СЕТКИ
+	// 3. ФАБРИКА: СОЗДАНИЕ ОДНОГО ЭЛЕМЕНТА СЕТКИ
 	// ============================================================
 
 	function createPhotoItem( photo, index ) {
@@ -99,7 +87,7 @@ function initGallery( config ) {
 
 		// Задержка анимации (каскадный эффект).
 		// Ограничиваем задержку для больших списков, чтобы не ждать долго.
-		item.style.transitionDelay = `${( index % 15 ) * 0.04}s`;
+		item.style.transitionDelay = `${( index % 5 ) * 0.08}s`;
 
 		// --- Изображение ---
 		const img = document.createElement( 'img' );
@@ -111,10 +99,6 @@ function initGallery( config ) {
 
 		// Для сетки всегда используем превью (srcThumb)
 		img.src = srcThumb;
-
-		// Если хотите, чтобы браузер на Retina-экранах мог подгрузить более качественную версию,
-		// можно добавить srcset. Но для экономии трафика лучше оставить только thumb.
-		// img.srcset = `${srcThumb} 600w, ${srcFull} 1600w`; 
 
 		img.alt = photo.alt || '';
 		img.loading = 'lazy';
@@ -158,7 +142,7 @@ function initGallery( config ) {
 	}
 
 	// ============================================================
-	// 5. ПОСТРОЕНИЕ ВСЕЙ СЕТКИ
+	// 4. ПОСТРОЕНИЕ ВСЕЙ СЕТКИ
 	// ============================================================
 
 	// Храним обработчики на самом элементе сетки, чтобы не было утечек памяти
@@ -276,8 +260,6 @@ function initGallery( config ) {
 		// Рисуем первую партию
 		appendPhotos( visiblePhotos, 0 );
 
-		updateCounter();
-
 		// Дополнительный пересчет через requestAnimationFrame
 		requestAnimationFrame( () => {
 			requestAnimationFrame( recalcAllSpans );
@@ -292,7 +274,7 @@ function initGallery( config ) {
 	}
 
 	// ============================================================
-	// 6. ЛОГИКА КНОПКИ "ПОКАЗАТЬ ВСЕ"
+	// 5. ЛОГИКА КНОПКИ "ПОКАЗАТЬ ВСЕ"
 	// ============================================================
 
 	function setupLoadMoreButton() {
@@ -326,11 +308,40 @@ function initGallery( config ) {
 	}
 
 	// ============================================================
+	// 6. КНОПКА «НАВЕРХ» (SCROLL TO TOP)
+	// ============================================================
+
+	function setupScrollToTop() {
+		const btn = document.getElementById( 'scrollToTop' );
+		if ( !btn ) return;
+
+		// Показ/скрытие при скролле
+		const toggleVisibility = () => {
+			if ( window.scrollY > 400 ) {
+				btn.classList.add( 'visible' );
+			} else {
+				btn.classList.remove( 'visible' );
+			}
+		};
+
+		window.addEventListener( 'scroll', toggleVisibility, { passive: true } );
+
+		// Плавный скролл наверх
+		btn.addEventListener( 'click', () => {
+			window.scrollTo( {
+				top: 0,
+				behavior: 'smooth'
+			} );
+		} );
+	}
+
+	// ============================================================
 	// 7. ЗАПУСК
 	// ============================================================
 
 	buildGrid();
 	setupLoadMoreButton();
+	setupScrollToTop();
 
 	console.log(
 		`📸 Галерея «${section}» [${gridId}] готова — ` +
