@@ -746,27 +746,35 @@ body {
 	opacity: 1;
 }
 
-/* Пока фото грузится — ячейка скрыта, без «пустого» квадрата */
-.gallery-item.is-loading {
-	opacity: 0;
-	pointer-events: none;
-	min-height: 0;
-}
-
-/* После load (ставит gallery.js) */
-.gallery-item.is-ready.visible {
-	opacity: 1;
-	transform: translateY(0) translateZ(0);
-}
+/* Делаем плавное появление с фильтром при скролле */
 
 .gallery-item.is-loading img {
 	opacity: 0;
 }
 
 .gallery-item.is-ready img {
-	opacity: 1;
-	transition: opacity 0.35s ease;
+	animation: galleryBlurUp 1s ease both;
 }
+
+@keyframes galleryBlurUp {
+	0% {
+		opacity: 0;
+		filter: blur(12px) brightness(0.85);
+	}
+
+	100% {
+		opacity: 1;
+		filter: blur(0) brightness(0.85);
+	}
+}
+
+/* После анимации hover снова может менять filter */
+.gallery-item.is-ready:hover img {
+	filter: brightness(1.02);
+	transform: scale(1.18) translateZ(0);
+}
+
+
 
 /* Рамка фото */
 .gallery-item::after {
