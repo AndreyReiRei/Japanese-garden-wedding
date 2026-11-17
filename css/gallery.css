@@ -746,6 +746,28 @@ body {
 	opacity: 1;
 }
 
+/* Пока фото грузится — ячейка скрыта, без «пустого» квадрата */
+.gallery-item.is-loading {
+	opacity: 0;
+	pointer-events: none;
+	min-height: 0;
+}
+
+/* После load (ставит gallery.js) */
+.gallery-item.is-ready.visible {
+	opacity: 1;
+	transform: translateY(0) translateZ(0);
+}
+
+.gallery-item.is-loading img {
+	opacity: 0;
+}
+
+.gallery-item.is-ready img {
+	opacity: 1;
+	transition: opacity 0.35s ease;
+}
+
 /* Рамка фото */
 .gallery-item::after {
 	content: '';

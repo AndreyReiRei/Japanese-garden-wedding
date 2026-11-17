@@ -480,6 +480,8 @@ function openSlider( config ) {
 		slidesPerView: 'auto',
 		freeMode: true,
 		watchSlidesProgress: true,
+		slideToClickedSlide: true,
+		initialSlide: startIndex,
 		lazy: {
 			loadPrevNext: true,
 			loadPrevNextAmount: 5,

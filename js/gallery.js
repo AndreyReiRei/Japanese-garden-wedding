@@ -77,43 +77,47 @@ function initGallery( config ) {
 	// ============================================================
 
 	function createPhotoItem( photo, index ) {
-		// --- Контейнер ---
+		// --- Контейнер (скрыт, пока фото не загрузилось) ---
 		const item = document.createElement( 'div' );
-		item.className = 'gallery-item';
+		item.className = 'gallery-item is-loading';
 
 		if ( photo.span ) {
-			item.classList.add( `span-${photo.span}` );
+			item.classList.add( 'span-' + photo.span );
 		}
 
-		// Задержка анимации (каскадный эффект).
-		// Ограничиваем задержку для больших списков, чтобы не ждать долго.
-		item.style.transitionDelay = `${( index % 10 ) * 0.08}s`;
+		// Задержка анимации (каскад), не больше 10 шагов
+		item.style.transitionDelay = ( ( index % 10 ) * 0.08 ) + 's';
 
 		// --- Изображение ---
 		const img = document.createElement( 'img' );
-
-		// Логика адаптивных изображений:
-		// Если переданы srcSmall и srcFull (или src), используем их.
 		const srcThumb = photo.srcSmall || photo.src;
-		const srcFull = photo.srcFull || photo.src;
-
-		// Для сетки всегда используем превью (srcThumb)
-		img.src = srcThumb;
 
 		img.alt = photo.alt || '';
 		img.loading = 'lazy';
 		img.decoding = 'async';
 
-		// Заглушка, если фото не загрузилось
-		img.onerror = function () {
-			this.src = 'data:image/svg+xml,' +
-				'%3Csvg xmlns=\'http://www.w3.org/2000/svg\' ' +
-				'width=\'400\' height=\'300\'%3E' +
-				'%3Crect fill=\'%231a1a1a\' width=\'400\' height=\'300\'/%3E' +
-				'%3Ctext fill=\'%23555\' x=\'50%25\' y=\'50%25\' ' +
-				'text-anchor=\'middle\' dy=\'.3em\' font-size=\'14\'%3E' +
-				'Фото не найдено%3C/text%3E%3C/svg%3E';
+		// Показать ячейку только после успешной загрузки
+		const reveal = function () {
+			item.classList.remove( 'is-loading' );
+			item.classList.add( 'is-ready', 'visible' );
+			setItemSpan( item );
 		};
+
+		img.onload = reveal;
+
+		// Битое фото — убираем ячейку, без пустого квадрата
+		img.onerror = function () {
+			if ( item.parentNode ) {
+				item.parentNode.removeChild( item );
+			}
+		};
+
+		// src в конце, чтобы не пропустить onload из кэша
+		img.src = srcThumb;
+
+		if ( img.complete && img.naturalWidth > 0 ) {
+			reveal();
+		}
 
 		item.appendChild( img );
 
@@ -126,12 +130,12 @@ function initGallery( config ) {
 		}
 
 		// --- Клик: открытие слайдера ---
-		item.addEventListener( 'click', () => {
+		item.addEventListener( 'click', function () {
 			if ( typeof openSlider === 'function' ) {
 				openSlider( {
-					photos: photos,           // Передаем ВСЕ фото (слайдер сам возьмет srcFull для показа)
-					startIndex: index,        // С какого начать
-					theme: section            // Тема для цветов
+					photos: photos,
+					startIndex: index,
+					theme: section
 				} );
 			} else {
 				console.warn( 'openSlider не найден. Подключён ли slider.js?' );
@@ -176,7 +180,7 @@ function initGallery( config ) {
 
 		const rowSpan = Math.max( 1, Math.ceil( ( imgHeight + gap ) / ( 1 + gap ) ) );
 
-		item.style.gridRowEnd = `span ${rowSpan}`;
+		item.style.gridRowEnd = 'span ' + rowSpan;
 	}
 
 	/**
@@ -184,7 +188,9 @@ function initGallery( config ) {
 	 */
 	function recalcAllSpans() {
 		const items = galleryGrid.querySelectorAll( '.gallery-item' );
-		items.forEach( item => setItemSpan( item ) );
+		items.forEach( function ( item ) {
+			setItemSpan( item );
+		} );
 	}
 
 	/**
@@ -200,7 +206,7 @@ function initGallery( config ) {
 			return;
 		}
 
-		items.forEach( item => {
+		items.forEach( function ( item ) {
 			const img = item.querySelector( 'img' );
 			if ( !img ) {
 				loadedCount++;
@@ -213,14 +219,14 @@ function initGallery( config ) {
 				loadedCount++;
 				if ( loadedCount === totalImages && callback ) callback();
 			} else {
-				img.addEventListener( 'load', () => {
+				img.addEventListener( 'load', function () {
 					setItemSpan( item );
 					loadedCount++;
 					if ( loadedCount === totalImages && callback ) callback();
 				}, { once: true } );
 
-				img.addEventListener( 'error', () => {
-					item.style.gridRowEnd = 'span 300';
+				img.addEventListener( 'error', function () {
+					// createPhotoItem сам удаляет битый item
 					loadedCount++;
 					if ( loadedCount === totalImages && callback ) callback();
 				}, { once: true } );
@@ -229,29 +235,21 @@ function initGallery( config ) {
 	}
 
 	/**
-	 * Добавляет элементы в сетку и запускает анимацию.
+	 * Добавляет элементы в сетку.
+	 * Класс visible ставит createPhotoItem после load — здесь не трогаем opacity.
 	 */
-	function appendPhotos( photosToAdd, startIndexOffset = 0 ) {
+	function appendPhotos( photosToAdd, startIndexOffset ) {
+		if ( startIndexOffset === undefined ) startIndexOffset = 0;
+
 		const newItems = [];
 
-		photosToAdd.forEach( ( photo, index ) => {
+		photosToAdd.forEach( function ( photo, index ) {
 			const item = createPhotoItem( photo, startIndexOffset + index );
 			galleryGrid.appendChild( item );
 			newItems.push( item );
 		} );
 
-		// Анимация появления:
-		// Двойной requestAnimationFrame позволяет браузеру отрисовать
-		// элементы с opacity: 0, и только потом добавить visible.
-		// Это гарантирует плавную анимацию даже для только что созданных элементов.
-		requestAnimationFrame( () => {
-			requestAnimationFrame( () => {
-				newItems.forEach( item => item.classList.add( 'visible' ) );
-			} );
-		} );
-
-		// Считаем высоты
-		watchImages( newItems, () => {
+		watchImages( newItems, function () {
 			recalcAllSpans();
 		} );
 
@@ -265,13 +263,13 @@ function initGallery( config ) {
 		// Рисуем первую партию
 		appendPhotos( visiblePhotos, 0 );
 
-		// Дополнительный пересчет через requestAnimationFrame
-		requestAnimationFrame( () => {
+		// Дополнительный пересчет
+		requestAnimationFrame( function () {
 			requestAnimationFrame( recalcAllSpans );
 		} );
 
 		// Обработчик ресайза
-		galleryGrid._resizeHandler = () => {
+		galleryGrid._resizeHandler = function () {
 			clearTimeout( galleryGrid._resizeTimer );
 			galleryGrid._resizeTimer = setTimeout( recalcAllSpans, 150 );
 		};
